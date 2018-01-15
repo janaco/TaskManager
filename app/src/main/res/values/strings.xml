@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">MyTaskManager</string>
+
+    <string name="create_task">Create task</string>
+    <string name="enter_task">Enter task</string>
+    <string name="comment_task">Comment task</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="empty_field">Please, fill out this field.</string>
+
+</resources>
