@@ -27,7 +27,7 @@ public class ListActivity extends AppCompatActivity {
     Toolbar toolbar;
 
     private TasksAdapter mTasksAdapter;
-    private List<Task> mTasks;
+    private ArrayList<Task> mTasks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +42,19 @@ public class ListActivity extends AppCompatActivity {
         mTasksAdapter = new TasksAdapter(getApplicationContext(), mTasks);
         listTasks.setAdapter(mTasksAdapter);
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("tasks", mTasks);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        ArrayList<Task> tasksList = savedInstanceState.getParcelableArrayList("tasks");
+        mTasks.addAll(tasksList);
     }
 
     @OnClick(R.id.btn_create_task)
