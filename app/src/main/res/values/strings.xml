@@ -8,5 +8,7 @@
     <string name="cancel">Cancel</string>
     <string name="empty_field">Please, fill out this field.</string>
     <string name="backup">Backup</string>
+    <string name="create_backup">Create backup on Google Drive</string>
+    <string name="restore_from_backup">Restore from backup</string>
 
 </resources>

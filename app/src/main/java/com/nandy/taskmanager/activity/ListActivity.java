@@ -66,7 +66,7 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
         switch (item.getItemId()) {
 
             case R.id.action_backup:
-                startActivity(new Intent(getApplicationContext(), BackupActivity.class));
+                startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
                 return true;
 
             default:

@@ -25,8 +25,6 @@ import java.io.OutputStream;
 
 public class RestoreFromBackupModel extends BackupModel {
 
-    private static final String TAG = "CreateFileInAppFolder";
-
     private Context mContext;
     private DriveResourceClient mDriveResourceClient;
     private ProgressListener mProgressListener;
