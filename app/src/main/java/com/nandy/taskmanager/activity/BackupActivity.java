@@ -43,6 +43,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.TasksDao;
+import com.nandy.taskmanager.mvp.model.CreateBackupModel;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -66,8 +67,11 @@ public class BackupActivity extends DRiveActivity {
 
     private ExecutorService mExecutorService;
 
+    private CreateBackupModel mCreateBackupModel;
+
     @Override
     protected void onDriveClientReady() {
+        mCreateBackupModel.setDriveResourceClient(getDriveResourceClient());
     }
 
     @Override
@@ -79,10 +83,12 @@ public class BackupActivity extends DRiveActivity {
         mProgressBar.setMax(100);
         mExecutorService = Executors.newSingleThreadExecutor();
 
+        mCreateBackupModel = new CreateBackupModel(getApplicationContext());
+
     }
 
     public void onClickCreateFile(View view) {
-        checkForExistingBackup();
+        mCreateBackupModel.createBackup();
     }
 
     public void onClickOpenFile(View view) {
@@ -120,66 +126,6 @@ public class BackupActivity extends DRiveActivity {
                 });
     }
 
-    private void checkForExistingBackup() {
-
-        Query query = new Query.Builder()
-                .addFilter(Filters.and(Filters.eq(SearchableField.TITLE, "tasks.db"), Filters.eq(SearchableField.MIME_TYPE, "application/x-sqlite3")))
-                .build();
-        Task<MetadataBuffer> queryTask = getDriveResourceClient().query(query);
-        queryTask
-                .addOnSuccessListener(this,
-                        new OnSuccessListener<MetadataBuffer>() {
-                            @Override
-                            public void onSuccess(MetadataBuffer metadataBuffer) {
-                                // Handle results...
-                                // [START_EXCLUDE]
-                                // [END_EXCLUDE]
-
-                                Log.d("CONTENT_", "count " + metadataBuffer.getCount());
-                                if (metadataBuffer.getCount() > 0) {
-
-                                    for (int i = 0; i < metadataBuffer.getCount(); i++) {
-                                        Metadata metadata = metadataBuffer.get(i);
-                                        DriveFile driveFile = metadata.getDriveId().asDriveFile();
-                                        Log.d("CONTENT_", "delete " + metadata.getTitle() + ", " + metadata.getMimeType() + ", " + metadata.getDriveId().encodeToString());
-                                        deleteFile(driveFile);
-
-                                    }
-                                }
-                                createFileInAppFolder();
-
-                            }
-                        })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "Error retrieving files", e);
-                        finish();
-                    }
-                });
-    }
-
-
-    private void deleteFile(DriveFile file) {
-
-        getDriveResourceClient()
-                .delete(file)
-                .addOnSuccessListener(this,
-                        new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                showMessage("DELETED");
-                                finish();
-                            }
-                        })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                        showMessage("Unable to delete file");
-                    }
-                });
-    }
 
     @Override
     protected void onDestroy() {
@@ -278,64 +224,5 @@ public class BackupActivity extends DRiveActivity {
             }
         }
 
-    }
-
-    private void createFileInAppFolder() {
-        final Task<DriveFolder> appFolderTask = getDriveResourceClient().getRootFolder();
-        final Task<DriveContents> createContentsTask = getDriveResourceClient().createContents();
-        Tasks.whenAll(appFolderTask, createContentsTask)
-                .continueWithTask(new Continuation<Void, Task<DriveFile>>() {
-                    @Override
-                    public Task<DriveFile> then(@NonNull Task<Void> task) throws Exception {
-                        DriveFolder parent = appFolderTask.getResult();
-                        DriveContents contents = createContentsTask.getResult();
-                        OutputStream outputStream = contents.getOutputStream();
-
-                        FileInputStream inputStream = null;
-                        try {
-                            inputStream = new FileInputStream(new File(getDatabasePath(AppDatabase.DB_NAME).getAbsolutePath()));
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-
-                        byte[] buf = new byte[1024];
-                        int bytesRead;
-                        try {
-                            if (inputStream != null) {
-                                while ((bytesRead = inputStream.read(buf)) > 0) {
-                                    outputStream.write(buf, 0, bytesRead);
-                                }
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-
-                        MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                                .setTitle("tasks.db")
-                                .setMimeType("application/x-sqlite3")
-                                .build();
-
-
-                        return getDriveResourceClient().createFile(parent, changeSet, contents);
-                    }
-                })
-                .addOnSuccessListener(this,
-                        new OnSuccessListener<DriveFile>() {
-                            @Override
-                            public void onSuccess(DriveFile driveFile) {
-                                showMessage("File created: " +
-                                        driveFile.getDriveId().encodeToString());
-                                finish();
-                            }
-                        })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "Unable to create file", e);
-                        showMessage("Failed to create file");
-                        finish();
-                    }
-                });
     }
 }
