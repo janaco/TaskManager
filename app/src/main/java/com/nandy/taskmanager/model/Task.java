@@ -1,25 +1,35 @@
 package com.nandy.taskmanager.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
+@Entity(tableName = "tasks")
 public class Task implements Parcelable{
 
+    @PrimaryKey
+    @NonNull
+    private String id;
     private String title;
     private String comment;
 
     public Task(String title, String comment) {
         this.title = title;
         this.comment = comment;
+        this.id = String.valueOf(title.hashCode()).concat(String.valueOf(comment.hashCode()));
     }
 
     protected Task(Parcel in) {
+        id = in.readString();
         title = in.readString();
         comment = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
         dest.writeString(title);
         dest.writeString(comment);
     }
@@ -55,6 +65,14 @@ public class Task implements Parcelable{
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override
