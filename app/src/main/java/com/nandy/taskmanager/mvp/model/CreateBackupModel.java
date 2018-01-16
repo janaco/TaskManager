@@ -7,9 +7,6 @@ import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.MetadataChangeSet;
-import com.google.android.gms.drive.query.Filters;
-import com.google.android.gms.drive.query.Query;
-import com.google.android.gms.drive.query.SearchableField;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.nandy.taskmanager.db.AppDatabase;
@@ -24,13 +21,9 @@ import java.io.OutputStream;
  * Created by yana on 16.01.18.
  */
 
-public class CreateBackupModel {
+public class CreateBackupModel extends BackupModel{
 
     private Context mContext;
-
-    private static final String TAG = "CreateFileInAppFolder";
-
-
     private DriveResourceClient mDriveResourceClient;
 
     public CreateBackupModel(Context context) {
@@ -71,8 +64,8 @@ public class CreateBackupModel {
                     writeDatabaseToFile(outputStream);
 
                     MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                            .setTitle("tasks.db")
-                            .setMimeType("application/x-sqlite3")
+                            .setTitle(BACKUP_FILE_NAME)
+                            .setMimeType(BACKUP_MIME_TYPE)
                             .build();
 
 
@@ -85,14 +78,7 @@ public class CreateBackupModel {
                 .addOnFailureListener(Throwable::printStackTrace);
     }
 
-    private Query buildBackupFilesQuery() {
-        return new Query.Builder()
-                .addFilter(
-                        Filters.and(
-                                Filters.eq(SearchableField.TITLE, "tasks.db"),
-                                Filters.eq(SearchableField.MIME_TYPE, "application/x-sqlite3")))
-                .build();
-    }
+
 
 
     private void deleteFile(DriveFile file) {
