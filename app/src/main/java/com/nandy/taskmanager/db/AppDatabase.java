@@ -15,10 +15,12 @@ import com.nandy.taskmanager.model.Task;
 @Database(entities = {Task.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static AppDatabase getInstance(Context context){
-        return Room.databaseBuilder(context,
-                AppDatabase.class, "taskmanager")
-                .allowMainThreadQueries().build();
+    public static final String DB_NAME = "taskmanager";
+
+    public static AppDatabase getInstance(Context context) {
+        return Room.databaseBuilder(context, AppDatabase.class, DB_NAME)
+                .allowMainThreadQueries()
+                .build();
     }
 
     public abstract TasksDao tasksDao();

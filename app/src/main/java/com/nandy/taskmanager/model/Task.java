@@ -1,6 +1,7 @@
 package com.nandy.taskmanager.model;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -21,6 +22,14 @@ public class Task implements Parcelable{
         this.id = String.valueOf(title.hashCode()).concat(String.valueOf(comment.hashCode()));
     }
 
+    @Ignore
+    public Task(String id, String title, String comment){
+        this.id = id;
+        this.title = title;
+        this.comment = comment;
+    }
+
+    @Ignore
     protected Task(Parcel in) {
         id = in.readString();
         title = in.readString();

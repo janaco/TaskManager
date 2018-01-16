@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp"
+    android:layout_height="match_parent"
+    tools:context="com.nandy.taskmanager.activity.BackupActivity">
+
+    <Button
+    android:id="@+id/createfile"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Create a file on Google Drive"
+    android:onClick="onClickCreateFile"/>
+
+    <Button
+    android:id="@+id/openfile"
+    android:layout_below="@+id/createfile"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Open file from Google Drive"
+    android:onClick="onClickOpenFile"/>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

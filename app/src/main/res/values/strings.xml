@@ -7,5 +7,6 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="empty_field">Please, fill out this field.</string>
+    <string name="backup">Backup</string>
 
 </resources>
