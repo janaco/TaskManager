@@ -1,6 +1,7 @@
 package com.nandy.taskmanager.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class TaskActivity extends AppCompatActivity implements CreateTaskView {
+
+    private final static int REQUEST_CODE_LOCATION = 52;
 
     @BindView(R.id.input_name)
     EditText inputTitle;
@@ -80,6 +83,11 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
     void onCancelBtnClick() {
         setResult(Activity.RESULT_CANCELED);
         finish();
+    }
+
+    @OnClick(R.id.btn_set_location)
+    void onSetLocationButtonClick(){
+        startActivityForResult(new Intent(getApplicationContext(), MapActivity.class), REQUEST_CODE_LOCATION);
     }
 
     @Override

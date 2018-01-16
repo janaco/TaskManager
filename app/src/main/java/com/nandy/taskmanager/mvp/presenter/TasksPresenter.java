@@ -11,7 +11,7 @@ import com.nandy.taskmanager.mvp.view.TasksListView;
  * Created by yana on 16.01.18.
  */
 
-public class TasksPresenter implements BasePresenter {
+public class TasksPresenter extends BasePresenter {
 
     private TasksListView mView;
     private TasksListModel mTasksListModel;
@@ -23,6 +23,11 @@ public class TasksPresenter implements BasePresenter {
     @Override
     public void start() {
         mView.setAdapter(mTasksListModel.getAdapter());
+    }
+
+    @Override
+    public void stop() {
+
     }
 
     @Override

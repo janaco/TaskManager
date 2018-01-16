@@ -7,40 +7,49 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.maps.model.LatLng;
+
 @Entity(tableName = "tasks")
 public class Task implements Parcelable{
 
     @PrimaryKey
     @NonNull
-    private String id;
-    private String title;
-    private String comment;
+    private String mId;
+    private String mTitle;
+    private String mComment;
+    
+    private double mLatitude;
+    private double mLongitude;
 
     public Task(String title, String comment) {
-        this.title = title;
-        this.comment = comment;
-        this.id = String.valueOf(title.hashCode()).concat(String.valueOf(comment.hashCode()));
+        mTitle = title;
+        mComment = comment;
+        mId = String.valueOf(title.hashCode()).concat(String.valueOf(comment.hashCode()));
     }
 
     @Ignore
     public Task(String id, String title, String comment){
-        this.id = id;
-        this.title = title;
-        this.comment = comment;
+        mId = id;
+        mTitle = title;
+        mComment = comment;
     }
 
-    @Ignore
+
     protected Task(Parcel in) {
-        id = in.readString();
-        title = in.readString();
-        comment = in.readString();
+        mId = in.readString();
+        mTitle = in.readString();
+        mComment = in.readString();
+        mLatitude = in.readDouble();
+        mLongitude = in.readDouble();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(title);
-        dest.writeString(comment);
+        dest.writeString(mId);
+        dest.writeString(mTitle);
+        dest.writeString(mComment);
+        dest.writeDouble(mLatitude);
+        dest.writeDouble(mLongitude);
     }
 
     @Override
@@ -60,35 +69,60 @@ public class Task implements Parcelable{
         }
     };
 
+    public void setLocation(@NonNull LatLng location) {
+        mLatitude = location.latitude;
+        mLongitude = location.longitude;
+    }
+
+    public LatLng getLocation() {
+        return new LatLng(mLatitude, mLongitude);
+    }
+
+    public double getLatitude() {
+        return mLatitude;
+    }
+
+    public void setLatitude(double mLatitude) {
+        this.mLatitude = mLatitude;
+    }
+
+    public double getLongitude() {
+        return mLongitude;
+    }
+
+    public void setLongitude(double mLongitude) {
+        this.mLongitude = mLongitude;
+    }
+
     public String getTitle() {
-        return title;
+        return mTitle;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        mTitle = title;
     }
 
     public String getComment() {
-        return comment;
+        return mComment;
     }
 
     public void setComment(String comment) {
-        this.comment = comment;
+        mComment = comment;
     }
 
     public String getId() {
-        return id;
+        return mId;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.mId = id;
     }
 
     @Override
     public String toString() {
         return "Task{" +
-                "title='" + title + '\'' +
-                ", comment='" + comment + '\'' +
+                "title='" + mTitle + '\'' +
+                ", comment='" + mComment + '\'' +
                 '}';
     }
 }

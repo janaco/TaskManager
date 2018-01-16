@@ -21,7 +21,7 @@ import butterknife.OnClick;
 public class SettingsActivity extends AppCompatActivity implements SettingsView{
 
     @BindView(R.id.progressBar)
-    private ProgressBar mProgressBar;
+    ProgressBar mProgressBar;
 
     private SettingsPresenter mPresenter;
 

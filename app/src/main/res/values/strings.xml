@@ -10,5 +10,8 @@
     <string name="backup">Backup</string>
     <string name="create_backup">Create backup on Google Drive</string>
     <string name="restore_from_backup">Restore from backup</string>
+    <string name="title_activity_map">Map</string>
+    <string name="set_location">Set location</string>
+    <string name="location_not_specified">Location isn\'t specified.</string>
 
 </resources>
