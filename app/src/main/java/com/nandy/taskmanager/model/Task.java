@@ -1,5 +1,6 @@
 package com.nandy.taskmanager.model;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
@@ -9,44 +10,63 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Date;
+
 @Entity(tableName = "tasks")
 public class Task implements Parcelable{
 
     @PrimaryKey
     @NonNull
+    @ColumnInfo(name = "id")
     private String mId;
+    @ColumnInfo(name = "title")
     private String mTitle;
-    private String mComment;
-    
+    @ColumnInfo(name = "description")
+    private String mDescription;
+    @ColumnInfo(name = "image")
+    private String mImage;
+
     private LatLng mLocation;
 
-    public Task(String title, String comment) {
+    @ColumnInfo(name = "date_start")
+    private Date mStartDate;
+    @ColumnInfo(name = "date_end")
+    private Date mEndDate;
+
+
+    public Task(String title, String description) {
         mTitle = title;
-        mComment = comment;
-        mId = String.valueOf(title.hashCode()).concat(String.valueOf(comment.hashCode()));
+        mDescription = description;
+        mId = String.valueOf(title.hashCode()).concat(String.valueOf(description.hashCode()));
     }
 
     @Ignore
-    public Task(String id, String title, String comment){
+    public Task(@NonNull String id, String title, String description){
         mId = id;
         mTitle = title;
-        mComment = comment;
+        mDescription = description;
     }
 
-
+    @Ignore
     protected Task(Parcel in) {
         mId = in.readString();
         mTitle = in.readString();
-        mComment = in.readString();
+        mDescription = in.readString();
+        mImage = in.readString();
         mLocation = in.readParcelable(LatLng.class.getClassLoader());
+        mStartDate = (Date) in.readSerializable();
+        mEndDate = (Date) in.readSerializable();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mId);
         dest.writeString(mTitle);
-        dest.writeString(mComment);
+        dest.writeString(mDescription);
+        dest.writeString(mImage);
         dest.writeParcelable(mLocation, flags);
+        dest.writeSerializable(mStartDate);
+        dest.writeSerializable(mEndDate);
     }
 
     @Override
@@ -82,12 +102,12 @@ public class Task implements Parcelable{
         mTitle = title;
     }
 
-    public String getComment() {
-        return mComment;
+    public String getDescription() {
+        return mDescription;
     }
 
-    public void setComment(String comment) {
-        mComment = comment;
+    public void setDescription(String mDescription) {
+        this.mDescription = mDescription;
     }
 
     public String getId() {
@@ -98,11 +118,35 @@ public class Task implements Parcelable{
         this.mId = id;
     }
 
+    public String getImage() {
+        return mImage;
+    }
+
+    public void setImage(String mImage) {
+        this.mImage = mImage;
+    }
+
+    public Date getStartDate() {
+        return mStartDate;
+    }
+
+    public void setStartDate(Date mStartDate) {
+        this.mStartDate = mStartDate;
+    }
+
+    public Date getEndDate() {
+        return mEndDate;
+    }
+
+    public void setEndDate(Date mEndDate) {
+        this.mEndDate = mEndDate;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
                 "title='" + mTitle + '\'' +
-                ", comment='" + mComment + '\'' +
+                ", comment='" + mDescription + '\'' +
                 '}';
     }
 }

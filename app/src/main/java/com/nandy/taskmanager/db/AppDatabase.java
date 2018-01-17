@@ -14,7 +14,7 @@ import com.nandy.taskmanager.model.Task;
  */
 
 @Database(entities = {Task.class}, version = 1)
-@TypeConverters(LocationTypeConverter.class)
+@TypeConverters({LocationTypeConverter.class, DateTypeConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 
     public static final String DB_NAME = "taskmanager";

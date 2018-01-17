@@ -42,7 +42,7 @@ public class TasksAdapter extends ArrayAdapter<Task> {
         Task task = getItem(position);
         if (task != null) {
             viewHolder.setTitle(task.getTitle());
-            viewHolder.setComment(task.getComment());
+            viewHolder.setComment(task.getDescription());
         }
 
 
