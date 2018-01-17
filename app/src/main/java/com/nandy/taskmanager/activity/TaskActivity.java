@@ -17,6 +17,7 @@ import android.widget.TimePicker;
 
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
+import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
 import com.nandy.taskmanager.mvp.presenter.CreateTaskPresenter;
 import com.nandy.taskmanager.mvp.view.CreateTaskView;
@@ -66,6 +67,7 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
         mPresener = new CreateTaskPresenter(this);
         mPresener.setCreateTaskMode(new CreateTaskModel(getApplicationContext()));
         mPresener.setValidationModel(new ValidationModel());
+        mPresener.setDateFormatModel(new DateFormatModel());
     }
 
     @OnClick(R.id.txt_location)
@@ -75,67 +77,34 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
 
     @OnClick(R.id.txt_start_date)
     void onSetStartDateButtonClick() {
-        showDatePickerDialog();
-
-    }
-
-    private void showDatePickerDialog() {
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this
-                , new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                showTimePickerDialog();
-            }
-        }, year, month, day);
-        datePickerDialog.setTitle(R.string.set_start_date);
-        datePickerDialog.show();
-    }
-
-    private void showTimePickerDialog() {
-        final Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int minute = c.get(Calendar.MINUTE);
-
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-
-            }
-        }, hour, minute, true);
-        timePickerDialog.setTitle(R.string.set_start_date);
-        timePickerDialog.show();
+        mPresener.setStartDate();
     }
 
     @OnClick(R.id.txt_end_date)
     void onSetEndDateButtonClick() {
-
+        mPresener.setEndDate();
     }
 
     @OnClick(R.id.btn_microphone)
     void onVoiceInputButtonClick() {
-        //TODO: voice input
+        mPresener.enableVoiceInput();
     }
 
     @OnClick(R.id.btn_clear_start_date)
     void onClearStartDateBtnClick() {
-        mStartDateTextView.setText(R.string.set_start_time);
+        mPresener.clearStartDate();
     }
 
 
     @OnClick(R.id.btn_clear_end_date)
     void onClearEndDateButtonClick() {
-        mEndDateTextView.setText(R.string.set_end_time);
+        mPresener.clearEndDate();
     }
 
 
     @OnClick(R.id.btn_clear_start_date)
     void onClearLocationButtonClick() {
-        mLocationTextView.setText(R.string.set_location);
+        mPresener.clearLocation();
     }
 
     @OnClick(R.id.image_task)
@@ -192,4 +161,39 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
     }
 
 
+    @Override
+    public void showDatePickerDialog(DatePickerDialog.OnDateSetListener onDateSetListener, int year, int month, int day) {
+        new DatePickerDialog(this, onDateSetListener, year, month, day).show();
+    }
+
+    @Override
+    public void showTimePickerDialog(TimePickerDialog.OnTimeSetListener onTimeSetListener, int hour, int minute) {
+        new TimePickerDialog(this,onTimeSetListener, hour, minute, true).show();
+    }
+
+
+    @Override
+    public void clearEndDateAndTime() {
+        mEndDateTextView.setText(R.string.set_end_time);
+    }
+
+    @Override
+    public void clearStartDateTime() {
+        mStartDateTextView.setText(R.string.set_start_time);
+    }
+
+    @Override
+    public void clearLocation() {
+        mLocationTextView.setText(R.string.location);
+    }
+
+    @Override
+    public void displayStartDate(String date) {
+        mStartDateTextView.setText(date);
+    }
+
+    @Override
+    public void displayEndDate(String date) {
+        mEndDateTextView.setText(date);
+    }
 }

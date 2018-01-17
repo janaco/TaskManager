@@ -20,5 +20,6 @@
     <string name="set_end_time">Set end time</string>
     <string name="set_end_date">Set end date</string>
     <string name="location">Location</string>
+    <string name="title_is_too_short">Title is too short.</string>
 
 </resources>

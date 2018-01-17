@@ -10,4 +10,9 @@ public class ValidationModel {
 
         return text == null || text.isEmpty();
     }
+
+    public boolean isTitleValid(String text){
+
+        return text.length() > 5;
+    }
 }
