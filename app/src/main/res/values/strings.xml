@@ -22,5 +22,8 @@
     <string name="location">Location</string>
     <string name="title_is_too_short">Title is too short.</string>
     <string name="take_or_select_photo">Take or select photo</string>
+    <string name="fill_with_dummy_data">Fill with dummy data</string>
+    <string name="clear_tasks">Clear tasks</string>
+    <string name="exit">Exit</string>
 
 </resources>

@@ -69,6 +69,20 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
                 startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
                 return true;
 
+            case R.id.action_create_task:
+                onCreateTaskClick();
+                return true;
+
+            case R.id.action_fill_list:
+                return true;
+
+            case R.id.action_clear_all:
+                return true;
+
+            case R.id.action_exit:
+                finish();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
 

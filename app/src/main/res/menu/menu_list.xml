@@ -4,7 +4,28 @@
 
     <item android:icon="@drawable/cloud_upload"
         android:title="@string/backup"
-        app:showAsAction="always"
         android:id="@+id/action_backup"/>
+
+    <item android:icon="@drawable/ic_plus"
+        app:showAsAction="never"
+        android:title="@string/create_task"
+        android:id="@+id/action_create_task"/>
+
+    <item
+        app:showAsAction="never"
+        android:title="@string/fill_with_dummy_data"
+        android:id="@+id/action_fill_list"/>
+
+    <item
+        android:title="@string/clear_tasks"
+        app:showAsAction="never"
+        android:id="@+id/action_clear_all"/>
+
+
+    <item
+        app:showAsAction="never"
+        android:title="@string/exit"
+        android:id="@+id/action_exit"/>
+
 
 </menu>
