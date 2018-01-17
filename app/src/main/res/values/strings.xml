@@ -21,5 +21,6 @@
     <string name="set_end_date">Set end date</string>
     <string name="location">Location</string>
     <string name="title_is_too_short">Title is too short.</string>
+    <string name="take_or_select_photo">Take or select photo</string>
 
 </resources>

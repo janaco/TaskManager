@@ -2,16 +2,23 @@ package com.nandy.taskmanager.mvp.presenter;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Pair;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.activity.TaskActivity;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
+import com.nandy.taskmanager.mvp.model.CropImageModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
 import com.nandy.taskmanager.mvp.view.CreateTaskView;
+import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -27,26 +34,27 @@ public class CreateTaskPresenter {
     private CreateTaskModel mCreateTaskMode;
     private ValidationModel mValidationModel;
     private DateFormatModel mDateFormatModel;
+    private CropImageModel mCropImageModel;
 
     public CreateTaskPresenter(CreateTaskView view) {
         mView = view;
     }
 
-    public void createTask(String title, String desctiption) {
+    public boolean createTask(String title, String desctiption) {
 
         if (mValidationModel.isEmpty(title)) {
             mView.setTitleError(R.string.empty_field);
-            return;
+            return false;
         }
 
-        if (!mValidationModel.isTitleValid(title)){
+        if (!mValidationModel.isTitleValid(title)) {
             mView.setTitleError(R.string.title_is_too_short);
-            return;
+            return false;
         }
 
         if (mValidationModel.isEmpty(desctiption)) {
             mView.setCommentError(R.string.empty_field);
-            return;
+            return false;
         }
 
         Task task = new Task(title, desctiption);
@@ -55,21 +63,45 @@ public class CreateTaskPresenter {
         Intent intent = new Intent();
         intent.putExtra("task", task);
         mView.setResult(RESULT_OK, intent);
+
+        return true;
     }
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (resultCode != RESULT_OK){
-            return;
-        }
+        String pathToImageFile;
 
-        if (requestCode == TaskActivity.REQUEST_CODE_LOCATION){
-            LatLng latLng = data.getParcelableExtra("location");
-            onLocationSpecified(latLng);
+        switch (requestCode) {
+
+            case TaskActivity.REQUEST_CODE_LOCATION:
+                if (resultCode == RESULT_OK) {
+                    LatLng latLng = data.getParcelableExtra("location");
+                    onLocationSpecified(latLng);
+                }
+                break;
+
+            case TaskActivity.CHOOSE_IMAGE_REQUEST_CODE:
+
+                if (resultCode == RESULT_OK) {
+                   mView.startCropActivity(mCropImageModel.buildImageCropper(data));
+                }
+                break;
+
+            case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
+                try {
+                    File imageFile = mCropImageModel.getCroppedImage(data, resultCode);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //TODO: show error
+                }
+
+                break;
+
         }
 
     }
+
 
     public void setDateFormatModel(DateFormatModel mDateFormatModel) {
         this.mDateFormatModel = mDateFormatModel;
@@ -81,6 +113,10 @@ public class CreateTaskPresenter {
 
     public void setValidationModel(ValidationModel mValidationModel) {
         this.mValidationModel = mValidationModel;
+    }
+
+    public void setCropImageModel(CropImageModel mCropImageModel) {
+        this.mCropImageModel = mCropImageModel;
     }
 
     public void enableVoiceInput() {

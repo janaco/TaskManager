@@ -1,28 +1,37 @@
 package com.nandy.taskmanager.activity;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
+import com.nandy.taskmanager.mvp.model.CropImageModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
 import com.nandy.taskmanager.mvp.presenter.CreateTaskPresenter;
 import com.nandy.taskmanager.mvp.view.CreateTaskView;
+import com.theartofdev.edmodo.cropper.CropImage;
 
-import java.util.Calendar;
+import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,6 +40,8 @@ import butterknife.OnClick;
 public class TaskActivity extends AppCompatActivity implements CreateTaskView {
 
     public final static int REQUEST_CODE_LOCATION = 52;
+    public final static int REQUEST_PERMISSIONS_CODE = 53;
+    public static final int CHOOSE_IMAGE_REQUEST_CODE = 54;
 
     @BindView(R.id.input_title)
     EditText mInputTitle;
@@ -68,6 +79,7 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
         mPresener.setCreateTaskMode(new CreateTaskModel(getApplicationContext()));
         mPresener.setValidationModel(new ValidationModel());
         mPresener.setDateFormatModel(new DateFormatModel());
+        mPresener.setCropImageModel(new CropImageModel(getApplicationContext()));
     }
 
     @Override
@@ -98,8 +110,12 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+
+
         mPresener.onActivityResult(requestCode, resultCode, data);
     }
+
 
     @OnClick(R.id.txt_location)
     void onSetLocationButtonClick() {
@@ -138,20 +154,34 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
         mPresener.clearLocation();
     }
 
+
     @OnClick(R.id.image_task)
     void onTaskImageClick() {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1 && !isReadExternalStoragePermissionGranted()) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    REQUEST_PERMISSIONS_CODE);
 
+            return;
+        }
+
+        showPickImagePopup();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @android.support.annotation.NonNull String[] permissions, @android.support.annotation.NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_PERMISSIONS_CODE && isReadExternalStoragePermissionGranted()) {
+            showPickImagePopup();
+        }
     }
 
 
-    private void onSaveBtnClick() {
-
-        String title = mInputTitle.getText().toString();
-        String comment = mInputDescription.getText().toString();
-
-        mPresener.createTask(title, comment);
-        finish();
-
+    private boolean isReadExternalStoragePermissionGranted() {
+        return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
 
@@ -206,4 +236,36 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
     public void displayLocation(String location) {
         mLocationTextView.setText(location);
     }
+
+    @Override
+    public void startCropActivity(CropImage.ActivityBuilder activityBuilder) {
+        activityBuilder.start(this);
+    }
+
+    private void showPickImagePopup() {
+        Intent pickIntent = new Intent();
+        pickIntent.setType("image/*");
+        pickIntent.setAction(Intent.ACTION_GET_CONTENT);
+        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Uri outputUri = Uri.fromFile(new File(getFilesDir(), "temp_cover.jpg"));
+        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
+
+        Intent chooserIntent = Intent.createChooser(pickIntent, getString(R.string.take_or_select_photo));
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
+        startActivityForResult(chooserIntent, CHOOSE_IMAGE_REQUEST_CODE);
+    }
+
+    private void onSaveBtnClick() {
+
+        String title = mInputTitle.getText().toString();
+        String comment = mInputDescription.getText().toString();
+
+        boolean success = mPresener.createTask(title, comment);
+        if (success) {
+            finish();
+        }
+
+    }
+
+
 }

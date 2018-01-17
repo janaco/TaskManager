@@ -5,6 +5,8 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.support.annotation.StringRes;
 
+import com.theartofdev.edmodo.cropper.CropImage;
+
 /**
  * Created by yana on 16.01.18.
  */
@@ -32,4 +34,6 @@ public interface CreateTaskView {
     void displayEndDate(String date);
 
     void displayLocation(String location);
+
+    void startCropActivity(CropImage.ActivityBuilder activityBuilder);
 }
