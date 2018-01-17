@@ -21,9 +21,22 @@ public class CreateTaskModel {
     private Date mStartDate;
     private Date mEndDate;
     private LatLng mLocation;
+    private String mImage;
 
     public CreateTaskModel(Context context) {
         mTasksDao = AppDatabase.getInstance(context).tasksDao();
+    }
+
+
+    public Task create(String title, String description){
+
+        Task task = new Task(title,description);
+        task.setStartDate(mStartDate);
+        task.setEndDate(mEndDate);
+        task.setLocation(mLocation);
+        task.setImage(mImage);
+
+        return task;
     }
 
     public void save(Task task) {
@@ -71,6 +84,10 @@ public class CreateTaskModel {
 
     public void clearLocation(){
         mLocation = null;
+    }
+
+    public void setImage(String mImage) {
+        this.mImage = mImage;
     }
 
     private long getTime(int year, int month, int day, int hour, int minute){

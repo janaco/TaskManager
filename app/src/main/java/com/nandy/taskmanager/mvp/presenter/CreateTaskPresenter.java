@@ -57,7 +57,7 @@ public class CreateTaskPresenter {
             return false;
         }
 
-        Task task = new Task(title, desctiption);
+        Task task = mCreateTaskMode.create(title, desctiption);
         mCreateTaskMode.save(task);
 
         Intent intent = new Intent();
@@ -70,7 +70,6 @@ public class CreateTaskPresenter {
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        String pathToImageFile;
 
         switch (requestCode) {
 
@@ -91,6 +90,7 @@ public class CreateTaskPresenter {
             case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
                 try {
                     File imageFile = mCropImageModel.getCroppedImage(data, resultCode);
+                    mCreateTaskMode.setImage(imageFile.getPath());
                     mView.displayImage(imageFile);
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -266,8 +266,8 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
 
     private void onSaveBtnClick() {
 
-        String title = mInputTitle.getText().toString();
-        String comment = mInputDescription.getText().toString();
+        String title = mInputTitle.getText().toString().trim();
+        String comment = mInputDescription.getText().toString().trim();
 
         boolean success = mPresener.createTask(title, comment);
         if (success) {
