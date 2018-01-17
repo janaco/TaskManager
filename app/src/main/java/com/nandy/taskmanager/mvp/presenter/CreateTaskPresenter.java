@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.activity.TaskActivity;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
@@ -12,6 +13,9 @@ import com.nandy.taskmanager.mvp.model.ValidationModel;
 import com.nandy.taskmanager.mvp.view.CreateTaskView;
 
 import java.util.Calendar;
+import java.util.Locale;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by yana on 16.01.18.
@@ -50,9 +54,22 @@ public class CreateTaskPresenter {
 
         Intent intent = new Intent();
         intent.putExtra("task", task);
-        mView.setResult(Activity.RESULT_OK, intent);
+        mView.setResult(RESULT_OK, intent);
     }
 
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (resultCode != RESULT_OK){
+            return;
+        }
+
+        if (requestCode == TaskActivity.REQUEST_CODE_LOCATION){
+            LatLng latLng = data.getParcelableExtra("location");
+            onLocationSpecified(latLng);
+        }
+
+    }
 
     public void setDateFormatModel(DateFormatModel mDateFormatModel) {
         this.mDateFormatModel = mDateFormatModel;
@@ -72,6 +89,7 @@ public class CreateTaskPresenter {
 
     public void onLocationSpecified(LatLng latLng) {
         mCreateTaskMode.setLocation(latLng);
+        mView.displayLocation(String.format(Locale.getDefault(), "%f, %f", latLng.latitude, latLng.longitude));
     }
 
     public void clearLocation() {

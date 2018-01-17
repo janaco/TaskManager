@@ -30,7 +30,7 @@ import butterknife.OnClick;
 
 public class TaskActivity extends AppCompatActivity implements CreateTaskView {
 
-    private final static int REQUEST_CODE_LOCATION = 52;
+    public final static int REQUEST_CODE_LOCATION = 52;
 
     @BindView(R.id.input_title)
     EditText mInputTitle;
@@ -70,6 +70,37 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
         mPresener.setDateFormatModel(new DateFormatModel());
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_task, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+
+            case R.id.action_save:
+                onSaveBtnClick();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mPresener.onActivityResult(requestCode, resultCode, data);
+    }
+
     @OnClick(R.id.txt_location)
     void onSetLocationButtonClick() {
         startActivityForResult(new Intent(getApplicationContext(), MapActivity.class), REQUEST_CODE_LOCATION);
@@ -102,7 +133,7 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
     }
 
 
-    @OnClick(R.id.btn_clear_start_date)
+    @OnClick(R.id.btn_clear_location)
     void onClearLocationButtonClick() {
         mPresener.clearLocation();
     }
@@ -110,32 +141,6 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
     @OnClick(R.id.image_task)
     void onTaskImageClick() {
 
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_task, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-
-            case R.id.action_save:
-                onSaveBtnClick();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-
-        }
     }
 
 
@@ -168,7 +173,7 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
 
     @Override
     public void showTimePickerDialog(TimePickerDialog.OnTimeSetListener onTimeSetListener, int hour, int minute) {
-        new TimePickerDialog(this,onTimeSetListener, hour, minute, true).show();
+        new TimePickerDialog(this, onTimeSetListener, hour, minute, true).show();
     }
 
 
@@ -195,5 +200,10 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
     @Override
     public void displayEndDate(String date) {
         mEndDateTextView.setText(date);
+    }
+
+    @Override
+    public void displayLocation(String location) {
+        mLocationTextView.setText(location);
     }
 }

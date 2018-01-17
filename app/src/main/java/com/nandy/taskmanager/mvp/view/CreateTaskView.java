@@ -30,4 +30,6 @@ public interface CreateTaskView {
     void displayStartDate(String date);
 
     void displayEndDate(String date);
+
+    void displayLocation(String location);
 }
