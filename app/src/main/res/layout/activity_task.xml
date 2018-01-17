@@ -8,55 +8,187 @@
 
     <include layout="@layout/layout_toolbar" />
 
-    <EditText
-        android:id="@+id/input_name"
-        style="@style/EditTextStyle"
-        android:hint="@string/enter_task"
-        android:maxLines="1" />
-
-    <EditText
-        android:id="@+id/input_comment"
-        style="@style/EditTextStyle"
-        android:hint="@string/comment_task"
-        android:maxLines="3"
-        android:minLines="3" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/set_location"
-        android:background="@android:color/transparent"
-        android:layout_marginLeft="15dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="15dp"
-        android:id="@+id/btn_set_location"/>
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
+        android:padding="10dp">
 
-        android:gravity="end">
+        <ImageView
+            android:id="@+id/image_task"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:src="@drawable/image_plus" />
 
-        <Button
+        <EditText
+            android:id="@+id/input_title"
+            style="@style/EditTextStyle"
+            android:layout_toEndOf="@+id/image_task"
+            android:layout_toRightOf="@+id/image_task"
+            android:hint="@string/title"
+            android:maxLines="1"
+            android:background="@android:color/transparent"
+            android:padding="5dp"
+            android:textColor="@color/primaryTextColor"
+            android:textColorHint="@color/secondaryColor"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/secondaryColor"
+            android:layout_below="@+id/input_title"
+            android:layout_alignStart="@+id/input_title"
+            android:layout_alignLeft="@+id/input_title"
+            android:layout_alignEnd="@+id/input_title"
+            android:layout_alignRight="@+id/input_title"
+            />
+
+        <RelativeLayout
+            android:id="@+id/layout_description"
+            android:layout_width="match_parent"
+            android:layout_marginTop="15dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/image_task">
+
+            <EditText
+                android:id="@+id/input_description"
+                style="@style/EditTextStyle"
+                android:hint="@string/description"
+                android:maxLines="3"
+                android:layout_toLeftOf="@+id/btn_microphone"
+                android:layout_toStartOf="@+id/btn_microphone"
+                android:padding="5dp"
+                android:background="@android:color/transparent"
+                android:layout_centerVertical="true"
+                android:textColor="@color/primaryTextColor"
+                android:textColorHint="@color/secondaryColor"
+                android:textSize="16sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/secondaryColor"
+                android:layout_below="@+id/input_description"
+                android:layout_alignStart="@+id/input_description"
+                android:layout_alignLeft="@+id/input_description"
+                android:layout_alignEnd="@+id/input_description"
+                android:layout_alignRight="@+id/input_description"
+                />
+            <Button
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:id="@+id/btn_microphone"
+                android:background="@drawable/microphone" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/hint_start_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_cancel"
-            android:background="@android:color/transparent"
-            android:text="@string/cancel" />
+            android:layout_below="@+id/layout_description"
+            android:layout_marginTop="25dp"
+            android:text="@string/start_time"
+            android:textColor="@color/secondaryColor"
+            android:textColorHint="@color/secondaryColor"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/txt_start_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/hint_start_time"
+            android:padding="5dp"
+            android:layout_toStartOf="@+id/btn_clear_start_date"
+            android:layout_toLeftOf="@+id/btn_clear_start_date"
+            android:text="@string/start_time"
+            android:textColor="@color/secondaryDarkColor"
+            android:textSize="16sp" />
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/btn_save"
-            android:background="@android:color/transparent"
-            android:text="@string/save" />
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignBottom="@id/txt_start_date"
+            android:id="@+id/btn_clear_start_date"
+            android:background="@drawable/close_circle"/>
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/hint_end_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_start_date"
+            android:layout_marginTop="15dp"
+            android:text="@string/end_time"
+            android:textColor="@color/secondaryColor"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/txt_end_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/hint_end_time"
+            android:padding="5dp"
+            android:text="@string/end_time"
+            android:layout_toLeftOf="@+id/btn_clear_end_date"
+            android:layout_toStartOf="@+id/btn_clear_end_date"
+            android:textColor="@color/secondaryDarkColor"
+            android:textSize="16sp" />
+
+        <Button
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignBottom="@id/txt_end_date"
+            android:id="@+id/btn_clear_end_date"
+            android:background="@drawable/close_circle"/>
+
+        <TextView
+            android:id="@+id/hint_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_end_date"
+            android:layout_marginTop="25dp"
+            android:text="@string/location"
+            android:textColor="@color/secondaryColor"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/txt_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/hint_location"
+            android:padding="5dp"
+            android:text="@string/set_location"
+            android:layout_toStartOf="@+id/btn_clear_location"
+            android:layout_toLeftOf="@+id/btn_clear_location"
+            android:textColor="@color/secondaryDarkColor"
+            android:textSize="16sp" />
+
+        <Button
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignBottom="@id/txt_location"
+            android:id="@+id/btn_clear_location"
+            android:background="@drawable/close_circle"/>
+
+
+    </RelativeLayout>
 
 </LinearLayout>
