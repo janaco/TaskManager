@@ -7,6 +7,8 @@ import android.support.annotation.StringRes;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.io.File;
+
 /**
  * Created by yana on 16.01.18.
  */
@@ -34,6 +36,8 @@ public interface CreateTaskView {
     void displayEndDate(String date);
 
     void displayLocation(String location);
+
+    void displayImage(File file);
 
     void startCropActivity(CropImage.ActivityBuilder activityBuilder);
 }

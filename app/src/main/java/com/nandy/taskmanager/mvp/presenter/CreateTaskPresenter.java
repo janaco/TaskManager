@@ -91,6 +91,7 @@ public class CreateTaskPresenter {
             case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
                 try {
                     File imageFile = mCropImageModel.getCroppedImage(data, resultCode);
+                    mView.displayImage(imageFile);
                 } catch (Exception e) {
                     e.printStackTrace();
                     //TODO: show error

@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.CropImageModel;
@@ -235,6 +236,14 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
     @Override
     public void displayLocation(String location) {
         mLocationTextView.setText(location);
+    }
+
+    @Override
+    public void displayImage(File file) {
+        Glide
+                .with(getApplicationContext())
+                .load(file)
+                .into(mTaskImageView);
     }
 
     @Override
