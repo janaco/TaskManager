@@ -18,8 +18,7 @@ public class Task implements Parcelable{
     private String mTitle;
     private String mComment;
     
-    private double mLatitude;
-    private double mLongitude;
+    private LatLng mLocation;
 
     public Task(String title, String comment) {
         mTitle = title;
@@ -39,8 +38,7 @@ public class Task implements Parcelable{
         mId = in.readString();
         mTitle = in.readString();
         mComment = in.readString();
-        mLatitude = in.readDouble();
-        mLongitude = in.readDouble();
+        mLocation = in.readParcelable(LatLng.class.getClassLoader());
     }
 
     @Override
@@ -48,8 +46,7 @@ public class Task implements Parcelable{
         dest.writeString(mId);
         dest.writeString(mTitle);
         dest.writeString(mComment);
-        dest.writeDouble(mLatitude);
-        dest.writeDouble(mLongitude);
+        dest.writeParcelable(mLocation, flags);
     }
 
     @Override
@@ -69,29 +66,12 @@ public class Task implements Parcelable{
         }
     };
 
-    public void setLocation(@NonNull LatLng location) {
-        mLatitude = location.latitude;
-        mLongitude = location.longitude;
+    public void setLocation(LatLng mLocation) {
+        this.mLocation = mLocation;
     }
 
     public LatLng getLocation() {
-        return new LatLng(mLatitude, mLongitude);
-    }
-
-    public double getLatitude() {
-        return mLatitude;
-    }
-
-    public void setLatitude(double mLatitude) {
-        this.mLatitude = mLatitude;
-    }
-
-    public double getLongitude() {
-        return mLongitude;
-    }
-
-    public void setLongitude(double mLongitude) {
-        this.mLongitude = mLongitude;
+        return mLocation;
     }
 
     public String getTitle() {
