@@ -6,6 +6,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.TasksDao;
 import com.nandy.taskmanager.model.Task;
+import com.nandy.taskmanager.model.TaskStatus;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -35,6 +36,7 @@ public class CreateTaskModel {
         task.setEndDate(mEndDate);
         task.setLocation(mLocation);
         task.setImage(mImage);
+        task.setStatus(TaskStatus.NEW);
 
         return task;
     }

@@ -33,6 +33,9 @@ public class Task implements Parcelable{
     @ColumnInfo(name = "date_end")
     private Date mEndDate;
 
+    @ColumnInfo(name = "status")
+    private TaskStatus mStatus;
+
 
     public Task(String title, String description) {
         mTitle = title;
@@ -47,15 +50,13 @@ public class Task implements Parcelable{
         mDescription = description;
     }
 
-    @Ignore
     protected Task(Parcel in) {
         mId = in.readString();
         mTitle = in.readString();
         mDescription = in.readString();
         mImage = in.readString();
         mLocation = in.readParcelable(LatLng.class.getClassLoader());
-        mStartDate = (Date) in.readSerializable();
-        mEndDate = (Date) in.readSerializable();
+        mStatus = TaskStatus.valueOf(in.readString());
     }
 
     @Override
@@ -65,8 +66,7 @@ public class Task implements Parcelable{
         dest.writeString(mDescription);
         dest.writeString(mImage);
         dest.writeParcelable(mLocation, flags);
-        dest.writeSerializable(mStartDate);
-        dest.writeSerializable(mEndDate);
+        dest.writeString(mStatus.name());
     }
 
     @Override
@@ -112,6 +112,14 @@ public class Task implements Parcelable{
 
     public String getId() {
         return mId;
+    }
+
+    public TaskStatus getStatus() {
+        return mStatus;
+    }
+
+    public void setStatus(TaskStatus mStatus) {
+        this.mStatus = mStatus;
     }
 
     public void setId(String id) {

@@ -14,7 +14,10 @@ import com.nandy.taskmanager.model.Task;
  */
 
 @Database(entities = {Task.class}, version = 1)
-@TypeConverters({LocationTypeConverter.class, DateTypeConverter.class})
+@TypeConverters({
+        LocationTypeConverter.class,
+        DateTypeConverter.class,
+        TaskStatusConventer.class})
 public abstract class AppDatabase extends RoomDatabase {
 
     public static final String DB_NAME = "taskmanager";
@@ -22,14 +25,14 @@ public abstract class AppDatabase extends RoomDatabase {
 
 
     public synchronized static AppDatabase getInstance(Context context) {
-        if (INSTANCE==null) {
-            INSTANCE=create(context);
+        if (INSTANCE == null) {
+            INSTANCE = create(context);
         }
 
-        return(INSTANCE);
+        return (INSTANCE);
     }
 
-    private  static AppDatabase create(Context context) {
+    private static AppDatabase create(Context context) {
         return Room.databaseBuilder(context, AppDatabase.class, DB_NAME)
                 .allowMainThreadQueries()
                 .build();
