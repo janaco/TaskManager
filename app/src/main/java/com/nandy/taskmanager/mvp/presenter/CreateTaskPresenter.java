@@ -80,7 +80,9 @@ public class CreateTaskPresenter {
                 case CreateTaskActivity.REQUEST_CODE_VIOCE_INPUT:
                     if (resultCode == RESULT_OK) {
                         ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                        mView.setDescription(matches.toString());
+                        if (matches.size() > 0){
+                            mView.setDescription(matches.get(0));
+                        }
                     }
                     break;
 

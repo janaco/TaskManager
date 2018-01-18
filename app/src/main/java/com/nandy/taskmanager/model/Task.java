@@ -57,6 +57,8 @@ public class Task implements Parcelable{
         mImage = in.readString();
         mLocation = in.readParcelable(LatLng.class.getClassLoader());
         mStatus = TaskStatus.valueOf(in.readString());
+        mStartDate = (Date) in.readSerializable();
+        mEndDate = (Date) in.readSerializable();
     }
 
     @Override
@@ -67,6 +69,8 @@ public class Task implements Parcelable{
         dest.writeString(mImage);
         dest.writeParcelable(mLocation, flags);
         dest.writeString(mStatus.name());
+        dest.writeSerializable(mStartDate);
+        dest.writeSerializable(mEndDate);
     }
 
     @Override
@@ -157,8 +161,14 @@ public class Task implements Parcelable{
     @Override
     public String toString() {
         return "Task{" +
-                "title='" + mTitle + '\'' +
-                ", comment='" + mDescription + '\'' +
+                "mId='" + mId + '\'' +
+                ", mTitle='" + mTitle + '\'' +
+                ", mDescription='" + mDescription + '\'' +
+                ", mImage='" + mImage + '\'' +
+                ", mLocation=" + mLocation +
+                ", mStartDate=" + mStartDate +
+                ", mEndDate=" + mEndDate +
+                ", mStatus=" + mStatus +
                 '}';
     }
 }

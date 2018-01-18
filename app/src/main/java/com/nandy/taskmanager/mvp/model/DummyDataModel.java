@@ -1,6 +1,7 @@
 package com.nandy.taskmanager.mvp.model;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.TasksDao;
@@ -54,6 +55,8 @@ public class DummyDataModel {
             task.setStatus(getRandomStatus(TaskStatus.values()));
 
             tasksDao.insert(task);
+
+            Log.d("TASK_", "insert: " + task);
 
             tasks.add(task);
         }

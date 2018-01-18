@@ -2,6 +2,7 @@ package com.nandy.taskmanager.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -20,7 +21,7 @@ import butterknife.ButterKnife;
 
 public class TaskDetailsActivity extends AppCompatActivity implements TaskDetailsView {
 
-    @BindView(R.id.task_image)
+    @BindView(R.id.image_task)
     ImageView mTaskImageView;
     @BindView(R.id.txt_title)
     TextView mTitleTextView;
@@ -42,6 +43,7 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
         ButterKnife.bind(this);
 
         Task task = getIntent().getParcelableExtra("task");
+        Log.d("TASK_", "details: " + task);
 
         mPresenter = new TaskDetailsPresenter(this);
         mPresenter.setDateFormatModel(new DateFormatModel());
