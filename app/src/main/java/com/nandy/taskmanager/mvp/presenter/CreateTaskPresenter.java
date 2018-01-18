@@ -1,11 +1,7 @@
 package com.nandy.taskmanager.mvp.presenter;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.util.Pair;
+import android.speech.RecognizerIntent;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.R;
@@ -19,6 +15,7 @@ import com.nandy.taskmanager.mvp.view.CreateTaskView;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -80,7 +77,14 @@ public class CreateTaskPresenter {
                 }
                 break;
 
-            case TaskActivity.CHOOSE_IMAGE_REQUEST_CODE:
+                case TaskActivity.REQUEST_CODE_VIOCE_INPUT:
+                    if (resultCode == RESULT_OK) {
+                        ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                        mView.setDescription(matches.toString());
+                    }
+                    break;
+
+            case TaskActivity.REQUEST_CODE_CHOOSE_IMAGE:
 
                 if (resultCode == RESULT_OK) {
                    mView.startCropActivity(mCropImageModel.buildImageCropper(data));
@@ -118,10 +122,6 @@ public class CreateTaskPresenter {
 
     public void setCropImageModel(CropImageModel mCropImageModel) {
         this.mCropImageModel = mCropImageModel;
-    }
-
-    public void enableVoiceInput() {
-
     }
 
     public void onLocationSpecified(LatLng latLng) {

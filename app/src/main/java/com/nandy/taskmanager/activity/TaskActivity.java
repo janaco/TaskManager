@@ -5,17 +5,16 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.speech.RecognizerIntent;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -33,6 +32,7 @@ import com.nandy.taskmanager.mvp.view.CreateTaskView;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,7 +42,8 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
 
     public final static int REQUEST_CODE_LOCATION = 52;
     public final static int REQUEST_PERMISSIONS_CODE = 53;
-    public static final int CHOOSE_IMAGE_REQUEST_CODE = 54;
+    public static final int REQUEST_CODE_CHOOSE_IMAGE = 54;
+    public static final int REQUEST_CODE_VIOCE_INPUT = 55;
 
     @BindView(R.id.input_title)
     EditText mInputTitle;
@@ -111,9 +112,6 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-
-
         mPresener.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -135,8 +133,12 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
 
     @OnClick(R.id.btn_microphone)
     void onVoiceInputButtonClick() {
-        mPresener.enableVoiceInput();
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.description));
+        startActivityForResult(intent, REQUEST_CODE_VIOCE_INPUT);
     }
+
 
     @OnClick(R.id.btn_clear_start_date)
     void onClearStartDateBtnClick() {
@@ -251,6 +253,11 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
         activityBuilder.start(this);
     }
 
+    @Override
+    public void setDescription(String description) {
+        mInputDescription.setText(description);
+    }
+
     private void showPickImagePopup() {
         Intent pickIntent = new Intent();
         pickIntent.setType("image/*");
@@ -261,7 +268,7 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
 
         Intent chooserIntent = Intent.createChooser(pickIntent, getString(R.string.take_or_select_photo));
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
-        startActivityForResult(chooserIntent, CHOOSE_IMAGE_REQUEST_CODE);
+        startActivityForResult(chooserIntent, REQUEST_CODE_CHOOSE_IMAGE);
     }
 
     private void onSaveBtnClick() {

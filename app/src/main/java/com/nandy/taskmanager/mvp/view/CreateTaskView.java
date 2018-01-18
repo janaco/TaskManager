@@ -39,5 +39,7 @@ public interface CreateTaskView {
 
     void displayImage(File file);
 
+    void setDescription(String description);
+
     void startCropActivity(CropImage.ActivityBuilder activityBuilder);
 }
