@@ -8,8 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
 
@@ -43,6 +45,8 @@ public class TasksAdapter extends ArrayAdapter<Task> {
         if (task != null) {
             viewHolder.setTitle(task.getTitle());
             viewHolder.setComment(task.getDescription());
+            viewHolder.setStatus(task.getStatus().name());
+//            viewHolder.loadImage(task.getImage());
         }
 
 
@@ -52,9 +56,13 @@ public class TasksAdapter extends ArrayAdapter<Task> {
 
     static class ViewHolder {
 
+        @BindView(R.id.task_image)
+        ImageView imageTask;
+        @BindView(R.id.txt_status)
+        TextView textViewStatus;
         @BindView(R.id.txt_title)
         TextView textViewTitle;
-        @BindView(R.id.txt_comment)
+        @BindView(R.id.txt_description)
         TextView textViewComment;
 
         ViewHolder(View view) {
@@ -67,6 +75,16 @@ public class TasksAdapter extends ArrayAdapter<Task> {
 
         void setComment(String comment) {
             textViewComment.setText(comment);
+        }
+
+        void setStatus(String status){
+            textViewStatus.setText(status);
+        }
+
+        void loadImage(String image){
+            Glide.with(imageTask.getContext())
+                    .load(image)
+                    .into(imageTask);
         }
     }
 }
