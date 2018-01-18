@@ -39,6 +39,9 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
 
         setSupportActionBar(toolbar);
 
+        listTasks.setOnItemClickListener((adapterView, view, position, l) ->
+                openDetails(mTasksPresenter.getArguments(position)));
+
         mTasksPresenter = new TasksPresenter(this);
         mTasksPresenter.setTasksListModel(new TasksListModel(getApplicationContext()));
         mTasksPresenter.setDummyDataModel(new DummyDataModel(getApplicationContext()));
@@ -51,9 +54,16 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
 
     }
 
+    private void openDetails(Bundle args) {
+        Intent intent = new Intent(this, TaskDetailsActivity.class);
+        intent.putExtras(args);
+
+        startActivity(intent);
+    }
+
     @OnClick(R.id.btn_create_task)
     void onCreateTaskClick() {
-        startActivityForResult(new Intent(getApplicationContext(), TaskActivity.class), Constants.REQUEST_CREATE_TASK);
+        startActivityForResult(new Intent(getApplicationContext(), CreateTaskActivity.class), Constants.REQUEST_CREATE_TASK);
     }
 
     @Override

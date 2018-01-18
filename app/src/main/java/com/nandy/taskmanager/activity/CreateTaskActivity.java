@@ -32,13 +32,12 @@ import com.nandy.taskmanager.mvp.view.CreateTaskView;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class TaskActivity extends AppCompatActivity implements CreateTaskView {
+public class CreateTaskActivity extends AppCompatActivity implements CreateTaskView {
 
     public final static int REQUEST_CODE_LOCATION = 52;
     public final static int REQUEST_PERMISSIONS_CODE = 53;
@@ -65,7 +64,7 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_task);
+        setContentView(R.layout.activity_create_task);
 
         ButterKnife.bind(this);
 
@@ -86,7 +85,7 @@ public class TaskActivity extends AppCompatActivity implements CreateTaskView {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_task, menu);
+        getMenuInflater().inflate(R.menu.menu_create_task, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

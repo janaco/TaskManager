@@ -43,6 +43,10 @@ public class TasksListModel {
         mAdapter.clear();
     }
 
+    public Task get(int position){
+        return mTasks.get(position);
+    }
+
     public void display(Task task){
         mAdapter.add(task);
     }

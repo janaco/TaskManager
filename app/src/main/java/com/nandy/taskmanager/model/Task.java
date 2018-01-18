@@ -94,6 +94,10 @@ public class Task implements Parcelable{
         return mLocation;
     }
 
+    public boolean hasLocation(){
+        return mLocation != null;
+    }
+
     public String getTitle() {
         return mTitle;
     }

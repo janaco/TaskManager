@@ -21,15 +21,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activity.CreateTaskActivity" />
         <activity
-            android:name=".activity.TaskActivity" />
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
 
-        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat"/>
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAuYH6PhPLPRYjKHn3dPsrgNYafOkbzRAs" />
@@ -40,8 +39,9 @@
             android:label="@string/title_activity_map">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nandy.taskmanager.activity.TaskActivity" />
+                android:value="com.nandy.taskmanager.activity.CreateTaskActivity" />
         </activity>
+        <activity android:name=".activity.TaskDetailsActivity"></activity>
     </application>
 
 </manifest>

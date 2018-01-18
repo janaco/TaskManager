@@ -5,7 +5,7 @@ import android.speech.RecognizerIntent;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.R;
-import com.nandy.taskmanager.activity.TaskActivity;
+import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.CropImageModel;
@@ -70,21 +70,21 @@ public class CreateTaskPresenter {
 
         switch (requestCode) {
 
-            case TaskActivity.REQUEST_CODE_LOCATION:
+            case CreateTaskActivity.REQUEST_CODE_LOCATION:
                 if (resultCode == RESULT_OK) {
                     LatLng latLng = data.getParcelableExtra("location");
                     onLocationSpecified(latLng);
                 }
                 break;
 
-                case TaskActivity.REQUEST_CODE_VIOCE_INPUT:
+                case CreateTaskActivity.REQUEST_CODE_VIOCE_INPUT:
                     if (resultCode == RESULT_OK) {
                         ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                         mView.setDescription(matches.toString());
                     }
                     break;
 
-            case TaskActivity.REQUEST_CODE_CHOOSE_IMAGE:
+            case CreateTaskActivity.REQUEST_CODE_CHOOSE_IMAGE:
 
                 if (resultCode == RESULT_OK) {
                    mView.startCropActivity(mCropImageModel.buildImageCropper(data));

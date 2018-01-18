@@ -49,6 +49,14 @@ public class TasksPresenter extends BasePresenter {
         mTasksListModel.displayAll(tasks);
     }
 
+    public Bundle getArguments(int position){
+        Bundle args = new Bundle();
+        args.putParcelable("task", mTasksListModel.get(position));
+
+        return args;
+
+    }
+
     public void clearAllTasks() {
         mTasksListModel.clearAll();
     }
