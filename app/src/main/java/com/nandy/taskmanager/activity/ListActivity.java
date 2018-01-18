@@ -12,6 +12,7 @@ import android.widget.ListView;
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
+import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.DummyDataModel;
 import com.nandy.taskmanager.mvp.model.TasksListModel;
 import com.nandy.taskmanager.mvp.presenter.TasksPresenter;
@@ -54,6 +55,12 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mTasksPresenter.refreshList();
+    }
+
     private void openDetails(Bundle args) {
         Intent intent = new Intent(this, TaskDetailsActivity.class);
         intent.putExtras(args);
@@ -63,7 +70,9 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
 
     @OnClick(R.id.btn_create_task)
     void onCreateTaskClick() {
-        startActivityForResult(new Intent(getApplicationContext(), CreateTaskActivity.class), Constants.REQUEST_CREATE_TASK);
+        Intent intent = new Intent(getApplicationContext(), CreateTaskActivity.class);
+        intent.putExtra("mode", CreateTaskModel.MODE_CREATE);
+        startActivityForResult(intent, Constants.REQUEST_CREATE_TASK);
     }
 
     @Override

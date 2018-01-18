@@ -138,6 +138,10 @@ public class Task implements Parcelable{
         return mImage;
     }
 
+    public boolean hasImage(){
+        return mImage != null;
+    }
+
     public void setImage(String mImage) {
         this.mImage = mImage;
     }

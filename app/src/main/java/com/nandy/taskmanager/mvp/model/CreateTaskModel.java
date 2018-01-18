@@ -17,32 +17,55 @@ import java.util.Date;
 
 public class CreateTaskModel {
 
-    private TasksDao mTasksDao;
+    public static final int MODE_CREATE = 1;
+    public static final int MODE_EDIT = 2;
 
     private Date mStartDate;
     private Date mEndDate;
     private LatLng mLocation;
     private String mImage;
 
-    public CreateTaskModel(Context context) {
-        mTasksDao = AppDatabase.getInstance(context).tasksDao();
+    private Task mTask;
+
+    private int mMode;
+
+    public CreateTaskModel(Task task, int mode) {
+        mMode = mode;
+        mTask = task;
+
+        if (task != null) {
+            mStartDate = task.getStartDate();
+            mEndDate = task.getEndDate();
+            mLocation = task.getLocation();
+            mImage = task.getImage();
+        }
     }
 
+    public int getMode() {
+        return mMode;
+    }
+
+    public Task getTask() {
+        return mTask;
+    }
 
     public Task create(String title, String description){
 
-        Task task = new Task(title,description);
-        task.setStartDate(mStartDate);
-        task.setEndDate(mEndDate);
-        task.setLocation(mLocation);
-        task.setImage(mImage);
-        task.setStatus(TaskStatus.NEW);
+        if (mMode == MODE_CREATE) {
+            mTask = new Task(title, description);
+            mTask.setStatus(TaskStatus.NEW);
+        }else {
+            mTask.setTitle(title);
+            mTask.setDescription(description);
+        }
 
-        return task;
-    }
+        mTask.setStartDate(mStartDate);
+        mTask.setEndDate(mEndDate);
+        mTask.setLocation(mLocation);
+        mTask.setImage(mImage);
 
-    public void save(Task task) {
-        mTasksDao.insert(task);
+        return mTask;
+
     }
 
     public void setStartDateAndTime(int year, int month, int day, int hour, int minute) {

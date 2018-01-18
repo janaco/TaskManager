@@ -7,9 +7,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.model.Task;
+import com.nandy.taskmanager.mvp.BasePresenter;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.CropImageModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
+import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
 import com.nandy.taskmanager.mvp.view.CreateTaskView;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -25,16 +27,44 @@ import static android.app.Activity.RESULT_OK;
  * Created by yana on 16.01.18.
  */
 
-public class CreateTaskPresenter {
+public class CreateTaskPresenter extends BasePresenter {
 
     private CreateTaskView mView;
     private CreateTaskModel mCreateTaskMode;
     private ValidationModel mValidationModel;
     private DateFormatModel mDateFormatModel;
     private CropImageModel mCropImageModel;
+    private TaskRecordsModel mRecordsModel;
 
     public CreateTaskPresenter(CreateTaskView view) {
         mView = view;
+    }
+
+    @Override
+    public void start() {
+
+        Task task = mCreateTaskMode.getTask();
+        if (task != null) {
+
+            mView.setTitle(task.getTitle());
+            mView.setDescription(task.getDescription());
+            mView.displayStartDate(mDateFormatModel.format(task.getStartDate()));
+            mView.displayEndDate(mDateFormatModel.format(task.getEndDate()));
+            if (task.hasLocation()) {
+                mView.displayLocation(String.format(Locale.getDefault(), "%f, %f",
+                        task.getLocation().latitude,
+                        task.getLocation().longitude));
+            }
+
+            if (task.hasImage()){
+                mView.displayImage(new File(task.getImage()));
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+
     }
 
     public boolean createTask(String title, String desctiption) {
@@ -55,7 +85,12 @@ public class CreateTaskPresenter {
         }
 
         Task task = mCreateTaskMode.create(title, desctiption);
-        mCreateTaskMode.save(task);
+        if (mCreateTaskMode.getMode() == CreateTaskModel.MODE_CREATE){
+            mRecordsModel.insert(task);
+        }else {
+            mRecordsModel.update(task);
+
+        }
 
         Intent intent = new Intent();
         intent.putExtra("task", task);
@@ -77,19 +112,19 @@ public class CreateTaskPresenter {
                 }
                 break;
 
-                case CreateTaskActivity.REQUEST_CODE_VIOCE_INPUT:
-                    if (resultCode == RESULT_OK) {
-                        ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                        if (matches.size() > 0){
-                            mView.setDescription(matches.get(0));
-                        }
+            case CreateTaskActivity.REQUEST_CODE_VIOCE_INPUT:
+                if (resultCode == RESULT_OK) {
+                    ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    if (matches.size() > 0) {
+                        mView.setDescription(matches.get(0));
                     }
-                    break;
+                }
+                break;
 
             case CreateTaskActivity.REQUEST_CODE_CHOOSE_IMAGE:
 
                 if (resultCode == RESULT_OK) {
-                   mView.startCropActivity(mCropImageModel.buildImageCropper(data));
+                    mView.startCropActivity(mCropImageModel.buildImageCropper(data));
                 }
                 break;
 
@@ -186,4 +221,7 @@ public class CreateTaskPresenter {
     }
 
 
+    public void setRecordsModel(TaskRecordsModel mRecordsModel) {
+        this.mRecordsModel = mRecordsModel;
+    }
 }

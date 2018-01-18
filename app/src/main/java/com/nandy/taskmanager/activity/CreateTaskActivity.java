@@ -23,9 +23,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.CropImageModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
+import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
 import com.nandy.taskmanager.mvp.presenter.CreateTaskPresenter;
 import com.nandy.taskmanager.mvp.view.CreateTaskView;
@@ -76,11 +78,18 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
             actionBar.setTitle(R.string.create_task);
         }
 
+        Task task = getIntent().getParcelableExtra("task");
+        int mode = getIntent().getIntExtra("mode", CreateTaskModel.MODE_CREATE);
+
+
         mPresener = new CreateTaskPresenter(this);
-        mPresener.setCreateTaskMode(new CreateTaskModel(getApplicationContext()));
+        mPresener.setCreateTaskMode(new CreateTaskModel(task, mode));
         mPresener.setValidationModel(new ValidationModel());
         mPresener.setDateFormatModel(new DateFormatModel());
         mPresener.setCropImageModel(new CropImageModel(getApplicationContext()));
+        mPresener.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
+
+        mPresener.start();
     }
 
     @Override
@@ -237,6 +246,11 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
     @Override
     public void displayLocation(String location) {
         mLocationTextView.setText(location);
+    }
+
+    @Override
+    public void setTitle(String title) {
+        mInputTitle.setText(title);
     }
 
     @Override

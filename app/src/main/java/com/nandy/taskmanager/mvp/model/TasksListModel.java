@@ -52,7 +52,13 @@ public class TasksListModel {
     }
 
     public void displayAll(Collection<Task> tasks){
-        mAdapter.addAll(tasks);
+        mTasks.addAll(tasks);
+    }
+
+    public void refreshList(Collection<Task> tasks){
+        mTasks.clear();
+        mAdapter.clear();
+        displayAll(tasks);
     }
 
     public void saveInstanceState(Bundle outState){

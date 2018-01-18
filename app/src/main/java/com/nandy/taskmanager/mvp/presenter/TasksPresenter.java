@@ -34,6 +34,10 @@ public class TasksPresenter extends BasePresenter {
 
     }
 
+    public void refreshList(){
+        mTasksListModel.refreshList(mTasksListModel.loadTasks());
+    }
+
     @Override
     public void saveInstanceState(Bundle outState) {
         mTasksListModel.saveInstanceState(outState);

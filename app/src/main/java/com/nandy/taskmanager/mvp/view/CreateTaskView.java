@@ -41,5 +41,7 @@ public interface CreateTaskView {
 
     void setDescription(String description);
 
+    void setTitle(String title);
+
     void startCropActivity(CropImage.ActivityBuilder activityBuilder);
 }
