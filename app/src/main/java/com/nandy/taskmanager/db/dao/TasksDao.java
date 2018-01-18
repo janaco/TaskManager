@@ -29,4 +29,7 @@ public interface TasksDao {
 
     @Delete
     void delete(Task task);
+
+    @Query("DELETE FROM tasks")
+    void deleteAll();
 }

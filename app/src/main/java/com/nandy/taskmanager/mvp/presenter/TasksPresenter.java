@@ -4,8 +4,11 @@ import android.os.Bundle;
 
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.BasePresenter;
+import com.nandy.taskmanager.mvp.model.DummyDataModel;
 import com.nandy.taskmanager.mvp.model.TasksListModel;
 import com.nandy.taskmanager.mvp.view.TasksListView;
+
+import java.util.List;
 
 /**
  * Created by yana on 16.01.18.
@@ -15,6 +18,7 @@ public class TasksPresenter extends BasePresenter {
 
     private TasksListView mView;
     private TasksListModel mTasksListModel;
+    private DummyDataModel mDummyDataModel;
 
     public TasksPresenter(TasksListView view) {
         mView = view;
@@ -40,6 +44,15 @@ public class TasksPresenter extends BasePresenter {
         mTasksListModel.restoreInstanceState(savedInstanceState);
     }
 
+    public void generateDummyData() {
+        List<Task> tasks = mDummyDataModel.generateDummyData(mTasksListModel.getTasksCount(), 30);
+        mTasksListModel.displayAll(tasks);
+    }
+
+    public void clearAllTasks() {
+        mTasksListModel.clearAll();
+    }
+
     public void loadTasks() {
         mTasksListModel.displayAll(mTasksListModel.loadTasks());
     }
@@ -50,5 +63,9 @@ public class TasksPresenter extends BasePresenter {
 
     public void setTasksListModel(TasksListModel mTasksListModel) {
         this.mTasksListModel = mTasksListModel;
+    }
+
+    public void setDummyDataModel(DummyDataModel mDummyDataModel) {
+        this.mDummyDataModel = mDummyDataModel;
     }
 }

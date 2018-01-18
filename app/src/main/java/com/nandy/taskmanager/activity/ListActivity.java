@@ -12,6 +12,7 @@ import android.widget.ListView;
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
+import com.nandy.taskmanager.mvp.model.DummyDataModel;
 import com.nandy.taskmanager.mvp.model.TasksListModel;
 import com.nandy.taskmanager.mvp.presenter.TasksPresenter;
 import com.nandy.taskmanager.mvp.view.TasksListView;
@@ -40,6 +41,7 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
 
         mTasksPresenter = new TasksPresenter(this);
         mTasksPresenter.setTasksListModel(new TasksListModel(getApplicationContext()));
+        mTasksPresenter.setDummyDataModel(new DummyDataModel(getApplicationContext()));
 
         mTasksPresenter.start();
 
@@ -74,9 +76,11 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
                 return true;
 
             case R.id.action_fill_list:
+                mTasksPresenter.generateDummyData();
                 return true;
 
             case R.id.action_clear_all:
+                mTasksPresenter.clearAllTasks();
                 return true;
 
             case R.id.action_exit:

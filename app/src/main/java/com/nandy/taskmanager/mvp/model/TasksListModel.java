@@ -34,8 +34,13 @@ public class TasksListModel {
     }
 
     public List<Task> loadTasks(){
-
         return mTasksDao.getAll();
+    }
+
+    public void clearAll(){
+        mTasksDao.deleteAll();
+        mTasks.clear();
+        mAdapter.clear();
     }
 
     public void display(Task task){
@@ -53,5 +58,9 @@ public class TasksListModel {
     public void restoreInstanceState(Bundle savedInstanceState){
         ArrayList<Task> tasksList = savedInstanceState.getParcelableArrayList("tasks");
         mTasks.addAll(tasksList);
+    }
+
+    public int getTasksCount(){
+        return mTasks.size();
     }
 }
