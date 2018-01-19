@@ -1,8 +1,11 @@
 package com.nandy.taskmanager.activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.BaseTransientBottomBar;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -10,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
@@ -28,11 +32,16 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
 
 
     @BindView(R.id.list_tasks)
-    ListView listTasks;
+    ListView mTaskLisView;
     @BindView(R.id.toolbar)
-    Toolbar toolbar;
+    Toolbar mToolbar;
+    @BindView(R.id.coordinator_layout)
+    CoordinatorLayout mCoordinatorLayout;
+
+    private Snackbar mExitSnackbar;
 
     private TasksPresenter mTasksPresenter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +49,9 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
         setContentView(R.layout.activity_list);
         ButterKnife.bind(this);
 
-        setSupportActionBar(toolbar);
+        setSupportActionBar(mToolbar);
 
-        listTasks.setOnItemClickListener((adapterView, view, position, l) ->
+        mTaskLisView.setOnItemClickListener((adapterView, view, position, l) ->
                 openDetails(mTasksPresenter.getArguments(position)));
 
         mTasksPresenter = new TasksPresenter(this);
@@ -55,6 +64,30 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
             mTasksPresenter.loadTasks();
         }
 
+    }
+
+
+    @Override
+    public void onBackPressed() {
+
+        if (mExitSnackbar == null) {
+            mExitSnackbar = createExitSnackBar();
+            mExitSnackbar.show();
+        }else
+        if (!mExitSnackbar.isShown()) {
+            mExitSnackbar.show();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private Snackbar createExitSnackBar() {
+        Snackbar snackbar = Snackbar.make(mCoordinatorLayout, R.string.exit_app_message, Snackbar.LENGTH_LONG);
+        snackbar.getView().setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.secondaryColor));
+        TextView textView = snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+        textView.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.secondaryTextColor));
+
+        return snackbar;
     }
 
     @Override
@@ -148,6 +181,6 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
 
     @Override
     public <T extends ArrayAdapter> void setAdapter(T adapter) {
-        listTasks.setAdapter(adapter);
+        mTaskLisView.setAdapter(adapter);
     }
 }

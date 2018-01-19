@@ -37,5 +37,6 @@
     <string name="completed">Completed</string>
     <string name="clear_all_data">Clear all data?</string>
     <string name="clear_all">Clear all</string>
+    <string name="exit_app_message">Press back button one more time to exit.</string>
 
 </resources>
