@@ -1,6 +1,5 @@
 package com.nandy.taskmanager;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,7 +11,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
@@ -26,6 +24,8 @@ import java.security.MessageDigest;
  */
 
 public class OverlayTransformation extends BitmapTransformation {
+
+    private static final float RADIUS_CORNER_PX = 10;
 
     private Bitmap mBitmapOverlay;
     private DisplayMetrics mDisplayMetrics;
@@ -44,9 +44,29 @@ public class OverlayTransformation extends BitmapTransformation {
 
         Canvas canvas = new Canvas(resultBitmap);
 
-        final int cornerSizePx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) 9, mDisplayMetrics);
+        int padding = mBitmapOverlay.getHeight()/5;
+        int width = resultBitmap.getWidth() - padding;
+        int height = resultBitmap.getHeight() - padding;
+        roundCorners(canvas, mDisplayMetrics, source, width, height, RADIUS_CORNER_PX );
+
+        int overlaySize = mBitmapOverlay.getHeight() - padding;
+        Bitmap overlay = resize(mBitmapOverlay, overlaySize, overlaySize);
+        overlay = drawOverlay(overlay, mBitmapOverlay.getHeight(), mBitmapOverlay.getHeight());
+
+        int left = canvas.getWidth() - overlay.getWidth();
+        int top = canvas.getHeight() - overlay.getHeight();
+
+        canvas.drawBitmap(overlay, left, top, new Paint());
+
+        return resultBitmap;
+    }
+
+    private void roundCorners(Canvas canvas, DisplayMetrics displayMetrics, Bitmap source, int width, int height, float cornersRadius){
+
+        final int cornerSizePx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornersRadius,
+               displayMetrics);
         final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, resultBitmap.getWidth() - mBitmapOverlay.getHeight()/2, resultBitmap.getHeight() - mBitmapOverlay.getHeight()/2);
+        final Rect rect = new Rect(0, 0, width, height);
         final RectF rectF = new RectF(rect);
 
         paint.setAntiAlias(true);
@@ -57,19 +77,20 @@ public class OverlayTransformation extends BitmapTransformation {
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(source, rect, rect, paint);
+    }
 
+    private Bitmap resize(Bitmap source, int width, int height) {
+        int originWidth = source.getWidth();
+        int originHeight = source.getHeight();
+        float scaleWidth = ((float) width) / originWidth;
+        float scaleHeight = ((float) height) / originHeight;
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
 
-        Log.d("IMAGE_TRANSFORMATION_", "source: " + source + ", overlay: " + mBitmapOverlay);
-
-        int overlaySize = mBitmapOverlay.getHeight() + mBitmapOverlay.getHeight()/5;
-        Bitmap overlay = drawOverlay(mBitmapOverlay, overlaySize, overlaySize);
-
-        int left = canvas.getWidth() - overlay.getWidth();
-        int top = canvas.getHeight() - overlay.getHeight();
-
-        canvas.drawBitmap(overlay, left, top, new Paint());
-
-        return resultBitmap;
+        Bitmap resizedBitmap = Bitmap.createBitmap(
+                source, 0, 0, originWidth, originHeight, matrix, false);
+        source.recycle();
+        return resizedBitmap;
     }
 
     private Bitmap drawOverlay(Bitmap overlay, int resWidth, int resHeight){
@@ -97,29 +118,6 @@ public class OverlayTransformation extends BitmapTransformation {
         return result;
     }
 
-//    private  Bitmap transform( Bitmap source) {
-//        Bitmap output = Bitmap.createBitmap(source.getWidth(), source.getHeight(),
-//                Bitmap.Config.ARGB_8888);
-//
-//        Canvas canvas = new Canvas(output);
-//
-//        final int cornerSizePx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) 9, mDisplayMetrics);
-//        final Paint paint = new Paint();
-//        final Rect rect = new Rect(0, 0, output.getWidth(), output.getHeight());
-//        final RectF rectF = new RectF(rect);
-//
-//        paint.setAntiAlias(true);
-//        paint.setColor(0xFFFFFFFF);
-//        paint.setStyle(Paint.Style.FILL);
-//        canvas.drawARGB(0, 0, 0, 0);
-//        canvas.drawRoundRect(rectF, cornerSizePx, cornerSizePx, paint);
-//
-//        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-//        canvas.drawBitmap(source, rect, rect, paint);
-//
-//        return output;
-//    }
-
 
     @Override
     public void updateDiskCacheKey(@NonNull MessageDigest messageDigest) {
@@ -130,29 +128,3 @@ public class OverlayTransformation extends BitmapTransformation {
         }
     }
 }
-
-//        extends BitmapTransformation {
-//    private static final String ID = "com.nandy.taskmanager.OverlayTransformation";
-//
-//
-//    @Override
-//    protected Bitmap transform(@NonNull BitmapPool pool, @NonNull Bitmap source, int outWidth, int outHeight) {
-//
-//        Bitmap resultBitmap = Bitmap.createBitmap(source.getWidth(), source.getHeight(), source.getConfig());
-//        Canvas canvas = new Canvas(resultBitmap);
-//        canvas.drawBitmap(source, new Matrix(), null);
-//        canvas.drawBitmap(mBitmapOverlay, (source.getWidth() - mBitmapOverlay.getWidth()) / 2,
-//                (source.getHeight() - mBitmapOverlay.getHeight()) / 2, new Paint());
-//
-//        return resultBitmap;
-//    }
-//
-//    @Override
-//    public void updateDiskCacheKey(@NonNull MessageDigest messageDigest) {
-//        try {
-//            messageDigest.update(ID.getBytes(STRING_CHARSET_NAME));
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//}

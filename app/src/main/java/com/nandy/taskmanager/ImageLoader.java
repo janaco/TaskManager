@@ -25,8 +25,6 @@ public class ImageLoader {
 
         Bitmap overlay = BitmapFactory.decodeResource(context.getResources(), overlayResId);
 
-        Log.d("IMAGE_TRASFORMATION", "overlay: " + overlay);
-
         return Glide.with(context)
                 .load(pathToImage)
                 .apply(new RequestOptions()
