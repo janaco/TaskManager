@@ -1,7 +1,9 @@
 package com.nandy.taskmanager.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -99,7 +101,7 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
                 return true;
 
             case R.id.action_clear_all:
-                mTasksPresenter.clearAllTasks();
+                onClearAllOptionSelected();
                 return true;
 
             case R.id.action_exit:
@@ -110,6 +112,15 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    private void onClearAllOptionSelected() {
+
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.clear_all_data)
+                .setPositiveButton(R.string.clear_all, (dialogInterface, i) -> mTasksPresenter.clearAllTasks())
+                .setNegativeButton(R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
+                .show();
     }
 
     @Override

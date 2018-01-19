@@ -35,5 +35,7 @@
     <string name="pause">Pause</string>
     <string name="resume">Resume</string>
     <string name="completed">Completed</string>
+    <string name="clear_all_data">Clear all data?</string>
+    <string name="clear_all">Clear all</string>
 
 </resources>
