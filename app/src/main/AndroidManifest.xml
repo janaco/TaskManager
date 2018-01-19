@@ -18,13 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.ListActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".activity.ListActivity"/>
         <activity android:name=".activity.CreateTaskActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
@@ -45,7 +39,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nandy.taskmanager.activity.CreateTaskActivity" />
         </activity>
-        <activity android:name=".activity.TaskDetailsActivity"></activity>
+        <activity android:name=".activity.TaskDetailsActivity" />
+        <activity android:name=".activity.SplashActivity"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
