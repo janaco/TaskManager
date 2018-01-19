@@ -1,8 +1,8 @@
 package com.nandy.taskmanager.activity;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.RequestBuilder;
 import com.nandy.taskmanager.ImageLoader;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
@@ -141,14 +142,21 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
     }
 
     @Override
-    public void loadImage(String image) {
-        ImageLoader.load(getApplicationContext(), image)
-                .into(mTaskImageView);
+    public void loadImage(String image, boolean drawMapPin) {
+
+        RequestBuilder<Drawable> requestBuilder =
+                drawMapPin ?
+                        ImageLoader.load(getApplicationContext(), image, R.mipmap.ic_map_marker)
+                        : ImageLoader.load(getApplicationContext(), image);
+        requestBuilder.into(mTaskImageView);
     }
 
     @Override
-    public void loadImage(String image, @IdRes int overlayResId) {
-        ImageLoader.load(getApplicationContext(), image, overlayResId)
-                .into(mTaskImageView);
+    public void loadImage(int imageResId, boolean drawMapPin) {
+        RequestBuilder<Drawable> requestBuilder =
+                drawMapPin ?
+                        ImageLoader.load(getApplicationContext(), imageResId, R.mipmap.ic_map_marker)
+                        : ImageLoader.load(getApplicationContext(), imageResId);
+        requestBuilder.into(mTaskImageView);
     }
 }

@@ -22,7 +22,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.nandy.taskmanager.ImageLoader;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
@@ -192,14 +192,8 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
 
 
     private boolean isPermissionsGranted() {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED
+        return Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 || ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 
-                    ;
-        }
-
-        return true;
     }
 
 
@@ -261,10 +255,8 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
     }
 
     @Override
-    public void displayImage(File file) {
-        Glide
-                .with(getApplicationContext())
-                .load(file)
+    public void displayImage(String imagePath) {
+        ImageLoader.load(getApplicationContext(), imagePath)
                 .into(mTaskImageView);
     }
 
@@ -285,8 +277,6 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         Uri outputUri = Uri.fromFile(new File(getFilesDir(), "temp_cover.jpg"));
         takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
-
-        Log.d("IMAGE_", "output uri: " + outputUri);
 
         Intent chooserIntent = Intent.createChooser(pickIntent, getString(R.string.take_or_select_photo));
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});

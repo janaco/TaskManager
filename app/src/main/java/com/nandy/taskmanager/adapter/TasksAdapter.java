@@ -1,9 +1,6 @@
 package com.nandy.taskmanager.adapter;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,11 +8,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.nandy.taskmanager.ImageLoader;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -46,7 +42,12 @@ public class TasksAdapter extends ArrayAdapter<Task> {
             viewHolder.setTitle(task.getTitle());
             viewHolder.setComment(task.getDescription());
             viewHolder.setStatus(task.getStatus().name());
-//            viewHolder.loadImage(task.getImage());
+
+            if (task.hasImage()){
+                viewHolder.loadImage(task.getImage(), task.hasLocation());
+            }else {
+                viewHolder.loadImage(R.mipmap.ic_task, task.hasLocation());
+            }
         }
 
 
@@ -77,14 +78,30 @@ public class TasksAdapter extends ArrayAdapter<Task> {
             textViewComment.setText(comment);
         }
 
-        void setStatus(String status){
+        void setStatus(String status) {
             textViewStatus.setText(status);
         }
 
-        void loadImage(String image){
-            Glide.with(imageTask.getContext())
-                    .load(image)
-                    .into(imageTask);
+        void loadImage(String image, boolean drawMapPin) {
+
+            if (drawMapPin) {
+                ImageLoader.load(imageTask.getContext(), image, R.mipmap.ic_map_marker)
+                        .into(imageTask);
+            } else {
+                ImageLoader.load(imageTask.getContext(), image)
+                        .into(imageTask);
+            }
+        }
+
+        void loadImage(int resId, boolean drawMapPin) {
+
+            if (drawMapPin) {
+                ImageLoader.load(imageTask.getContext(), resId, R.mipmap.ic_map_marker)
+                        .into(imageTask);
+            } else {
+                ImageLoader.load(imageTask.getContext(), resId)
+                        .into(imageTask);
+            }
         }
     }
 }

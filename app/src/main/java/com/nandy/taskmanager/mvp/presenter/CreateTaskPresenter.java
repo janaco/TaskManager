@@ -58,7 +58,7 @@ public class CreateTaskPresenter extends BasePresenter {
             }
 
             if (task.hasImage()){
-                mView.displayImage(new File(task.getImage()));
+                mView.displayImage(task.getImage());
             }
         }
     }
@@ -132,9 +132,8 @@ public class CreateTaskPresenter extends BasePresenter {
             case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
                 try {
                     File imageFile = mCropImageModel.getCroppedImage(data, resultCode);
-                    Log.d("IMAGE_", "cropped file: " + imageFile);
                     mCreateTaskMode.setImage(imageFile.getPath());
-                    mView.displayImage(imageFile);
+                    mView.displayImage(imageFile.getPath());
                 } catch (Exception e) {
                     e.printStackTrace();
                     //TODO: show error

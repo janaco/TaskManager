@@ -74,17 +74,15 @@ public class TaskDetailsPresenter extends BasePresenter {
                 mDateFormatModel.format(task.getStartDate()),
                 mDateFormatModel.format(task.getEndDate())));
 
-        Log.d("IMAGE_", "image: " + task.getImage());
-
         if (task.hasLocation()) {
 
-            if (task.hasImage()) {
-                mView.loadImage(task.getImage(), R.mipmap.ic_map_marker);
-            }
-
             mView.setLocation(task.getLocation().toString());
+        }
+
+        if (task.hasImage()){
+            mView.loadImage(task.getImage(), task.hasLocation());
         }else {
-            mView.loadImage(task.getImage());
+            mView.loadImage(R.mipmap.ic_task, task.hasLocation());
         }
 
     }

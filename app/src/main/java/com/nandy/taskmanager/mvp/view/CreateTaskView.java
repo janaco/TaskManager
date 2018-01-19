@@ -37,7 +37,7 @@ public interface CreateTaskView {
 
     void displayLocation(String location);
 
-    void displayImage(File file);
+    void displayImage(String imagePath);
 
     void setDescription(String description);
 
