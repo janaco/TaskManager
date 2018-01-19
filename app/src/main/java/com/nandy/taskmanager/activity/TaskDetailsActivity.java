@@ -2,16 +2,16 @@ package com.nandy.taskmanager.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.nandy.taskmanager.ImageLoader;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
@@ -55,7 +55,7 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
 
         Task task = getIntent().getParcelableExtra("task");
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null){
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
@@ -114,7 +114,7 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
     @Override
     public void setTitle(String title) {
         mTitleTextView.setText(title);
-        if (getSupportActionBar() != null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(title);
         }
     }
@@ -142,8 +142,13 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
 
     @Override
     public void loadImage(String image) {
-        Glide.with(this)
-                .load(image)
+        ImageLoader.load(getApplicationContext(), image)
+                .into(mTaskImageView);
+    }
+
+    @Override
+    public void loadImage(String image, @IdRes int overlayResId) {
+        ImageLoader.load(getApplicationContext(), image, overlayResId)
                 .into(mTaskImageView);
     }
 }

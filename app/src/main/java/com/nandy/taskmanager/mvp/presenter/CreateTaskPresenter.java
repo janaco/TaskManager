@@ -2,6 +2,7 @@ package com.nandy.taskmanager.mvp.presenter;
 
 import android.content.Intent;
 import android.speech.RecognizerIntent;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.R;
@@ -131,6 +132,7 @@ public class CreateTaskPresenter extends BasePresenter {
             case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
                 try {
                     File imageFile = mCropImageModel.getCroppedImage(data, resultCode);
+                    Log.d("IMAGE_", "cropped file: " + imageFile);
                     mCreateTaskMode.setImage(imageFile.getPath());
                     mView.displayImage(imageFile);
                 } catch (Exception e) {

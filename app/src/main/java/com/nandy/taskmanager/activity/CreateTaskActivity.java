@@ -15,6 +15,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -168,9 +169,9 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
 
     @OnClick(R.id.image_task)
     void onTaskImageClick() {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1 && !isReadExternalStoragePermissionGranted()) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1 && !isPermissionsGranted()) {
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
                     REQUEST_PERMISSIONS_CODE);
 
             return;
@@ -184,15 +185,21 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
                                            @android.support.annotation.NonNull String[] permissions, @android.support.annotation.NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == REQUEST_PERMISSIONS_CODE && isReadExternalStoragePermissionGranted()) {
+        if (requestCode == REQUEST_PERMISSIONS_CODE && isPermissionsGranted()) {
             showPickImagePopup();
         }
     }
 
 
-    private boolean isReadExternalStoragePermissionGranted() {
-        return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED;
+    private boolean isPermissionsGranted() {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED
+
+                    ;
+        }
+
+        return true;
     }
 
 
@@ -278,6 +285,8 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         Uri outputUri = Uri.fromFile(new File(getFilesDir(), "temp_cover.jpg"));
         takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
+
+        Log.d("IMAGE_", "output uri: " + outputUri);
 
         Intent chooserIntent = Intent.createChooser(pickIntent, getString(R.string.take_or_select_photo));
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});

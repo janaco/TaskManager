@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -36,6 +37,8 @@ public class CropImageModel {
             fileUri = getImageFromGallery(data.getData());
         }
 
+        Log.d("IMAGE_", "crop uri: " + fileUri);
+
         return CropImage.activity(fileUri);
     }
 
@@ -45,7 +48,16 @@ public class CropImageModel {
         if (resultCode == RESULT_OK) {
             Uri resultUri = result.getUri();
             removeTempFile();
-            return new File(resultUri.getPath());
+
+            File tempFile = new File(resultUri.getPath());
+            File resultFile = new File(mContext.getFilesDir(), "image" + System.currentTimeMillis() + ".jpg" );
+            boolean renamed = tempFile.renameTo(resultFile);
+            boolean removed = tempFile.delete();
+
+            Log.d("IMAGE_", "renamed: " + renamed + ", removed: " + removed);
+            return resultFile;
+
+
         } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                     throw new Exception( result.getError());
         }

@@ -2,9 +2,9 @@ package com.nandy.taskmanager.mvp.presenter;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
+import android.util.Log;
 
-import com.nandy.taskmanager.activity.CreateTaskActivity;
+import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.BasePresenter;
@@ -19,14 +19,14 @@ import java.util.Locale;
  * Created by razomer on 18.01.18.
  */
 
-public class TaskDetailsPresenter extends BasePresenter{
+public class TaskDetailsPresenter extends BasePresenter {
 
     private TaskDetailsView mView;
     private TaskDetailsModel mDetailsModel;
     private DateFormatModel mDateFormatModel;
     private TaskRecordsModel mRecordsModel;
 
-    public TaskDetailsPresenter(TaskDetailsView view){
+    public TaskDetailsPresenter(TaskDetailsView view) {
         mView = view;
     }
 
@@ -54,18 +54,18 @@ public class TaskDetailsPresenter extends BasePresenter{
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (resultCode == Activity.RESULT_OK && requestCode == TaskDetailsActivity.REQUEST_CODE_EDIT){
+        if (resultCode == Activity.RESULT_OK && requestCode == TaskDetailsActivity.REQUEST_CODE_EDIT) {
             Task task = data.getParcelableExtra("task");
             mDetailsModel.setTask(task);
             displayData(task);
         }
     }
 
-    public Task getTask(){
+    public Task getTask() {
         return mDetailsModel.getTask();
     }
 
-    private void displayData(Task task){
+    private void displayData(Task task) {
 
         mView.setStatus(task.getStatus().name());
         mView.setTitle(task.getTitle());
@@ -73,18 +73,29 @@ public class TaskDetailsPresenter extends BasePresenter{
         mView.setTime(String.format(Locale.getDefault(), "%s - %s",
                 mDateFormatModel.format(task.getStartDate()),
                 mDateFormatModel.format(task.getEndDate())));
-        if (task.hasLocation()){
+
+        Log.d("IMAGE_", "image: " + task.getImage());
+
+        if (task.hasLocation()) {
+
+            if (task.hasImage()) {
+                mView.loadImage(task.getImage(), R.mipmap.ic_map_marker);
+            }
+
             mView.setLocation(task.getLocation().toString());
+        }else {
+            mView.loadImage(task.getImage());
         }
+
     }
 
-    public void toggleStatus(){
+    public void toggleStatus() {
         mDetailsModel.toggleStatus();
         mRecordsModel.update(mDetailsModel.getTask());
         mView.setStatus(mDetailsModel.getTask().getStatus().name());
     }
 
-    public void delete(){
+    public void delete() {
         mRecordsModel.delete(mDetailsModel.getTask());
     }
 }
