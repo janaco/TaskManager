@@ -4,6 +4,7 @@
 
     <item
         android:title="@string/save"
+        android:icon="@drawable/check"
         app:showAsAction="always"
         android:id="@+id/action_save"/>
 
