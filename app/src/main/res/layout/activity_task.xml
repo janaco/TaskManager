@@ -125,7 +125,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:background="@color/secondaryColor"
+            android:background="@drawable/selector_button"
             android:text="@string/start"
             android:textColor="@color/secondaryTextColor" />
 

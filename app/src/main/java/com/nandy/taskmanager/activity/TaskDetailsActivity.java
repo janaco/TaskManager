@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskDetailsModel;
+import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.presenter.TaskDetailsPresenter;
 import com.nandy.taskmanager.mvp.view.TaskDetailsView;
 
@@ -43,6 +45,8 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
     TextView mStatusTextView;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
+    @BindView(R.id.btn_control)
+    Button mControlButton;
 
     private TaskDetailsPresenter mPresenter;
 
@@ -63,6 +67,7 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
         mPresenter = new TaskDetailsPresenter(this);
         mPresenter.setDateFormatModel(new DateFormatModel());
         mPresenter.setDetailsModel(new TaskDetailsModel(task));
+        mPresenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
 
         mPresenter.start();
     }
@@ -139,6 +144,16 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
     @Override
     public void setLocation(String location) {
         mLocationTextView.setText(location);
+    }
+
+    @Override
+    public void setControlButtonEnabled(boolean enabled) {
+        mControlButton.setEnabled(enabled);
+    }
+
+    @Override
+    public void setControlButtonText(int resId) {
+        mControlButton.setText(resId);
     }
 
     @Override

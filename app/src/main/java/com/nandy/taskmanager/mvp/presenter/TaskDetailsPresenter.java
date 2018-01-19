@@ -7,6 +7,7 @@ import android.util.Log;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.model.Task;
+import com.nandy.taskmanager.model.TaskStatus;
 import com.nandy.taskmanager.mvp.BasePresenter;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskDetailsModel;
@@ -75,22 +76,50 @@ public class TaskDetailsPresenter extends BasePresenter {
                 mDateFormatModel.format(task.getEndDate())));
 
         if (task.hasLocation()) {
-
             mView.setLocation(task.getLocation().toString());
         }
 
-        if (task.hasImage()){
+        if (task.hasImage()) {
             mView.loadImage(task.getImage(), task.hasLocation());
-        }else {
+        } else {
             mView.loadImage(R.mipmap.ic_task, task.hasLocation());
         }
 
+        mView.setControlButtonEnabled(task.getStatus() != TaskStatus.COMPLETED);
+
+        if (task.getStatus() == TaskStatus.NEW) {
+            mView.setControlButtonText(R.string.start);
+        } else {
+            mView.setControlButtonText(R.string.finish);
+        }
+
+        setupControlButton(task.getStatus());
+    }
+
+    private void setupControlButton(TaskStatus status) {
+        mView.setControlButtonEnabled(status != TaskStatus.COMPLETED);
+
+        switch (status) {
+
+            case NEW:
+                mView.setControlButtonText(R.string.start);
+                break;
+
+            case COMPLETED:
+                mView.setControlButtonText(R.string.completed);
+                break;
+                
+            default:
+                mView.setControlButtonText(R.string.finish);
+                break;
+        }
     }
 
     public void toggleStatus() {
         mDetailsModel.toggleStatus();
         mRecordsModel.update(mDetailsModel.getTask());
         mView.setStatus(mDetailsModel.getTask().getStatus().name());
+        setupControlButton(mDetailsModel.getTask().getStatus());
     }
 
     public void delete() {

@@ -34,5 +34,6 @@
     <string name="finish">Finish</string>
     <string name="pause">Pause</string>
     <string name="resume">Resume</string>
+    <string name="completed">Completed</string>
 
 </resources>
