@@ -9,8 +9,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -51,6 +54,8 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
 
         setSupportActionBar(mToolbar);
 
+        registerForContextMenu(mTaskLisView);
+
         mTaskLisView.setOnItemClickListener((adapterView, view, position, l) ->
                 openDetails(mTasksPresenter.getArguments(position)));
 
@@ -68,13 +73,48 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
 
 
     @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        getMenuInflater().inflate(R.menu.menu_list_item, menu);
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int position = info.position;
+
+        switch (item.getItemId()) {
+
+
+            case R.id.action_delete:
+                return true;
+
+
+            case R.id.action_edit:
+                return true;
+
+
+            case R.id.action_reset_start:
+                return true;
+
+            case R.id.action_reset_end:
+                return true;
+
+            default:
+                return super.onContextItemSelected(item);
+
+        }
+
+    }
+
+    @Override
     public void onBackPressed() {
 
         if (mExitSnackbar == null) {
             mExitSnackbar = createExitSnackBar();
             mExitSnackbar.show();
-        }else
-        if (!mExitSnackbar.isShown()) {
+        } else if (!mExitSnackbar.isShown()) {
             mExitSnackbar.show();
         } else {
             super.onBackPressed();
