@@ -55,7 +55,7 @@ public class DummyDataModel {
 
             task.setStartDate(startDate);
             task.setEndDate(calculateEndDate(startDate, duration));
-            task.setStatus(getRandomStatus(TaskStatus.values()));
+            task.setStatus(TaskStatus.NEW);
             task.setMaxDuration(duration);
             task.setPeriod(getRandomPeriod(RepeatPeriod.values()));
 
@@ -76,11 +76,6 @@ public class DummyDataModel {
         calendar.add(Calendar.MILLISECOND,(int) duration);
 
         return calendar.getTime();
-    }
-
-
-    private TaskStatus getRandomStatus(TaskStatus[] statuses) {
-        return statuses[mRandom.nextInt(statuses.length - 1)];
     }
 
     private RepeatPeriod getRandomPeriod(RepeatPeriod[] periods) {

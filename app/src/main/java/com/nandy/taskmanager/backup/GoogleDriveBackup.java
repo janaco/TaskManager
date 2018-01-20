@@ -70,11 +70,11 @@
 //    }
 //
 //    @Override
-//    public void start() {
+//    public void sceduleTaskAutoComplete() {
 //        if (googleApiClient != null) {
 //            googleApiClient.connect();
 //        } else {
-//            throw new IllegalStateException("You should call init before start");
+//            throw new IllegalStateException("You should call init before sceduleTaskAutoComplete");
 //        }
 //    }
 //
@@ -83,7 +83,7 @@
 //        if (googleApiClient != null) {
 //            googleApiClient.disconnect();
 //        } else {
-//            throw new IllegalStateException("You should call init before start");
+//            throw new IllegalStateException("You should call init before sceduleTaskAutoComplete");
 //        }
 //    }
 //
@@ -171,7 +171,7 @@
 //                                                }
 //                                            });
 //                                }
-//                            }.start();
+//                            }.sceduleTaskAutoComplete();
 //                        }
 //                    });
 //        }

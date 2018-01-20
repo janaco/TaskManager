@@ -128,6 +128,7 @@ public class TaskDetailsPresenter extends BasePresenter {
 
             case NEW:
                 newStatus = TaskStatus.ACTIVE;
+                mShceduleModel.scheduleTaskAutoComplete(task.getId(), task.getMaxDuration());
                 break;
 
             case ACTIVE:
@@ -144,7 +145,6 @@ public class TaskDetailsPresenter extends BasePresenter {
         mView.setStatus(newStatus.name());
         setupControlButton(newStatus);
 
-        mShceduleModel.start(task.getId(), task.getMaxDuration());
     }
 
     public void delete() {

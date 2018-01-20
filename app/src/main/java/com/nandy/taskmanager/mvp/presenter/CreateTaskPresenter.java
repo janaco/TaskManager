@@ -2,7 +2,6 @@ package com.nandy.taskmanager.mvp.presenter;
 
 import android.content.Intent;
 import android.speech.RecognizerIntent;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.R;
@@ -14,6 +13,7 @@ import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.CropImageModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
+import com.nandy.taskmanager.mvp.model.TaskScheduleModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
 import com.nandy.taskmanager.mvp.view.CreateTaskView;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -38,6 +38,7 @@ public class CreateTaskPresenter extends BasePresenter {
     private DateFormatModel mDateFormatModel;
     private CropImageModel mCropImageModel;
     private TaskRecordsModel mRecordsModel;
+    private TaskScheduleModel mScheduleModel;
 
     public CreateTaskPresenter(CreateTaskView view) {
         mView = view;
@@ -81,7 +82,7 @@ public class CreateTaskPresenter extends BasePresenter {
 
     }
 
-    public boolean createTask(String title, String desctiption) {
+    public boolean saveChanges(String title, String description) {
 
         if (mValidationModel.isEmpty(title)) {
             mView.setTitleError(R.string.empty_field);
@@ -93,12 +94,12 @@ public class CreateTaskPresenter extends BasePresenter {
             return false;
         }
 
-        if (mValidationModel.isEmpty(desctiption)) {
+        if (mValidationModel.isEmpty(description)) {
             mView.setCommentError(R.string.empty_field);
             return false;
         }
 
-        Task task = mCreateTaskMode.create(title, desctiption);
+        Task task = mCreateTaskMode.create(title, description);
         if (mCreateTaskMode.getMode() == CreateTaskModel.MODE_CREATE) {
             mRecordsModel.insert(task);
         } else {
@@ -106,9 +107,12 @@ public class CreateTaskPresenter extends BasePresenter {
 
         }
 
+        mScheduleModel.scheduleAutoTaskStart(task.getId(), task.getStartDate());
+
         Intent intent = new Intent();
         intent.putExtra("task", task);
         mView.setResult(RESULT_OK, intent);
+
 
         return true;
     }
@@ -219,7 +223,6 @@ public class CreateTaskPresenter extends BasePresenter {
 
     public boolean onDurationSelected(int optionId) {
 
-        Log.d("CONTEXT_MENU_", "presenter.onDurationSelected: " + optionId + "(" + R.id.option_fifteen_minutes + ")");
         switch (optionId) {
             case R.id.option_fifteen_minutes:
                 setDuration(15, TimeUnit.MINUTES);
@@ -259,9 +262,7 @@ public class CreateTaskPresenter extends BasePresenter {
     }
 
     private void setDuration(int value, TimeUnit timeUnit) {
-        Log.d("CONTEXT_MENU_", "set duration: " + value + ", " + timeUnit);
         mCreateTaskMode.setDuration(timeUnit.toMillis(value));
-        Log.d("CONTEXT_MENU_", "mView.set duration: " + value + ", " + timeUnit);
         mView.setDuration(value, timeUnit == TimeUnit.MINUTES ? R.string.minutes : R.string.hour);
 
     }
@@ -300,7 +301,6 @@ public class CreateTaskPresenter extends BasePresenter {
 
     private void setRepeatPeriod(RepeatPeriod repeatPeriod) {
         mCreateTaskMode.setRepeatPeriod(repeatPeriod);
-        Log.d("CONTEXT_MENU_", "mView.setRepeatPeriod: " + repeatPeriod.name());
         mView.setRepeatPeriod(repeatPeriod.name());
 
     }
@@ -308,5 +308,9 @@ public class CreateTaskPresenter extends BasePresenter {
 
     public void setRecordsModel(TaskRecordsModel mRecordsModel) {
         this.mRecordsModel = mRecordsModel;
+    }
+
+    public void setScheduleModel(TaskScheduleModel mScheduleModel) {
+        this.mScheduleModel = mScheduleModel;
     }
 }

@@ -32,6 +32,7 @@ import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.CropImageModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
+import com.nandy.taskmanager.mvp.model.TaskScheduleModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
 import com.nandy.taskmanager.mvp.presenter.CreateTaskPresenter;
 import com.nandy.taskmanager.mvp.view.CreateTaskView;
@@ -101,6 +102,7 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         mPresener.setDateFormatModel(new DateFormatModel());
         mPresener.setCropImageModel(new CropImageModel(getApplicationContext()));
         mPresener.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
+        mPresener.setScheduleModel(new TaskScheduleModel(getApplicationContext()));
 
         mPresener.start();
     }
@@ -339,7 +341,7 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         String title = mInputTitle.getText().toString().trim();
         String comment = mInputDescription.getText().toString().trim();
 
-        boolean success = mPresener.createTask(title, comment);
+        boolean success = mPresener.saveChanges(title, comment);
         if (success) {
             finish();
         }
