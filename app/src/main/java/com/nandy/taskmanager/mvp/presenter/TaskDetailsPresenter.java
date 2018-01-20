@@ -36,7 +36,7 @@ public class TaskDetailsPresenter extends BasePresenter {
         this.mDetailsModel = mDetailsModel;
     }
 
-    public void setShceduleModel(TaskScheduleModel mShceduleModel) {
+    public void setScheduleModel(TaskScheduleModel mShceduleModel) {
         this.mShceduleModel = mShceduleModel;
     }
 
@@ -148,6 +148,12 @@ public class TaskDetailsPresenter extends BasePresenter {
     }
 
     public void delete() {
-        mRecordsModel.delete(mDetailsModel.getTask());
+        Task task = mDetailsModel.getTask();
+        mShceduleModel.cancelReminder((int) task.getId());
+        mRecordsModel.delete(task);
+
+        if (task.hasLocation()){
+            mShceduleModel.scheduleLocationUpdates();
+        }
     }
 }

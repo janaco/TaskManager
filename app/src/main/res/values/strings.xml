@@ -63,5 +63,8 @@
     <string name="task">Task</string>
     <string name="started_automatically">started automatically.</string>
     <string name="completed_automatically">completed automatically.</string>
+    <string name="location_tracking_is_enabled">Location tracking is enabled</string>
+    <string name="you_have">You have</string>
+    <string name="pending_tasks">pending task(s)</string>
 
 </resources>

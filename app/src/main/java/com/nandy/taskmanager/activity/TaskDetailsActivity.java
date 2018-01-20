@@ -69,7 +69,7 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
         mPresenter.setDateFormatModel(new DateFormatModel());
         mPresenter.setDetailsModel(new TaskDetailsModel(task));
         mPresenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
-        mPresenter.setShceduleModel(new TaskScheduleModel(getApplicationContext()));
+        mPresenter.setScheduleModel(new TaskScheduleModel(getApplicationContext()));
 
         mPresenter.start();
     }

@@ -22,7 +22,10 @@ public interface TasksDao {
     List<Task> getAll();
 
     @Query("SELECT * FROM tasks WHERE id LIKE :id")
-    List<Task> getById(String id);
+    List<Task> getById(long id);
+
+    @Query("SELECT * FROM tasks WHERE location IS NOT NULL AND status LIKE('NEW') OR status LIKE('COMPLETED')")
+    List<Task> selectAllWithLocation();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Task task);
@@ -35,4 +38,7 @@ public interface TasksDao {
 
     @Query("DELETE FROM tasks")
     void deleteAll();
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE location IS NOT NULL AND status LIKE('NEW') OR status LIKE('COMPLETED')")
+    int getNumberOfTasksWithLocation();
 }

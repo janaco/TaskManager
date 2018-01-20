@@ -18,7 +18,7 @@ public class Task implements Parcelable{
     @PrimaryKey
     @NonNull
     @ColumnInfo(name = "id")
-    private String mId;
+    private long mId;
     @ColumnInfo(name = "title")
     private String mTitle;
     @ColumnInfo(name = "description")
@@ -44,21 +44,14 @@ public class Task implements Parcelable{
     private RepeatPeriod mPeriod;
 
 
-    public Task(String title, String description) {
-        mTitle = title;
-        mDescription = description;
-        mId = String.valueOf(title.hashCode()).concat(String.valueOf(description.hashCode()));
-    }
-
-    @Ignore
-    public Task(@NonNull String id, String title, String description){
+    public Task(long id, String title, String description) {
         mId = id;
         mTitle = title;
         mDescription = description;
     }
 
     protected Task(Parcel in) {
-        mId = in.readString();
+        mId = in.readLong();
         mTitle = in.readString();
         mDescription = in.readString();
         mImage = in.readString();
@@ -72,7 +65,7 @@ public class Task implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mId);
+        dest.writeLong(mId);
         dest.writeString(mTitle);
         dest.writeString(mDescription);
         dest.writeString(mImage);
@@ -149,7 +142,7 @@ public class Task implements Parcelable{
         this.mDescription = mDescription;
     }
 
-    public String getId() {
+    public long getId() {
         return mId;
     }
 
@@ -161,8 +154,8 @@ public class Task implements Parcelable{
         this.mStatus = mStatus;
     }
 
-    public void setId(String id) {
-        this.mId = id;
+    public void setId(@NonNull long mId) {
+        this.mId = mId;
     }
 
     public String getImage() {

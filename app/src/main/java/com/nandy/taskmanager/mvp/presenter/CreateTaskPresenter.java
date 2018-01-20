@@ -107,7 +107,11 @@ public class CreateTaskPresenter extends BasePresenter {
 
         }
 
-        mScheduleModel.scheduleAutoTaskStart(task.getId(), task.getStartDate());
+        mScheduleModel.scheduleAutoTaskStart(task);
+
+        if (task.hasLocation()){
+            mScheduleModel.scheduleLocationUpdates();
+        }
 
         Intent intent = new Intent();
         intent.putExtra("task", task);

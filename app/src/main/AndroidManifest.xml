@@ -51,6 +51,12 @@
         </activity>
 
         <receiver android:name=".receiver.TaskStatusReceiver" />
+
+        <service
+            android:name=".service.LocationService"
+            android:enabled="true"
+            android:process=":remote"
+            android:exported="true"/>
     </application>
 
 </manifest>

@@ -97,7 +97,7 @@ public class RestoreFromBackupModel extends BackupModel {
         if (cursor.moveToFirst()) {
 
             do {
-                String id = cursor.getString(cursor.getColumnIndex("id"));
+                long id = cursor.getLong(cursor.getColumnIndex("id"));
                 String title = cursor.getString(cursor.getColumnIndex("title"));
                 String comment = cursor.getString(cursor.getColumnIndex("comment"));
 

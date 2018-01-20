@@ -55,7 +55,7 @@ public class CreateTaskModel {
     public Task create(String title, String description) {
 
         if (mMode == MODE_CREATE) {
-            mTask = new Task(title, description);
+            mTask = new Task(System.currentTimeMillis(), title, description);
             mTask.setStatus(TaskStatus.NEW);
         } else {
             mTask.setTitle(title);

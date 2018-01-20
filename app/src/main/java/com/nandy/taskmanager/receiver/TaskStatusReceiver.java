@@ -31,8 +31,8 @@ public class TaskStatusReceiver extends BroadcastReceiver {
 
     public static final String TASK_CHANNEL_ID = "Task";
 
-    private static final int NOTIFICATION_TAS_STARTED = 425;
-    private static final int NOTIFICATION_TAS_COMPLETED = 426;
+    private static final int NOTIFICATION_TASK_STARTED = 425;
+    private static final int NOTIFICATION_TASK_COMPLETED = 426;
 
 
     @Override
@@ -40,7 +40,7 @@ public class TaskStatusReceiver extends BroadcastReceiver {
 
 
         TasksDao tasksDao = AppDatabase.getInstance(context).tasksDao();
-        String taskId = intent.getStringExtra("id");
+        long taskId = intent.getLongExtra("id", -1);
 
         Log.d("TASK_RECEIVE_", "id: " + taskId + ", " + intent.getAction());
 
@@ -54,7 +54,8 @@ public class TaskStatusReceiver extends BroadcastReceiver {
         switch (intent.getAction()) {
 
             case ACTION_START:
-                if (task.getStatus() == TaskStatus.NEW) {
+                if (task.getStatus() == TaskStatus.NEW
+                        || (task.isPeriodical() && task.getStatus() == TaskStatus.COMPLETED)) {
                     task.setStatus(TaskStatus.ACTIVE);
                     showTaskStartedNotification(context, task.getTitle());
                     new TaskScheduleModel(context).scheduleTaskAutoComplete(taskId, task.getMaxDuration());
@@ -75,7 +76,7 @@ public class TaskStatusReceiver extends BroadcastReceiver {
     }
 
     @Nullable
-    private Task getTask(TasksDao tasksDao, String taskId) {
+    private Task getTask(TasksDao tasksDao, long taskId) {
         List<Task> tasks = tasksDao.getById(taskId);
 
         if (tasks.size() > 0) {
@@ -91,7 +92,7 @@ public class TaskStatusReceiver extends BroadcastReceiver {
         showNotification(context,
                 buildTaskCompetedNotification(context, title,
                         getContentIntent(context)),
-                NOTIFICATION_TAS_COMPLETED);
+                NOTIFICATION_TASK_COMPLETED);
     }
 
     private void showTaskStartedNotification(Context context, String title) {
@@ -99,7 +100,7 @@ public class TaskStatusReceiver extends BroadcastReceiver {
         showNotification(context,
                 buildTaskStartedNotification(context, title,
                         getContentIntent(context)),
-                NOTIFICATION_TAS_STARTED);
+                NOTIFICATION_TASK_STARTED);
     }
 
     private PendingIntent getContentIntent(Context context) {
