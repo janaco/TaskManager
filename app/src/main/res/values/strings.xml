@@ -58,5 +58,8 @@
     <string name="six_hours">6 hour</string>
     <string name="minutes">minutes</string>
     <string name="set_duration">Set duration</string>
+    <string name="task_completed">Task was completed.</string>
+    <string name="task">Task</string>
+    <string name="completed_automatically">completed automatically.</string>
 
 </resources>

@@ -2,7 +2,6 @@ package com.nandy.taskmanager.mvp.presenter;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
@@ -11,6 +10,7 @@ import com.nandy.taskmanager.model.TaskStatus;
 import com.nandy.taskmanager.mvp.BasePresenter;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskDetailsModel;
+import com.nandy.taskmanager.mvp.model.TaskScheduleModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.view.TaskDetailsView;
 
@@ -26,6 +26,7 @@ public class TaskDetailsPresenter extends BasePresenter {
     private TaskDetailsModel mDetailsModel;
     private DateFormatModel mDateFormatModel;
     private TaskRecordsModel mRecordsModel;
+    private TaskScheduleModel mShceduleModel;
 
     public TaskDetailsPresenter(TaskDetailsView view) {
         mView = view;
@@ -33,6 +34,10 @@ public class TaskDetailsPresenter extends BasePresenter {
 
     public void setDetailsModel(TaskDetailsModel mDetailsModel) {
         this.mDetailsModel = mDetailsModel;
+    }
+
+    public void setShceduleModel(TaskScheduleModel mShceduleModel) {
+        this.mShceduleModel = mShceduleModel;
     }
 
     public void setDateFormatModel(DateFormatModel mDateFormatModel) {
@@ -107,7 +112,7 @@ public class TaskDetailsPresenter extends BasePresenter {
             case COMPLETED:
                 mView.setControlButtonText(R.string.completed);
                 break;
-                
+
             default:
                 mView.setControlButtonText(R.string.finish);
                 break;
@@ -115,10 +120,31 @@ public class TaskDetailsPresenter extends BasePresenter {
     }
 
     public void toggleStatus() {
-        mDetailsModel.toggleStatus();
+        Task task = mDetailsModel.getTask();
+        TaskStatus currentStatus = task.getStatus();
+        TaskStatus newStatus;
+
+        switch (currentStatus) {
+
+            case NEW:
+                newStatus = TaskStatus.ACTIVE;
+                break;
+
+            case ACTIVE:
+                newStatus = TaskStatus.COMPLETED;
+                break;
+
+            default:
+                newStatus = TaskStatus.NEW;
+                break;
+        }
+
+        mDetailsModel.setStatus(newStatus);
         mRecordsModel.update(mDetailsModel.getTask());
-        mView.setStatus(mDetailsModel.getTask().getStatus().name());
-        setupControlButton(mDetailsModel.getTask().getStatus());
+        mView.setStatus(newStatus.name());
+        setupControlButton(newStatus);
+
+        mShceduleModel.start(task.getId(), task.getMaxDuration());
     }
 
     public void delete() {

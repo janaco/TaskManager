@@ -20,6 +20,7 @@ import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskDetailsModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
+import com.nandy.taskmanager.mvp.model.TaskScheduleModel;
 import com.nandy.taskmanager.mvp.presenter.TaskDetailsPresenter;
 import com.nandy.taskmanager.mvp.view.TaskDetailsView;
 
@@ -68,6 +69,7 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
         mPresenter.setDateFormatModel(new DateFormatModel());
         mPresenter.setDetailsModel(new TaskDetailsModel(task));
         mPresenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
+        mPresenter.setShceduleModel(new TaskScheduleModel(getApplicationContext()));
 
         mPresenter.start();
     }

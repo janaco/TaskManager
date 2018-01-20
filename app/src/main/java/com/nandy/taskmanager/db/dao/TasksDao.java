@@ -21,6 +21,9 @@ public interface TasksDao {
     @Query("SELECT * FROM tasks")
     List<Task> getAll();
 
+    @Query("SELECT * FROM tasks WHERE id LIKE :id")
+    List<Task> getById(String id);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Task task);
 

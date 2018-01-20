@@ -11,11 +11,11 @@ public class TaskDetailsModel {
 
     private Task mTask;
 
-    public TaskDetailsModel(Task task){
+    public TaskDetailsModel(Task task) {
         mTask = task;
     }
 
-    public Task getTask(){
+    public Task getTask() {
         return mTask;
     }
 
@@ -24,21 +24,7 @@ public class TaskDetailsModel {
         this.mTask = mTask;
     }
 
-    public void toggleStatus(){
-
-        switch (mTask.getStatus()){
-
-            case NEW:
-                mTask.setStatus(TaskStatus.ACTIVE);
-                break;
-
-            case ACTIVE:
-                mTask.setStatus(TaskStatus.COMPLETED);
-                break;
-
-            case COMPLETED:
-                mTask.setStatus(TaskStatus.ACTIVE);
-                break;
-        }
+    public void setStatus(TaskStatus status) {
+        mTask.setStatus(status);
     }
 }
