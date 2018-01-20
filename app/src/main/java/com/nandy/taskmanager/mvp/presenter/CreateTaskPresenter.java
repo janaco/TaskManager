@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.activity.CreateTaskActivity;
+import com.nandy.taskmanager.model.RepeatPeriod;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.BasePresenter;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -49,15 +51,26 @@ public class CreateTaskPresenter extends BasePresenter {
 
             mView.setTitle(task.getTitle());
             mView.setDescription(task.getDescription());
-            mView.displayStartDate(mDateFormatModel.format(task.getStartDate()));
-            mView.displayEndDate(mDateFormatModel.format(task.getEndDate()));
+            mView.displayStartDate(mDateFormatModel.formatDate(task.getStartDate()));
+            mView.displayStartTime(mDateFormatModel.formatTime(task.getStartDate()));
+            mView.setStartTimeVisible(true);
+
+            int duration = mDateFormatModel.convertToMinutes(task.getMaxDuration());
+            int textResId = R.string.minutes;
+
+            if (duration > 30) {
+                duration = mDateFormatModel.convertToHours(task.getMaxDuration());
+                textResId = R.string.hour;
+            }
+            mView.setDuration(duration, textResId);
+            mView.setRepeatPeriod(task.getPeriod().name());
             if (task.hasLocation()) {
                 mView.displayLocation(String.format(Locale.getDefault(), "%f, %f",
                         task.getLocation().latitude,
                         task.getLocation().longitude));
             }
 
-            if (task.hasImage()){
+            if (task.hasImage()) {
                 mView.displayImage(task.getImage());
             }
         }
@@ -86,9 +99,9 @@ public class CreateTaskPresenter extends BasePresenter {
         }
 
         Task task = mCreateTaskMode.create(title, desctiption);
-        if (mCreateTaskMode.getMode() == CreateTaskModel.MODE_CREATE){
+        if (mCreateTaskMode.getMode() == CreateTaskModel.MODE_CREATE) {
             mRecordsModel.insert(task);
-        }else {
+        } else {
             mRecordsModel.update(task);
 
         }
@@ -172,15 +185,6 @@ public class CreateTaskPresenter extends BasePresenter {
         mView.clearLocation();
     }
 
-    public void clearStartDate() {
-        mCreateTaskMode.clearStartDate();
-        mView.clearStartDateTime();
-    }
-
-    public void clearEndDate() {
-        mCreateTaskMode.clearEndDate();
-        mView.clearEndDateAndTime();
-    }
 
     public void setStartDate() {
 
@@ -188,37 +192,117 @@ public class CreateTaskPresenter extends BasePresenter {
 
         mView.showDatePickerDialog(
                 (datePicker, year, month, day) ->
-                        mView.showTimePickerDialog(
-                                (timePicker, hour, minute) ->
-                                {
-                                    mCreateTaskMode.setStartDateAndTime(year, month, day, hour, minute);
-                                    mView.displayStartDate(
-                                            mDateFormatModel.format(mCreateTaskMode.getStartDate()));
-                                },
-                                calendar.get(Calendar.HOUR_OF_DAY),
-                                calendar.get(Calendar.MINUTE)),
+                {
+                    mCreateTaskMode.setStartDate(year, month, day);
+                    mView.setStartTimeVisible(true);
+                    mView.displayStartDate(
+                            mDateFormatModel.formatDate(mCreateTaskMode.getStartDate()));
+                },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH));
     }
 
-    public void setEndDate() {
+    public void setStartTime() {
         Calendar calendar = Calendar.getInstance();
 
-        mView.showDatePickerDialog(
-                (datePicker, year, month, day) ->
-                        mView.showTimePickerDialog(
-                                (timePicker, hour, minute) ->
-                                {
-                                    mCreateTaskMode.setEndDateAndTime(year, month, day, hour, minute);
-                                    mView.displayEndDate(
-                                            mDateFormatModel.format(mCreateTaskMode.getEndDate()));
-                                },
-                                calendar.get(Calendar.HOUR_OF_DAY),
-                                calendar.get(Calendar.MINUTE)),
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH));
+        mView.showTimePickerDialog(
+                (timePicker, hour, minute) ->
+                {
+                    mCreateTaskMode.setStartTime(hour, minute);
+                    mView.displayStartTime(
+                            mDateFormatModel.formatTime(mCreateTaskMode.getStartDate()));
+                },
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE));
+    }
+
+    public boolean onDurationSelected(int optionId) {
+
+        Log.d("CONTEXT_MENU_", "presenter.onDurationSelected: " + optionId + "(" + R.id.option_fifteen_minutes + ")");
+        switch (optionId) {
+            case R.id.option_fifteen_minutes:
+                setDuration(15, TimeUnit.MINUTES);
+                return true;
+
+            case R.id.option_half_of_hour:
+                setDuration(30, TimeUnit.MINUTES);
+                return true;
+
+            case R.id.option_one_hour:
+                setDuration(1, TimeUnit.HOURS);
+                return true;
+
+            case R.id.option_two_hours:
+                setDuration(2, TimeUnit.HOURS);
+                return true;
+
+            case R.id.option_three_hours:
+                setDuration(3, TimeUnit.HOURS);
+                return true;
+
+            case R.id.option_four_hours:
+                setDuration(4, TimeUnit.HOURS);
+                return true;
+
+            case R.id.option_five_hours:
+                setDuration(5, TimeUnit.HOURS);
+                return true;
+
+            case R.id.option_six_hours:
+                setDuration(6, TimeUnit.HOURS);
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    private void setDuration(int value, TimeUnit timeUnit) {
+        Log.d("CONTEXT_MENU_", "set duration: " + value + ", " + timeUnit);
+        mCreateTaskMode.setDuration(timeUnit.toMillis(value));
+        Log.d("CONTEXT_MENU_", "mView.set duration: " + value + ", " + timeUnit);
+        mView.setDuration(value, timeUnit == TimeUnit.MINUTES ? R.string.minutes : R.string.hour);
+
+    }
+
+    public boolean onRepeatPeriodSelected(int optionId) {
+
+        switch (optionId) {
+            case R.id.option_no_repeat:
+                setRepeatPeriod(RepeatPeriod.NO_REPEAT);
+                return true;
+
+            case R.id.option_once_a_hour:
+                setRepeatPeriod(RepeatPeriod.ONCE_A_HOUR);
+                return true;
+
+            case R.id.option_once_a_day:
+                setRepeatPeriod(RepeatPeriod.ONCE_A_DAY);
+                return true;
+
+            case R.id.option_once_a_week:
+                setRepeatPeriod(RepeatPeriod.ONCE_A_WEEK);
+                return true;
+
+            case R.id.option_once_a_month:
+                setRepeatPeriod(RepeatPeriod.ONCE_A_MONTH);
+                return true;
+
+            case R.id.option_once_a_year:
+                setRepeatPeriod(RepeatPeriod.ONCE_A_YEAR);
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    private void setRepeatPeriod(RepeatPeriod repeatPeriod) {
+        mCreateTaskMode.setRepeatPeriod(repeatPeriod);
+        Log.d("CONTEXT_MENU_", "mView.setRepeatPeriod: " + repeatPeriod.name());
+        mView.setRepeatPeriod(repeatPeriod.name());
+
     }
 
 

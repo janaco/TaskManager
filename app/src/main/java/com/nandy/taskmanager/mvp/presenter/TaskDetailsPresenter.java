@@ -71,9 +71,8 @@ public class TaskDetailsPresenter extends BasePresenter {
         mView.setStatus(task.getStatus().name());
         mView.setTitle(task.getTitle());
         mView.setDescription(task.getDescription());
-        mView.setTime(String.format(Locale.getDefault(), "%s - %s",
-                mDateFormatModel.format(task.getStartDate()),
-                mDateFormatModel.format(task.getEndDate())));
+        mView.setTime(String.format(Locale.getDefault(), "%s",
+                mDateFormatModel.formatAsFullDate(task.getStartDate())));
 
         if (task.hasLocation()) {
             mView.setLocation(task.getLocation().toString());

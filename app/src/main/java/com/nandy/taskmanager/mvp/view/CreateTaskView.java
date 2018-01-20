@@ -7,8 +7,6 @@ import android.support.annotation.StringRes;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 
-import java.io.File;
-
 /**
  * Created by yana on 16.01.18.
  */
@@ -21,19 +19,17 @@ public interface CreateTaskView {
 
     void setResult(int resultCode, Intent intent);
 
-    void showDatePickerDialog(DatePickerDialog.OnDateSetListener onDateSetListener, int year, int month, int day);
-
-    void showTimePickerDialog(TimePickerDialog.OnTimeSetListener onTimeSetListener, int hour, int minute);
-
-    void clearStartDateTime();
-
-    void clearEndDateAndTime();
-
     void clearLocation();
 
     void displayStartDate(String date);
 
-    void displayEndDate(String date);
+    void displayStartTime(String time);
+
+    void setStartTimeVisible(boolean visible);
+
+    void setDuration(int duration, @StringRes int textResId);
+
+    void setRepeatPeriod(String repeatPeriod);
 
     void displayLocation(String location);
 
@@ -44,4 +40,8 @@ public interface CreateTaskView {
     void setTitle(String title);
 
     void startCropActivity(CropImage.ActivityBuilder activityBuilder);
+
+    void showDatePickerDialog(DatePickerDialog.OnDateSetListener onDateSetListener, int year, int month, int day);
+
+    void showTimePickerDialog(TimePickerDialog.OnTimeSetListener onTimeSetListener, int hour, int minute);
 }

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.TasksDao;
+import com.nandy.taskmanager.model.RepeatPeriod;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskStatus;
 
@@ -14,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by razomer on 18.01.18.
@@ -47,12 +49,15 @@ public class DummyDataModel {
             int startHour = getRandomHour();
             int startMinute = getRandomMinute();
 
+            long duration = TimeUnit.HOURS.toMinutes(getRandomDuration());
+
             Date startDate = generateDate(month, day, startHour, startMinute);
-            Date endDate = generateEndDate(startDate);
 
             task.setStartDate(startDate);
-            task.setEndDate(endDate);
+            task.setEndDate(calculateEndDate(startDate, duration));
             task.setStatus(getRandomStatus(TaskStatus.values()));
+            task.setMaxDuration(duration);
+            task.setPeriod(getRandomPeriod(RepeatPeriod.values()));
 
             tasksDao.insert(task);
 
@@ -64,12 +69,26 @@ public class DummyDataModel {
         return tasks;
     }
 
+    private Date calculateEndDate(Date startDate, long duration){
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startDate);
+        calendar.add(Calendar.MILLISECOND,(int) duration);
+
+        return calendar.getTime();
+    }
+
+
     private TaskStatus getRandomStatus(TaskStatus[] statuses) {
         return statuses[mRandom.nextInt(statuses.length - 1)];
     }
 
+    private RepeatPeriod getRandomPeriod(RepeatPeriod[] periods) {
+        return periods[mRandom.nextInt(periods.length - 1)];
+    }
+
     private int getRandomDuration() {
-        return mRandom.nextInt(3);
+        return mRandom.nextInt(6);
     }
 
     private int getRandomDayOfTheMonth() {
@@ -99,11 +118,5 @@ public class DummyDataModel {
         return calendar.getTime();
     }
 
-    private Date generateEndDate(Date startDate) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(startDate);
-        calendar.add(Calendar.HOUR, getRandomDuration());
 
-        return calendar.getTime();
-    }
 }

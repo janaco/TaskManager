@@ -10,14 +10,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
+import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,6 +38,7 @@ import com.nandy.taskmanager.mvp.view.CreateTaskView;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,8 +61,12 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
     ImageView mTaskImageView;
     @BindView(R.id.txt_start_date)
     TextView mStartDateTextView;
-    @BindView(R.id.txt_end_date)
-    TextView mEndDateTextView;
+    @BindView(R.id.txt_start_time)
+    TextView mStartTimeTextView;
+    @BindView(R.id.txt_duration)
+    TextView mDurationTextView;
+    @BindView(R.id.txt_repeat)
+    TextView mRepeatPeriodTextView;
     @BindView(R.id.txt_location)
     TextView mLocationTextView;
 
@@ -78,6 +86,10 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle(R.string.create_task);
         }
+
+        registerForContextMenu(mDurationTextView);
+        registerForContextMenu(mRepeatPeriodTextView);
+
 
         Task task = getIntent().getParcelableExtra("task");
         int mode = getIntent().getIntExtra("mode", CreateTaskModel.MODE_CREATE);
@@ -117,6 +129,41 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         }
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+
+        switch (v.getId()) {
+
+            case R.id.txt_duration:
+                getMenuInflater().inflate(R.menu.menu_duration, menu);
+                break;
+
+            case R.id.txt_repeat:
+                getMenuInflater().inflate(R.menu.menu_repeat_period, menu);
+                break;
+        }
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }
+
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        switch (item.getGroupId()) {
+
+            case R.id.group_duration:
+                Log.d("CONTEXT_MENU", "onDurationSelected: " + item);
+                return mPresener.onDurationSelected(item.getItemId());
+
+            case R.id.group_period:
+                Log.d("CONTEXT_MENU", "onRepeatPeriodSelected: " + item);
+                return mPresener.onRepeatPeriodSelected(item.getItemId());
+
+            default:
+                return super.onContextItemSelected(item);
+        }
+
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -135,9 +182,19 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         mPresener.setStartDate();
     }
 
-    @OnClick(R.id.txt_end_date)
-    void onSetEndDateButtonClick() {
-        mPresener.setEndDate();
+    @OnClick(R.id.txt_start_time)
+    void onSetStartTimeButtonClick() {
+        mPresener.setStartTime();
+    }
+
+    @OnClick(R.id.txt_duration)
+    void onSetDurationButtonClick(View view) {
+        openContextMenu(view);
+    }
+
+    @OnClick(R.id.txt_repeat)
+    void onSetRepeatPeriodClick(View view) {
+        openContextMenu(view);
     }
 
     @OnClick(R.id.btn_microphone)
@@ -146,18 +203,6 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.description));
         startActivityForResult(intent, REQUEST_CODE_VIOCE_INPUT);
-    }
-
-
-    @OnClick(R.id.btn_clear_start_date)
-    void onClearStartDateBtnClick() {
-        mPresener.clearStartDate();
-    }
-
-
-    @OnClick(R.id.btn_clear_end_date)
-    void onClearEndDateButtonClick() {
-        mPresener.clearEndDate();
     }
 
 
@@ -209,27 +254,6 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
 
 
     @Override
-    public void showDatePickerDialog(DatePickerDialog.OnDateSetListener onDateSetListener, int year, int month, int day) {
-        new DatePickerDialog(this, onDateSetListener, year, month, day).show();
-    }
-
-    @Override
-    public void showTimePickerDialog(TimePickerDialog.OnTimeSetListener onTimeSetListener, int hour, int minute) {
-        new TimePickerDialog(this, onTimeSetListener, hour, minute, true).show();
-    }
-
-
-    @Override
-    public void clearEndDateAndTime() {
-        mEndDateTextView.setText(R.string.set_end_time);
-    }
-
-    @Override
-    public void clearStartDateTime() {
-        mStartDateTextView.setText(R.string.set_start_time);
-    }
-
-    @Override
     public void clearLocation() {
         mLocationTextView.setText(R.string.location);
     }
@@ -240,8 +264,25 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
     }
 
     @Override
-    public void displayEndDate(String date) {
-        mEndDateTextView.setText(date);
+    public void displayStartTime(String time) {
+        mStartTimeTextView.setText(time);
+    }
+
+    @Override
+    public void setStartTimeVisible(boolean visible) {
+        mStartTimeTextView.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void setDuration(int duration, @StringRes int textResId) {
+        mDurationTextView.setText(String.format(Locale.getDefault(), "%d %s", duration, getString(textResId)));
+    }
+
+    @Override
+    public void setRepeatPeriod(String repeatPeriod) {
+        Log.d("CONTEXT_MENU_", "setRepeatPeriod: " + repeatPeriod);
+
+        mRepeatPeriodTextView.setText(repeatPeriod);
     }
 
     @Override
@@ -268,6 +309,16 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
     @Override
     public void setDescription(String description) {
         mInputDescription.setText(description);
+    }
+
+    @Override
+    public void showDatePickerDialog(DatePickerDialog.OnDateSetListener onDateSetListener, int year, int month, int day) {
+        new DatePickerDialog(this, onDateSetListener, year, month, day).show();
+    }
+
+    @Override
+    public void showTimePickerDialog(TimePickerDialog.OnTimeSetListener onTimeSetListener, int hour, int minute) {
+        new TimePickerDialog(this, onTimeSetListener, hour, minute, true).show();
     }
 
     private void showPickImagePopup() {

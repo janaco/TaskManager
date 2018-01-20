@@ -53,6 +53,7 @@ public class TasksListModel {
 
     public void displayAll(Collection<Task> tasks){
         mTasks.addAll(tasks);
+        mAdapter.notifyDataSetChanged();
     }
 
     public void refreshList(Collection<Task> tasks){

@@ -5,6 +5,7 @@ import android.content.Context;
 import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.TasksDao;
+import com.nandy.taskmanager.model.RepeatPeriod;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskStatus;
 
@@ -21,9 +22,10 @@ public class CreateTaskModel {
     public static final int MODE_EDIT = 2;
 
     private Date mStartDate;
-    private Date mEndDate;
     private LatLng mLocation;
     private String mImage;
+    private long mDuration;
+    private RepeatPeriod mRepeatPeriod;
 
     private Task mTask;
 
@@ -35,9 +37,10 @@ public class CreateTaskModel {
 
         if (task != null) {
             mStartDate = task.getStartDate();
-            mEndDate = task.getEndDate();
             mLocation = task.getLocation();
             mImage = task.getImage();
+            mDuration = task.getMaxDuration();
+            mRepeatPeriod = task.getPeriod();
         }
     }
 
@@ -49,65 +52,89 @@ public class CreateTaskModel {
         return mTask;
     }
 
-    public Task create(String title, String description){
+    public Task create(String title, String description) {
 
         if (mMode == MODE_CREATE) {
             mTask = new Task(title, description);
             mTask.setStatus(TaskStatus.NEW);
-        }else {
+        } else {
             mTask.setTitle(title);
             mTask.setDescription(description);
         }
 
         mTask.setStartDate(mStartDate);
-        mTask.setEndDate(mEndDate);
+        mTask.setEndDate(calculateEndDate(mStartDate, mDuration));
         mTask.setLocation(mLocation);
         mTask.setImage(mImage);
+        mTask.setMaxDuration(mDuration);
+        mTask.setPeriod(mRepeatPeriod);
 
         return mTask;
 
     }
 
-    public void setStartDateAndTime(int year, int month, int day, int hour, int minute) {
+    private Date calculateEndDate(Date startDate, long duration){
 
-        if (mStartDate != null){
-            mStartDate.setTime(getTime(year, month, day, hour, minute));
-        }else {
-            mStartDate = new Date(getTime(year, month, day, hour, minute));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startDate);
+        calendar.add(Calendar.MILLISECOND,(int) duration);
+
+        return calendar.getTime();
+    }
+
+    public void setStartDate(int year, int month, int day) {
+        Calendar calendar = Calendar.getInstance();
+
+        if (mStartDate != null) {
+            calendar.setTime(mStartDate);
+        }
+
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        setStartDate(calendar.getTime());
+    }
+
+
+    public void setStartTime(int hour, int minute) {
+        Calendar calendar = Calendar.getInstance();
+
+        if (mStartDate != null) {
+            calendar.setTime(mStartDate);
+        }
+
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        setStartDate(calendar.getTime());
+    }
+
+    private void setStartDate(Date date) {
+        if (mStartDate != null) {
+            mStartDate.setTime(date.getTime());
+        } else {
+            mStartDate = date;
         }
     }
 
-    public void setEndDateAndTime(int year, int month, int day, int hour, int minute) {
-
-        if (mEndDate != null){
-            mEndDate.setTime(getTime(year, month, day, hour, minute));
-        }else {
-            mEndDate = new Date(getTime(year, month, day, hour, minute));
-        }
+    public void setDuration(long duration){
+        mDuration = duration;
     }
 
-    public void clearStartDate(){
-        mStartDate = null;
-    }
+    public void setRepeatPeriod(RepeatPeriod repeatPeriod){
+        mRepeatPeriod = repeatPeriod;
 
-    public void clearEndDate(){
-        mEndDate = null;
     }
-
 
     public Date getStartDate() {
         return mStartDate;
     }
 
-    public Date getEndDate() {
-        return mEndDate;
-    }
 
     public void setLocation(LatLng location) {
         this.mLocation = location;
     }
 
-    public void clearLocation(){
+    public void clearLocation() {
         mLocation = null;
     }
 
@@ -115,16 +142,5 @@ public class CreateTaskModel {
         this.mImage = mImage;
     }
 
-    private long getTime(int year, int month, int day, int hour, int minute){
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-
-        return calendar.getTimeInMillis();
-    }
 
 }

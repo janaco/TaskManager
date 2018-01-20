@@ -38,5 +38,25 @@
     <string name="clear_all_data">Clear all data?</string>
     <string name="clear_all">Clear all</string>
     <string name="exit_app_message">Press back button one more time to exit.</string>
+    <string name="duration">Duration</string>
+    <string name="hour">hour(s)</string>
+    <string name="repeat">Repeat</string>
+    <string name="start_date">Start Date</string>
+    <string name="no_repeat">No repeat</string>
+    <string name="once_a_hour">Once a hour</string>
+    <string name="once_a_day">Once a day</string>
+    <string name="once_a_week">Once a week</string>
+    <string name="once_a_month">Once a month</string>
+    <string name="once_a_year">Once a year</string>
+    <string name="fifteen_minutes">15 minutes</string>
+    <string name="half_of_hour">Half of hour</string>
+    <string name="one_hour">1 hour</string>
+    <string name="two_hours">2 hour</string>
+    <string name="three_hours">3 hour</string>
+    <string name="four_hours">4 hour</string>
+    <string name="five_hours">5 hour</string>
+    <string name="six_hours">6 hour</string>
+    <string name="minutes">minutes</string>
+    <string name="set_duration">Set duration</string>
 
 </resources>

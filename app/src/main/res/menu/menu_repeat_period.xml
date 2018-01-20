@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:id="@+id/group_period">
+
+
+        <item android:id="@+id/option_no_repeat"
+            android:title="@string/no_repeat"/>
+
+        <item android:id="@+id/option_once_a_hour"
+            android:title="@string/once_a_hour"/>
+
+        <item android:id="@+id/option_once_a_day"
+            android:title="@string/once_a_day"/>
+
+        <item android:id="@+id/option_once_a_week"
+            android:title="@string/once_a_week"/>
+
+        <item android:id="@+id/option_once_a_month"
+            android:title="@string/once_a_month"/>
+
+        <item android:id="@+id/option_once_a_year"
+            android:title="@string/once_a_year"/>
+
+    </group>
+
+</menu>

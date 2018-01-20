@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:id="@+id/group_duration">
+
+        <item
+            android:id="@+id/option_fifteen_minutes"
+            android:title="@string/fifteen_minutes" />
+
+        <item
+            android:id="@+id/option_half_of_hour"
+            android:title="@string/half_of_hour" />
+
+        <item
+            android:id="@+id/option_one_hour"
+            android:title="@string/one_hour" />
+
+        <item
+            android:id="@+id/option_two_hours"
+            android:title="@string/two_hours" />
+
+        <item
+            android:id="@+id/option_three_hours"
+            android:title="@string/three_hours" />
+
+        <item
+            android:id="@+id/option_four_hours"
+            android:title="@string/four_hours" />
+
+        <item
+            android:id="@+id/option_five_hours"
+            android:title="@string/five_hours" />
+
+        <item
+            android:id="@+id/option_six_hours"
+            android:title="@string/six_hours" />
+
+
+    </group>
+</menu>

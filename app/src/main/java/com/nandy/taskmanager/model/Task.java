@@ -26,6 +26,7 @@ public class Task implements Parcelable{
     @ColumnInfo(name = "image")
     private String mImage;
 
+    @ColumnInfo(name = "location")
     private LatLng mLocation;
 
     @ColumnInfo(name = "date_start")
@@ -35,6 +36,12 @@ public class Task implements Parcelable{
 
     @ColumnInfo(name = "status")
     private TaskStatus mStatus;
+
+    @ColumnInfo(name = "max_duration")
+    private long mMaxDuration;
+
+    @ColumnInfo(name = "repeat_period")
+    private RepeatPeriod mPeriod;
 
 
     public Task(String title, String description) {
@@ -56,9 +63,11 @@ public class Task implements Parcelable{
         mDescription = in.readString();
         mImage = in.readString();
         mLocation = in.readParcelable(LatLng.class.getClassLoader());
-        mStatus = TaskStatus.valueOf(in.readString());
+        mMaxDuration = in.readLong();
         mStartDate = (Date) in.readSerializable();
         mEndDate = (Date) in.readSerializable();
+        mStatus = TaskStatus.valueOf(in.readString());
+        mPeriod = RepeatPeriod.valueOf(in.readString());
     }
 
     @Override
@@ -68,9 +77,11 @@ public class Task implements Parcelable{
         dest.writeString(mDescription);
         dest.writeString(mImage);
         dest.writeParcelable(mLocation, flags);
-        dest.writeString(mStatus.name());
+        dest.writeLong(mMaxDuration);
         dest.writeSerializable(mStartDate);
         dest.writeSerializable(mEndDate);
+        dest.writeString(mStatus.name());
+        dest.writeString(mPeriod.name());
     }
 
     @Override
@@ -89,6 +100,26 @@ public class Task implements Parcelable{
             return new Task[size];
         }
     };
+
+    public boolean isPeriodical() {
+        return mPeriod != RepeatPeriod.NO_REPEAT;
+    }
+
+    public long getMaxDuration() {
+        return mMaxDuration;
+    }
+
+    public void setMaxDuration(long mMaxDuration) {
+        this.mMaxDuration = mMaxDuration;
+    }
+
+    public RepeatPeriod getPeriod() {
+        return mPeriod;
+    }
+
+    public void setPeriod(RepeatPeriod mPeriod) {
+        this.mPeriod = mPeriod;
+    }
 
     public void setLocation(LatLng mLocation) {
         this.mLocation = mLocation;
