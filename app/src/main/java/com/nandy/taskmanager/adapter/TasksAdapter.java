@@ -1,6 +1,7 @@
 package com.nandy.taskmanager.adapter;
 
 import android.content.Context;
+import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,11 +44,13 @@ public class TasksAdapter extends ArrayAdapter<Task> {
             viewHolder.setComment(task.getDescription());
             viewHolder.setStatus(task.getStatus().name());
 
-            if (task.hasImage()){
+            if (task.hasImage()) {
                 viewHolder.loadImage(task.getImage(), task.hasLocation());
-            }else {
+            } else {
                 viewHolder.loadImage(R.mipmap.ic_task, task.hasLocation());
             }
+            viewHolder.setPeriodical(task.isPeriodical());
+            viewHolder.setRepeatPeriod(task.getPeriod().getTextResId());
         }
 
 
@@ -65,6 +68,8 @@ public class TasksAdapter extends ArrayAdapter<Task> {
         TextView textViewTitle;
         @BindView(R.id.txt_description)
         TextView textViewComment;
+        @BindView(R.id.txt_period)
+        TextView textViewPeriod;
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);
@@ -102,6 +107,14 @@ public class TasksAdapter extends ArrayAdapter<Task> {
                 ImageLoader.load(imageTask.getContext(), resId)
                         .into(imageTask);
             }
+        }
+
+        void setPeriodical(boolean periodical) {
+            textViewPeriod.setVisibility(periodical ? View.VISIBLE : View.GONE);
+        }
+
+        void setRepeatPeriod(@StringRes int textResId){
+            textViewPeriod.setText(textResId);
         }
     }
 }

@@ -29,7 +29,7 @@ public interface CreateTaskView {
 
     void setDuration(int duration, @StringRes int textResId);
 
-    void setRepeatPeriod(String repeatPeriod);
+    void setRepeatPeriod(@StringRes int textResId);
 
     void displayLocation(String location);
 

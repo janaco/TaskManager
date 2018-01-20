@@ -64,7 +64,7 @@ public class CreateTaskPresenter extends BasePresenter {
                 textResId = R.string.hour;
             }
             mView.setDuration(duration, textResId);
-            mView.setRepeatPeriod(task.getPeriod().name());
+            mView.setRepeatPeriod(task.getPeriod().getTextResId());
             if (task.hasLocation()) {
                 mView.displayLocation(String.format(Locale.getDefault(), "%f, %f",
                         task.getLocation().latitude,
@@ -301,7 +301,7 @@ public class CreateTaskPresenter extends BasePresenter {
 
     private void setRepeatPeriod(RepeatPeriod repeatPeriod) {
         mCreateTaskMode.setRepeatPeriod(repeatPeriod);
-        mView.setRepeatPeriod(repeatPeriod.name());
+        mView.setRepeatPeriod(repeatPeriod.getTextResId());
 
     }
 

@@ -281,10 +281,8 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
     }
 
     @Override
-    public void setRepeatPeriod(String repeatPeriod) {
-        Log.d("CONTEXT_MENU_", "setRepeatPeriod: " + repeatPeriod);
-
-        mRepeatPeriodTextView.setText(repeatPeriod);
+    public void setRepeatPeriod(@StringRes int textResId) {
+        mRepeatPeriodTextView.setText(textResId);
     }
 
     @Override
