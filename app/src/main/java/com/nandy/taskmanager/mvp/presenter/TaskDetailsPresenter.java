@@ -129,10 +129,12 @@ public class TaskDetailsPresenter extends BasePresenter {
             case NEW:
                 newStatus = TaskStatus.ACTIVE;
                 mShceduleModel.scheduleTaskAutoComplete(task.getId(), task.getMaxDuration());
+                mRecordsModel.start(task.getId(), System.currentTimeMillis());
                 break;
 
             case ACTIVE:
                 newStatus = TaskStatus.COMPLETED;
+                mRecordsModel.end(task.getId(), System.currentTimeMillis());
                 break;
 
             default:
