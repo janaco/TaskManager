@@ -1,4 +1,4 @@
-package com.nandy.taskmanager.db;
+package com.nandy.taskmanager.db.converters;
 
 import android.arch.persistence.room.TypeConverter;
 
