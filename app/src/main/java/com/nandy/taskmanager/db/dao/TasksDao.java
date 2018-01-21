@@ -39,4 +39,7 @@ public interface TasksDao {
     @Query("DELETE FROM tasks")
     void deleteAll();
 
+    @Query("SELECT count(*) FROM tasks")
+    int getCount();
+
 }

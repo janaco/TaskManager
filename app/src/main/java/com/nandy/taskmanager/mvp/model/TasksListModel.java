@@ -18,12 +18,10 @@ import java.util.List;
 
 public class TasksListModel {
 
-    private TasksDao mTasksDao;
     private TasksAdapter mAdapter;
     private ArrayList<Task> mTasks;
 
     public TasksListModel(Context context){
-        mTasksDao = AppDatabase.getInstance(context).tasksDao();
         mTasks = new ArrayList<>();
         mAdapter = new TasksAdapter(context, mTasks);
     }
@@ -33,12 +31,7 @@ public class TasksListModel {
         return mAdapter;
     }
 
-    public List<Task> loadTasks(){
-        return mTasksDao.getAll();
-    }
-
     public void clearAll(){
-        mTasksDao.deleteAll();
         mTasks.clear();
         mAdapter.clear();
     }

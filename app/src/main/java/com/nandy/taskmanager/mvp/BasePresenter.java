@@ -12,6 +12,10 @@ public abstract class BasePresenter {
 
     public abstract void stop();
 
+    public void resume(){}
+
+    public void pause(){}
+
     public void saveInstanceState(Bundle outState){};
 
     public void restoreInstanceState(Bundle savedInstanceState){};

@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 public class DummyDataModel {
 
+    public static final int DEFAULT_CAPACITY = 30;
+
     private static final String TITLE_TEMPLATE = "Task #";
     private static final String DESCRIPTION_TEMPLATE = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
@@ -34,12 +36,17 @@ public class DummyDataModel {
         mRandom = new Random();
     }
 
-    public List<Task> generateDummyData(int startIndex, int count) {
+    public List<Task> generateDummyData(){
+        return generateDummyData(DEFAULT_CAPACITY);
+    }
+
+    public List<Task> generateDummyData(int capacity) {
 
         List<Task> tasks = new ArrayList<>();
         TasksDao tasksDao = AppDatabase.getInstance(mContext).tasksDao();
+        int startIndex = tasksDao.getCount() + 1;
 
-        for (int index = startIndex; index < startIndex + count; index++) {
+        for (int index = startIndex; index < startIndex + capacity; index++) {
 
             String title = String.format(Locale.getDefault(), "%s %d", TITLE_TEMPLATE, index);
             Task task = new Task(System.currentTimeMillis(), title, DESCRIPTION_TEMPLATE);

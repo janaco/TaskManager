@@ -2,11 +2,17 @@ package com.nandy.taskmanager.mvp.presenter;
 
 import android.os.Bundle;
 
+import com.nandy.taskmanager.eventbus.TaskListChangedEvent;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.BasePresenter;
 import com.nandy.taskmanager.mvp.model.DummyDataModel;
+import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TasksListModel;
 import com.nandy.taskmanager.mvp.view.TasksListView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
@@ -18,7 +24,7 @@ public class TasksPresenter extends BasePresenter {
 
     private TasksListView mView;
     private TasksListModel mTasksListModel;
-    private DummyDataModel mDummyDataModel;
+    private TaskRecordsModel mRecordsModel;
 
     public TasksPresenter(TasksListView view) {
         mView = view;
@@ -34,8 +40,21 @@ public class TasksPresenter extends BasePresenter {
 
     }
 
-    public void refreshList(){
-        mTasksListModel.refreshList(mTasksListModel.loadTasks());
+    @Override
+    public void resume() {
+        super.resume();
+        EventBus.getDefault().register(this);
+        refreshList();
+    }
+
+    @Override
+    public void pause() {
+        super.pause();
+        EventBus.getDefault().unregister(this);
+    }
+
+    private void refreshList(){
+        mTasksListModel.refreshList(mRecordsModel.selectAll());
     }
 
     @Override
@@ -48,11 +67,15 @@ public class TasksPresenter extends BasePresenter {
         mTasksListModel.restoreInstanceState(savedInstanceState);
     }
 
-    public void generateDummyData() {
-        List<Task> tasks = mDummyDataModel.generateDummyData(mTasksListModel.getTasksCount(), 30);
-        mTasksListModel.displayAll(tasks);
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onTaskListChangedEvent(TaskListChangedEvent event){
+        mTasksListModel.displayAll(event.getTasks());
     }
 
+    @Subscribe(threadMode =  ThreadMode.MAIN)
+    public void onTasksCleanedEvent(){
+        mTasksListModel.clearAll();
+    }
     public Bundle getArguments(int position){
         Bundle args = new Bundle();
         args.putParcelable("task", mTasksListModel.get(position));
@@ -61,12 +84,8 @@ public class TasksPresenter extends BasePresenter {
 
     }
 
-    public void clearAllTasks() {
-        mTasksListModel.clearAll();
-    }
-
     public void loadTasks() {
-        mTasksListModel.displayAll(mTasksListModel.loadTasks());
+        mTasksListModel.displayAll(mRecordsModel.selectAll());
     }
 
     public void displayTask(Task task) {
@@ -77,7 +96,7 @@ public class TasksPresenter extends BasePresenter {
         this.mTasksListModel = mTasksListModel;
     }
 
-    public void setDummyDataModel(DummyDataModel mDummyDataModel) {
-        this.mDummyDataModel = mDummyDataModel;
+    public void setRecordsModel(TaskRecordsModel mRecordsModel) {
+        this.mRecordsModel = mRecordsModel;
     }
 }

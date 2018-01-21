@@ -61,7 +61,7 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
 
         mTasksPresenter = new TasksPresenter(this);
         mTasksPresenter.setTasksListModel(new TasksListModel(getApplicationContext()));
-        mTasksPresenter.setDummyDataModel(new DummyDataModel(getApplicationContext()));
+//        mTasksPresenter.setDummyDataModel(new DummyDataModel(getApplicationContext()));
 
         mTasksPresenter.start();
 
@@ -133,7 +133,7 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
     @Override
     protected void onResume() {
         super.onResume();
-        mTasksPresenter.refreshList();
+//        mTasksPresenter.refreshList();
     }
 
     private void openDetails(Bundle args) {
@@ -170,7 +170,7 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
                 return true;
 
             case R.id.action_fill_list:
-                mTasksPresenter.generateDummyData();
+//                mTasksPresenter.generateDummyData();
                 return true;
 
             case R.id.action_clear_all:
@@ -189,11 +189,11 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
 
     private void onClearAllOptionSelected() {
 
-        new AlertDialog.Builder(this)
-                .setMessage(R.string.clear_all_data)
-                .setPositiveButton(R.string.clear_all, (dialogInterface, i) -> mTasksPresenter.clearAllTasks())
-                .setNegativeButton(R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
-                .show();
+//        new AlertDialog.Builder(this)
+//                .setMessage(R.string.clear_all_data)
+//                .setPositiveButton(R.string.clear_all, (dialogInterface, i) -> mTasksPresenter.clearAllTasks())
+//                .setNegativeButton(R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
+//                .show();
     }
 
     @Override

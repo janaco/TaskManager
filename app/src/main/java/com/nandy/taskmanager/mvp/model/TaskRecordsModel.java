@@ -9,6 +9,8 @@ import com.nandy.taskmanager.model.Action;
 import com.nandy.taskmanager.model.Statistics;
 import com.nandy.taskmanager.model.Task;
 
+import java.util.List;
+
 /**
  * Created by yana on 18.01.18.
  */
@@ -22,6 +24,10 @@ public class TaskRecordsModel {
 
         mTasksDao = AppDatabase.getInstance(context).tasksDao();
         mStatisticsDao = AppDatabase.getInstance(context).statisticsDao();
+    }
+
+    public List<Task> selectAll(){
+        return mTasksDao.getAll();
     }
 
     public void delete(Task task){
