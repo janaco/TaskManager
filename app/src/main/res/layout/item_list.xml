@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.daimajia.swipe.SwipeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipe"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:leftEdgeSwipeOffset="0dp"
+    app:rightEdgeSwipeOffset="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/secondaryColor"
+        android:gravity="center"
+        android:weightSum="3">
+
+        <Button
+            android:background="@color/secondaryLightColor"
+            android:textColor="@color/secondaryTextColor"
+            android:id="@+id/btn_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/delete"
+            android:layout_weight="1" />
+
+        <Button
+            android:background="@color/secondaryColor"
+            android:textColor="@color/secondaryTextColor"
+            android:id="@+id/btn_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/edit"
+            android:layout_weight="1" />
+
+        <Button
+            android:background="@color/secondaryDarkColor"
+            android:textColor="@color/secondaryTextColor"
+            android:id="@+id/btn_control"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/start"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <RelativeLayout  android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/item_selector"
+        android:padding="10dp">
+
+
+        <ImageView
+            android:id="@+id/task_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            app:srcCompat="@drawable/ic_image" />
+
+
+
+        <TextView
+            android:id="@+id/txt_status"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:gravity="end"
+            android:layout_height="wrap_content"
+            android:textColor="@color/secondaryDarkColor"
+            android:layout_toRightOf="@+id/task_image"
+            android:layout_toEndOf="@+id/task_image"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="Active" />
+
+
+        <TextView
+            android:id="@+id/txt_title"
+            android:layout_below="@+id/txt_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:textColor="@color/secondaryDarkColor"
+            android:layout_toRightOf="@+id/task_image"
+            android:layout_toEndOf="@+id/task_image"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="Title" />
+
+        <TextView
+            android:id="@+id/txt_period"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/txt_title"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="3"
+            android:visibility="gone"
+            android:drawableStart="@drawable/ic_repeat"
+            android:drawableLeft="@drawable/ic_repeat"
+            android:drawablePadding="5dp"
+            android:layout_alignStart="@+id/txt_title"
+            android:layout_alignLeft="@+id/txt_title"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp"
+            tools:text="Once a day" />
+
+
+        <TextView
+            android:id="@+id/txt_description"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/txt_period"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:layout_alignStart="@+id/txt_title"
+            android:layout_alignLeft="@+id/txt_title"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp"
+            tools:text="Comment" />
+
+
+    </RelativeLayout>
+
+</com.daimajia.swipe.SwipeLayout>

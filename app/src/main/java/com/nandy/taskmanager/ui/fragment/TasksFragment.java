@@ -12,16 +12,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.mvp.model.DummyDataModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
-import com.nandy.taskmanager.mvp.model.TasksListModel;
 import com.nandy.taskmanager.mvp.presenter.TasksPresenter;
 import com.nandy.taskmanager.mvp.view.TasksListView;
 
@@ -150,7 +148,7 @@ public class TasksFragment extends Fragment implements TasksListView {
     }
 
     @Override
-    public <T extends ArrayAdapter> void setAdapter(T adapter) {
+    public <T extends BaseSwipeAdapter> void setAdapter(T adapter) {
         mTaskLisView.setAdapter(adapter);
     }
 
@@ -159,7 +157,6 @@ public class TasksFragment extends Fragment implements TasksListView {
         TasksFragment fragment = new TasksFragment();
 
         TasksPresenter presenter = new TasksPresenter(fragment);
-        presenter.setTasksListModel(new TasksListModel(context));
         presenter.setRecordsModel(new TaskRecordsModel(context));
 
         fragment.setTasksPresenter(presenter);

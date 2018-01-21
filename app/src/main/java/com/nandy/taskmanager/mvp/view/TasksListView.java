@@ -1,6 +1,6 @@
 package com.nandy.taskmanager.mvp.view;
 
-import android.widget.ArrayAdapter;
+import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 
 /**
  * Created by yana on 16.01.18.
@@ -8,5 +8,5 @@ import android.widget.ArrayAdapter;
 
 public interface TasksListView {
 
-    <T extends ArrayAdapter>void setAdapter(T adapter);
+    <T extends BaseSwipeAdapter>void setAdapter(T adapter);
 }

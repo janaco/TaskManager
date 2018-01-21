@@ -2,11 +2,9 @@ package com.nandy.taskmanager.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
@@ -18,12 +16,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
-import com.nandy.taskmanager.mvp.model.DummyDataModel;
-import com.nandy.taskmanager.mvp.model.TasksListModel;
 import com.nandy.taskmanager.mvp.presenter.TasksPresenter;
 import com.nandy.taskmanager.mvp.view.TasksListView;
 
@@ -60,8 +57,6 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
                 openDetails(mTasksPresenter.getArguments(position)));
 
         mTasksPresenter = new TasksPresenter(this);
-        mTasksPresenter.setTasksListModel(new TasksListModel(getApplicationContext()));
-//        mTasksPresenter.setDummyDataModel(new DummyDataModel(getApplicationContext()));
 
         mTasksPresenter.start();
 
@@ -220,7 +215,7 @@ public class ListActivity extends AppCompatActivity implements TasksListView {
     }
 
     @Override
-    public <T extends ArrayAdapter> void setAdapter(T adapter) {
+    public <T extends BaseSwipeAdapter> void setAdapter(T adapter) {
         mTaskLisView.setAdapter(adapter);
     }
 }

@@ -6,57 +6,136 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.daimajia.swipe.SimpleSwipeListener;
+import com.daimajia.swipe.SwipeLayout;
+import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.nandy.taskmanager.ImageLoader;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class TasksAdapter extends ArrayAdapter<Task> {
+public class TasksAdapter extends BaseSwipeAdapter {
+
+    public interface OnItemOptionSelectedListener {
+
+        void onDeleteOptionSelected(Task task, int position);
+
+        void onEditOptionSelected(Task task, int position);
+
+        void onToggleStatus(Task task, int position);
+
+    }
+
+    private final ArrayList<Task> mTasks;
+    private OnItemOptionSelectedListener mOnItemOptionSelectedListener;
+
+    public TasksAdapter() {
+        mTasks = new ArrayList<>();
+    }
+
+    public void setOnItemOptionSelectedListener(OnItemOptionSelectedListener mOnItemOptionSelectedListener) {
+        this.mOnItemOptionSelectedListener = mOnItemOptionSelectedListener;
+    }
+
+    public void clearAll() {
+        mTasks.clear();
+        notifyDataSetChanged();
+    }
 
 
-    public TasksAdapter(Context context, List<Task> itemList) {
-        super(context, R.layout.item_task, itemList);
+    public void add(Task task) {
+        mTasks.add(task);
+        notifyDataSetChanged();
+    }
+
+
+    public void addAll(Collection<Task> tasks) {
+        mTasks.addAll(tasks);
+        notifyDataSetChanged();
+    }
+
+
+    public void refresh(Collection<Task> tasks) {
+        mTasks.clear();
+        addAll(tasks);
+    }
+
+    public ArrayList<Task> getItems() {
+        return mTasks;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public int getSwipeLayoutResourceId(int position) {
+        return R.id.swipe;
+    }
 
-        ViewHolder viewHolder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_task, parent, false);
-            viewHolder = new ViewHolder(convertView);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
+    @Override
+    public int getCount() {
+        return mTasks.size();
+    }
+
+    @Override
+    public Task getItem(int position) {
+        return mTasks.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return mTasks.get(position).getId();
+    }
+
+
+    @Override
+    public View generateView(int position, ViewGroup parent) {
+        return LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list, parent, false);
+    }
+
+
+    @Override
+    public void fillValues(int position, View convertView) {
+        ViewHolder holder = new ViewHolder(convertView);
 
         Task task = getItem(position);
         if (task != null) {
-            viewHolder.setTitle(task.getTitle());
-            viewHolder.setComment(task.getDescription());
-            viewHolder.setStatus(task.getStatus().name());
+            holder.setTitle(task.getTitle());
+            holder.setComment(task.getDescription());
+            holder.setStatus(task.getStatus().name());
 
             if (task.hasImage()) {
-                viewHolder.loadImage(task.getImage(), task.hasLocation());
+                holder.loadImage(task.getImage(), task.hasLocation());
             } else {
-                viewHolder.loadImage(R.mipmap.ic_task, task.hasLocation());
+                holder.loadImage(R.mipmap.ic_task, task.hasLocation());
             }
-            viewHolder.setPeriodical(task.isPeriodical());
-            viewHolder.setRepeatPeriod(task.getPeriod().getTextResId());
+            holder.setPeriodical(task.isPeriodical());
+            holder.setRepeatPeriod(task.getPeriod().getTextResId());
+
+            switch (task.getStatus()) {
+
+                case ACTIVE:
+                    holder.setControlButtonText(R.string.finish);
+
+                case NEW:
+                    holder.setControlButtonText(R.string.start);
+            }
+
+            holder.setOnDeleteButtonClickListener(view -> mOnItemOptionSelectedListener.onDeleteOptionSelected(task, position));
+            holder.setOnEditButtonClickListener(view -> mOnItemOptionSelectedListener.onEditOptionSelected(task, position));
+            holder.setOnControlButtonClickListener(view -> mOnItemOptionSelectedListener.onToggleStatus(task, position));
         }
 
-
-        return convertView;
     }
-
 
     static class ViewHolder {
 
@@ -70,6 +149,13 @@ public class TasksAdapter extends ArrayAdapter<Task> {
         TextView textViewComment;
         @BindView(R.id.txt_period)
         TextView textViewPeriod;
+        @BindView(R.id.btn_delete)
+        Button buttonDelete;
+        @BindView(R.id.btn_edit)
+        Button buttonEdit;
+        @BindView(R.id.btn_control)
+        Button buttonToggleStatus;
+
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);
@@ -85,6 +171,10 @@ public class TasksAdapter extends ArrayAdapter<Task> {
 
         void setStatus(String status) {
             textViewStatus.setText(status);
+        }
+
+        void setControlButtonText(@StringRes int textResId) {
+            buttonToggleStatus.setText(textResId);
         }
 
         void loadImage(String image, boolean drawMapPin) {
@@ -113,8 +203,21 @@ public class TasksAdapter extends ArrayAdapter<Task> {
             textViewPeriod.setVisibility(periodical ? View.VISIBLE : View.GONE);
         }
 
-        void setRepeatPeriod(@StringRes int textResId){
+        void setRepeatPeriod(@StringRes int textResId) {
             textViewPeriod.setText(textResId);
         }
+
+        void setOnDeleteButtonClickListener(View.OnClickListener onClickListener) {
+            buttonDelete.setOnClickListener(onClickListener);
+        }
+
+        void setOnEditButtonClickListener(View.OnClickListener onClickListener) {
+            buttonEdit.setOnClickListener(onClickListener);
+        }
+
+        void setOnControlButtonClickListener(View.OnClickListener onClickListener) {
+            buttonToggleStatus.setOnClickListener(onClickListener);
+        }
+
     }
 }
