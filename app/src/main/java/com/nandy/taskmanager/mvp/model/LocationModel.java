@@ -69,6 +69,7 @@ public class LocationModel {
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+
         }
     }
 
