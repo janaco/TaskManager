@@ -13,14 +13,14 @@ import com.nandy.taskmanager.db.converters.RepeatPeriodConverter;
 import com.nandy.taskmanager.db.converters.TaskStatusConventer;
 import com.nandy.taskmanager.db.dao.StatisticsDao;
 import com.nandy.taskmanager.db.dao.TasksDao;
-import com.nandy.taskmanager.model.Statistics;
+import com.nandy.taskmanager.model.TaskEvent;
 import com.nandy.taskmanager.model.Task;
 
 /**
  * Created by yana on 16.01.18.
  */
 
-@Database(entities = {Task.class, Statistics.class}, version = 1)
+@Database(entities = {Task.class, TaskEvent.class}, version = 1)
 @TypeConverters({
         LocationTypeConverter.class,
         DateTypeConverter.class,

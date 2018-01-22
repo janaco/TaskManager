@@ -7,7 +7,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.nandy.taskmanager.model.Statistics;
+import com.nandy.taskmanager.model.TaskEvent;
 
 import java.util.List;
 
@@ -18,19 +18,19 @@ import java.util.List;
 @Dao
 public interface StatisticsDao {
 
-    @Query("SELECT * FROM statistics")
-    List<Statistics> getAll();
+    @Query("SELECT * FROM events")
+    List<TaskEvent> getAll();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Statistics statistics);
+    void insert(TaskEvent taskEvent);
 
     @Update
-    void update(Statistics statistics);
+    void update(TaskEvent taskEvent);
 
     @Delete
-    void delete(Statistics statistics);
+    void delete(TaskEvent taskEvent);
 
-    @Query("DELETE FROM statistics")
+    @Query("DELETE FROM events")
     void deleteAll();
 
 }

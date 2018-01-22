@@ -3,10 +3,7 @@ package com.nandy.taskmanager.mvp.model;
 import android.content.Context;
 
 import com.nandy.taskmanager.db.AppDatabase;
-import com.nandy.taskmanager.db.dao.StatisticsDao;
 import com.nandy.taskmanager.db.dao.TasksDao;
-import com.nandy.taskmanager.model.Action;
-import com.nandy.taskmanager.model.Statistics;
 import com.nandy.taskmanager.model.Task;
 
 import java.util.List;

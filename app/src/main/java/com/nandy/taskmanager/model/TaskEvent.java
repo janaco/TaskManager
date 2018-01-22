@@ -10,8 +10,8 @@ import android.os.Parcelable;
  * Created by yana on 21.01.18.
  */
 
-@Entity(tableName = "statistics")
-public class Statistics implements Parcelable {
+@Entity(tableName = "events")
+public class TaskEvent implements Parcelable {
 
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
@@ -23,13 +23,13 @@ public class Statistics implements Parcelable {
     @ColumnInfo(name = "action")
     private Action mAction;
 
-    public Statistics(long taskId, long time, Action action) {
+    public TaskEvent(long taskId, long time, Action action) {
         mTaskId = taskId;
         mTime = time;
         mAction = action;
     }
 
-    protected Statistics(Parcel in) {
+    protected TaskEvent(Parcel in) {
         mId = in.readLong();
         mTaskId = in.readLong();
         mTime = in.readLong();
@@ -49,15 +49,15 @@ public class Statistics implements Parcelable {
         return 0;
     }
 
-    public static final Creator<Statistics> CREATOR = new Creator<Statistics>() {
+    public static final Creator<TaskEvent> CREATOR = new Creator<TaskEvent>() {
         @Override
-        public Statistics createFromParcel(Parcel in) {
-            return new Statistics(in);
+        public TaskEvent createFromParcel(Parcel in) {
+            return new TaskEvent(in);
         }
 
         @Override
-        public Statistics[] newArray(int size) {
-            return new Statistics[size];
+        public TaskEvent[] newArray(int size) {
+            return new TaskEvent[size];
         }
     };
 

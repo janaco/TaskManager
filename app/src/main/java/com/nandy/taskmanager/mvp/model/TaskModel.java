@@ -8,7 +8,7 @@ import com.nandy.taskmanager.db.dao.StatisticsDao;
 import com.nandy.taskmanager.db.dao.TasksDao;
 import com.nandy.taskmanager.model.Action;
 import com.nandy.taskmanager.model.Metadata;
-import com.nandy.taskmanager.model.Statistics;
+import com.nandy.taskmanager.model.TaskEvent;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskStatus;
 
@@ -80,7 +80,7 @@ public class TaskModel {
         task.setMetadata(metadata);
 
         mTasksDao.update(task);
-        mStatisticsDao.insert(new Statistics(task.getId(), System.currentTimeMillis(), Action.START));
+        mStatisticsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.START));
     }
 
     public void complete(){
@@ -99,7 +99,7 @@ public class TaskModel {
         task.setMetadata(metadata);
 
         mTasksDao.update(task);
-        mStatisticsDao.insert(new Statistics(task.getId(), System.currentTimeMillis(), Action.END));
+        mStatisticsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.END));
     }
 
     public void delete(){
