@@ -10,8 +10,9 @@ import com.nandy.taskmanager.model.TaskStatus;
 import com.nandy.taskmanager.mvp.BasePresenter;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskDetailsModel;
-import com.nandy.taskmanager.mvp.model.TaskScheduleModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
+import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
+import com.nandy.taskmanager.mvp.model.TaskStatusModel;
 import com.nandy.taskmanager.mvp.view.TaskDetailsView;
 
 import java.util.Locale;
@@ -20,15 +21,16 @@ import java.util.Locale;
  * Created by razomer on 18.01.18.
  */
 
-public class TaskDetailsPresenter extends BasePresenter {
+public class TaskItemPresenter extends BasePresenter {
 
     private TaskDetailsView mView;
     private TaskDetailsModel mDetailsModel;
     private DateFormatModel mDateFormatModel;
     private TaskRecordsModel mRecordsModel;
-    private TaskScheduleModel mShceduleModel;
+    private TaskStatusModel mTaskStatusModel;
+    private TaskRemindersModel mTaskReminderModel;
 
-    public TaskDetailsPresenter(TaskDetailsView view) {
+    public TaskItemPresenter(TaskDetailsView view) {
         mView = view;
     }
 
@@ -36,8 +38,12 @@ public class TaskDetailsPresenter extends BasePresenter {
         this.mDetailsModel = mDetailsModel;
     }
 
-    public void setScheduleModel(TaskScheduleModel mShceduleModel) {
-        this.mShceduleModel = mShceduleModel;
+    public void setTaskStatusModel(TaskStatusModel mTaskStatusModel) {
+        this.mTaskStatusModel = mTaskStatusModel;
+    }
+
+    public void setTaskReminderModel(TaskRemindersModel mTaskReminderModel) {
+        this.mTaskReminderModel = mTaskReminderModel;
     }
 
     public void setDateFormatModel(DateFormatModel mDateFormatModel) {
@@ -128,13 +134,14 @@ public class TaskDetailsPresenter extends BasePresenter {
 
             case NEW:
                 newStatus = TaskStatus.ACTIVE;
-                mShceduleModel.scheduleTaskAutoComplete(task.getId(), task.getMaxDuration());
-                mRecordsModel.start(task.getId(), System.currentTimeMillis());
+                mTaskStatusModel.start(task);
+                mTaskReminderModel.scheduleStartReminder(task);
                 break;
 
             case ACTIVE:
                 newStatus = TaskStatus.COMPLETED;
-                mRecordsModel.end(task.getId(), System.currentTimeMillis());
+                mTaskStatusModel.complete(task);
+                mTaskReminderModel.cancelReminder(task.getId());
                 break;
 
             default:
@@ -151,11 +158,11 @@ public class TaskDetailsPresenter extends BasePresenter {
 
     public void delete() {
         Task task = mDetailsModel.getTask();
-        mShceduleModel.cancelReminder((int) task.getId());
         mRecordsModel.delete(task);
+        mTaskReminderModel.cancelReminder(task.getId());
 
-        if (task.hasLocation()){
-            mShceduleModel.scheduleLocationUpdates();
-        }
+//        if (task.hasLocation()){
+//            mShceduleModel.scheduleLocationUpdates();
+//        }
     }
 }

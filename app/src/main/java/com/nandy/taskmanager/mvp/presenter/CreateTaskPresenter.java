@@ -13,7 +13,7 @@ import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.CropImageModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
-import com.nandy.taskmanager.mvp.model.TaskScheduleModel;
+import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
 import com.nandy.taskmanager.mvp.view.CreateTaskView;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -38,7 +38,7 @@ public class CreateTaskPresenter extends BasePresenter {
     private DateFormatModel mDateFormatModel;
     private CropImageModel mCropImageModel;
     private TaskRecordsModel mRecordsModel;
-    private TaskScheduleModel mScheduleModel;
+    private TaskRemindersModel mScheduleModel;
 
     public CreateTaskPresenter(CreateTaskView view) {
         mView = view;
@@ -107,7 +107,7 @@ public class CreateTaskPresenter extends BasePresenter {
 
         }
 
-        mScheduleModel.scheduleAutoTaskStart(task);
+        mScheduleModel.scheduleStartReminder(task);
 
         if (task.hasLocation()){
             mScheduleModel.scheduleLocationUpdates();
@@ -314,7 +314,7 @@ public class CreateTaskPresenter extends BasePresenter {
         this.mRecordsModel = mRecordsModel;
     }
 
-    public void setScheduleModel(TaskScheduleModel mScheduleModel) {
+    public void setScheduleModel(TaskRemindersModel mScheduleModel) {
         this.mScheduleModel = mScheduleModel;
     }
 }

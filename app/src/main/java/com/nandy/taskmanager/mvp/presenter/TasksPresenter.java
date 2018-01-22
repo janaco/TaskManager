@@ -6,8 +6,11 @@ import com.daimajia.swipe.util.Attributes;
 import com.nandy.taskmanager.adapter.TasksAdapter;
 import com.nandy.taskmanager.eventbus.TaskListChangedEvent;
 import com.nandy.taskmanager.model.Task;
+import com.nandy.taskmanager.model.TaskStatus;
 import com.nandy.taskmanager.mvp.BasePresenter;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
+import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
+import com.nandy.taskmanager.mvp.model.TaskStatusModel;
 import com.nandy.taskmanager.mvp.view.TasksListView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -24,6 +27,9 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
 
     private TasksListView mView;
     private TaskRecordsModel mRecordsModel;
+    private TaskRemindersModel mTaskReminderMode;
+    private TaskStatusModel mTaskStatusModel;
+
     private TasksAdapter mAdapter;
 
     public TasksPresenter(TasksListView view) {
@@ -103,18 +109,71 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
         this.mRecordsModel = mRecordsModel;
     }
 
+    public void delete(int position) {
+        onDeleteOptionSelected(mAdapter.getItem(position), position);
+    }
+
+    public Task getTask(int position) {
+        return mAdapter.getItem(position);
+    }
+
     @Override
     public void onDeleteOptionSelected(Task task, int position) {
-
+        mRecordsModel.delete(task);
+        mTaskReminderMode.cancelReminder(task.getId());
+        mAdapter.remove(position);
     }
 
     @Override
     public void onEditOptionSelected(Task task, int position) {
-
+        mView.startEditTaskActivity(task);
     }
 
     @Override
     public void onToggleStatus(Task task, int position) {
 
+        switch (task.getStatus()) {
+
+            case NEW:
+                task.setStatus(TaskStatus.ACTIVE);
+                mTaskStatusModel.start(task);
+                mTaskReminderMode.scheduleStartReminder(task);
+                break;
+
+            case ACTIVE:
+                task.setStatus(TaskStatus.COMPLETED);
+                mTaskStatusModel.complete(task);
+                mTaskReminderMode.cancelReminder(task.getId());
+                break;
+
+            default:
+                task.setStatus(TaskStatus.NEW);
+                break;
+        }
+
+        mRecordsModel.update(task);
+        mAdapter.set(task, position);
+    }
+
+    public void resetStart(int position) {
+        Task task = getTask(position);
+        task.setStatus(TaskStatus.NEW);
+        mRecordsModel.update(task);
+        mTaskReminderMode.cancelReminder(task.getId());
+    }
+
+    public void resetEnd(int position) {
+        Task task = getTask(position);
+        mTaskReminderMode.cancelReminder(task.getId());
+        mTaskReminderMode.scheduleEndReminder(task.getId(), task.getMaxDuration());
+    }
+
+
+    public void setTaskReminderMode(TaskRemindersModel mTaskReminderMode) {
+        this.mTaskReminderMode = mTaskReminderMode;
+    }
+
+    public void setTaskStatusModel(TaskStatusModel mTaskStatusModel) {
+        this.mTaskStatusModel = mTaskStatusModel;
     }
 }

@@ -16,7 +16,7 @@ import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.TasksDao;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskStatus;
-import com.nandy.taskmanager.mvp.model.TaskScheduleModel;
+import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 
 import java.util.List;
 
@@ -58,7 +58,7 @@ public class TaskStatusReceiver extends BroadcastReceiver {
                         || (task.isPeriodical() && task.getStatus() == TaskStatus.COMPLETED)) {
                     task.setStatus(TaskStatus.ACTIVE);
                     showTaskStartedNotification(context, task.getTitle());
-                    new TaskScheduleModel(context).scheduleTaskAutoComplete(taskId, task.getMaxDuration());
+                    new TaskRemindersModel(context).scheduleEndReminder(taskId, task.getMaxDuration());
                 }
                 break;
 

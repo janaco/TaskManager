@@ -25,14 +25,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nandy.taskmanager.ImageLoader;
+import com.nandy.taskmanager.image.ImageLoader;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.CropImageModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
-import com.nandy.taskmanager.mvp.model.TaskScheduleModel;
+import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
 import com.nandy.taskmanager.mvp.presenter.CreateTaskPresenter;
 import com.nandy.taskmanager.mvp.view.CreateTaskView;
@@ -102,7 +102,7 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         mPresener.setDateFormatModel(new DateFormatModel());
         mPresener.setCropImageModel(new CropImageModel(getApplicationContext()));
         mPresener.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
-        mPresener.setScheduleModel(new TaskScheduleModel(getApplicationContext()));
+        mPresener.setScheduleModel(new TaskRemindersModel(getApplicationContext()));
 
         mPresener.start();
     }

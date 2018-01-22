@@ -1,4 +1,4 @@
-package com.nandy.taskmanager;
+package com.nandy.taskmanager.image;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,6 +9,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.nandy.taskmanager.image.transformartion.OverlayTransformation;
+import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.image.transformartion.RoundedCornersTransformation;
 
 /**
  * Created by razomer on 19.01.18.

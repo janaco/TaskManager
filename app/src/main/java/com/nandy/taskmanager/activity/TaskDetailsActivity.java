@@ -13,15 +13,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.RequestBuilder;
-import com.nandy.taskmanager.ImageLoader;
+import com.nandy.taskmanager.image.ImageLoader;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskDetailsModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
-import com.nandy.taskmanager.mvp.model.TaskScheduleModel;
-import com.nandy.taskmanager.mvp.presenter.TaskDetailsPresenter;
+import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
+import com.nandy.taskmanager.mvp.model.TaskStatusModel;
+import com.nandy.taskmanager.mvp.presenter.TaskItemPresenter;
 import com.nandy.taskmanager.mvp.view.TaskDetailsView;
 
 import butterknife.BindView;
@@ -49,7 +50,7 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
     @BindView(R.id.btn_control)
     Button mControlButton;
 
-    private TaskDetailsPresenter mPresenter;
+    private TaskItemPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,15 +66,15 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        mPresenter = new TaskDetailsPresenter(this);
+        mPresenter = new TaskItemPresenter(this);
         mPresenter.setDateFormatModel(new DateFormatModel());
         mPresenter.setDetailsModel(new TaskDetailsModel(task));
         mPresenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
-        mPresenter.setScheduleModel(new TaskScheduleModel(getApplicationContext()));
+        mPresenter.setTaskReminderModel(new TaskRemindersModel(getApplicationContext()));
+        mPresenter.setTaskStatusModel(new TaskStatusModel(getApplicationContext()));
 
         mPresenter.start();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -13,7 +13,7 @@ import com.nandy.taskmanager.db.dao.TasksDao;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskStatus;
 import com.nandy.taskmanager.mvp.model.LocationModel;
-import com.nandy.taskmanager.mvp.model.TaskScheduleModel;
+import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 
 import java.util.List;
 import java.util.Locale;
@@ -24,7 +24,7 @@ public class LocationService extends Service implements LocationModel.LocationLi
 
     private LocationModel mLocationModel;
     private TasksDao mTasksDao;
-    private TaskScheduleModel mScheduleMode;
+    private TaskRemindersModel mScheduleMode;
     private List<Task> mTasks;
 
 
@@ -36,7 +36,7 @@ public class LocationService extends Service implements LocationModel.LocationLi
         super.onCreate();
         mLocationModel = new LocationModel(getApplicationContext());
         mTasksDao = AppDatabase.getInstance(getApplicationContext()).tasksDao();
-        mScheduleMode = new TaskScheduleModel(getApplicationContext());
+        mScheduleMode = new TaskRemindersModel(getApplicationContext());
         mLocationModel.setLocationListener(this);
     }
 
@@ -106,7 +106,7 @@ public class LocationService extends Service implements LocationModel.LocationLi
 
             case NEW:
                 task.setStatus(TaskStatus.ACTIVE);
-                mScheduleMode.scheduleTaskAutoComplete(task.getId(), task.getMaxDuration());
+                mScheduleMode.scheduleEndReminder(task.getId(), task.getMaxDuration());
                 break;
 
             case ACTIVE:

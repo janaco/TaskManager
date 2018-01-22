@@ -1,26 +1,21 @@
 package com.nandy.taskmanager.adapter;
 
-import android.content.Context;
 import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
-import com.nandy.taskmanager.ImageLoader;
 import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.image.ImageLoader;
 import com.nandy.taskmanager.model.Task;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -70,6 +65,16 @@ public class TasksAdapter extends BaseSwipeAdapter {
     public void refresh(Collection<Task> tasks) {
         mTasks.clear();
         addAll(tasks);
+    }
+
+    public void set(Task task, int position) {
+        mTasks.set(position, task);
+        notifyDataSetChanged();
+    }
+
+    public void remove(int position) {
+        mTasks.remove(position);
+        notifyDataSetChanged();
     }
 
     public ArrayList<Task> getItems() {
@@ -130,9 +135,20 @@ public class TasksAdapter extends BaseSwipeAdapter {
                     holder.setControlButtonText(R.string.start);
             }
 
-            holder.setOnDeleteButtonClickListener(view -> mOnItemOptionSelectedListener.onDeleteOptionSelected(task, position));
-            holder.setOnEditButtonClickListener(view -> mOnItemOptionSelectedListener.onEditOptionSelected(task, position));
-            holder.setOnControlButtonClickListener(view -> mOnItemOptionSelectedListener.onToggleStatus(task, position));
+            holder.setOnDeleteButtonClickListener(view -> {
+                holder.closeSwipeLayout(false);
+                mOnItemOptionSelectedListener.onDeleteOptionSelected(task, position);
+            });
+            holder.setOnEditButtonClickListener(view ->
+            {
+                holder.closeSwipeLayout(true);
+                mOnItemOptionSelectedListener.onEditOptionSelected(task, position);
+            });
+            holder.setOnControlButtonClickListener(view ->
+            {
+                holder.closeSwipeLayout(true);
+                mOnItemOptionSelectedListener.onToggleStatus(task, position);
+            });
         }
 
     }
@@ -155,6 +171,8 @@ public class TasksAdapter extends BaseSwipeAdapter {
         Button buttonEdit;
         @BindView(R.id.btn_control)
         Button buttonToggleStatus;
+        @BindView(R.id.swipe)
+        SwipeLayout mSwipeLayout;
 
 
         ViewHolder(View view) {
@@ -217,6 +235,10 @@ public class TasksAdapter extends BaseSwipeAdapter {
 
         void setOnControlButtonClickListener(View.OnClickListener onClickListener) {
             buttonToggleStatus.setOnClickListener(onClickListener);
+        }
+
+        void closeSwipeLayout(boolean smooth) {
+            mSwipeLayout.close(smooth);
         }
 
     }

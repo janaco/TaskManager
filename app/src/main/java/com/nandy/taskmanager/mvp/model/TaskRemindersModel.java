@@ -20,16 +20,16 @@ import static android.content.Context.ALARM_SERVICE;
  * Created by yana on 20.01.18.
  */
 
-public class TaskScheduleModel {
+public class TaskRemindersModel {
 
     private Context mContext;
 
-    public TaskScheduleModel(Context context) {
+    public TaskRemindersModel(Context context) {
         mContext = context;
     }
 
-    public void scheduleAutoTaskStart(Task task) {
-        Log.d("TASK_", "scheduleAutoTaskStart: " + task.getId() + ", " + task.getStartDate());
+    public void scheduleStartReminder(Task task) {
+        Log.d("TASK_", "scheduleStartReminder: " + task.getId() + ", " + task.getStartDate());
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(task.getStartDate());
@@ -55,16 +55,16 @@ public class TaskScheduleModel {
         }
     }
 
-    public void scheduleTaskAutoComplete(long taskId, long duration) {
+    public void scheduleEndReminder(long taskId, long duration) {
 
-        Log.d("TASK_", "scheduleTaskAutoComplete: " + taskId + ", " + duration);
+        Log.d("TASK_", "scheduleEndReminder: " + taskId + ", " + duration);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.add(Calendar.MILLISECOND, (int) duration);
 //        calendar.add(Calendar.SECOND, 30);
 
-
+        cancelReminder((int) taskId);
         enableTasksReceiver();
 
         Intent data = new Intent(mContext, TaskStatusReceiver.class);
@@ -91,7 +91,7 @@ public class TaskScheduleModel {
                         PackageManager.DONT_KILL_APP);
     }
 
-    public void cancelReminder(int requestCode) {
+    public void cancelReminder(long requestCode) {
         ComponentName componentName = new ComponentName(mContext, TaskStatusReceiver.class);
         PackageManager packageManager = mContext.getPackageManager();
         packageManager.setComponentEnabledSetting(componentName,
@@ -100,7 +100,7 @@ public class TaskScheduleModel {
 
         Intent intent = new Intent(mContext, TaskStatusReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext,
-                requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                (int) requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         getAlarmManager().cancel(pendingIntent);
         pendingIntent.cancel();
     }

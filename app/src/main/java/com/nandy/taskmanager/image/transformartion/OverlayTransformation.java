@@ -1,4 +1,4 @@
-package com.nandy.taskmanager;
+package com.nandy.taskmanager.image.transformartion;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

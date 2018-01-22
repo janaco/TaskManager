@@ -17,14 +17,20 @@ import android.widget.ListView;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.model.Task;
+import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
+import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
+import com.nandy.taskmanager.mvp.model.TaskStatusModel;
 import com.nandy.taskmanager.mvp.presenter.TasksPresenter;
 import com.nandy.taskmanager.mvp.view.TasksListView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.nandy.taskmanager.activity.TaskDetailsActivity.REQUEST_CODE_EDIT;
 
 /**
  * Created by yana on 21.01.18.
@@ -88,23 +94,36 @@ public class TasksFragment extends Fragment implements TasksListView {
 
 
             case R.id.action_delete:
+                mTasksPresenter.delete(position);
                 return true;
 
 
             case R.id.action_edit:
+                startEditTaskActivity(mTasksPresenter.getTask(position));
                 return true;
 
 
             case R.id.action_reset_start:
+                mTasksPresenter.resetStart(position);
                 return true;
 
             case R.id.action_reset_end:
+                mTasksPresenter.resetEnd(position);
                 return true;
 
             default:
                 return super.onContextItemSelected(item);
 
         }
+    }
+
+
+    @Override
+    public void startEditTaskActivity(Task task) {
+        Intent intent = new Intent(getContext(), CreateTaskActivity.class);
+        intent.putExtra("task", task);
+        intent.putExtra("mode", CreateTaskModel.MODE_EDIT);
+        startActivityForResult(intent, REQUEST_CODE_EDIT);
 
     }
 
@@ -158,6 +177,8 @@ public class TasksFragment extends Fragment implements TasksListView {
 
         TasksPresenter presenter = new TasksPresenter(fragment);
         presenter.setRecordsModel(new TaskRecordsModel(context));
+        presenter.setTaskStatusModel(new TaskStatusModel(context));
+        presenter.setTaskReminderMode(new TaskRemindersModel(context));
 
         fragment.setTasksPresenter(presenter);
 

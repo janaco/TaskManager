@@ -18,12 +18,10 @@ import java.util.List;
 public class TaskRecordsModel {
 
     private TasksDao mTasksDao;
-    private StatisticsDao mStatisticsDao;
 
     public TaskRecordsModel(Context context){
 
         mTasksDao = AppDatabase.getInstance(context).tasksDao();
-        mStatisticsDao = AppDatabase.getInstance(context).statisticsDao();
     }
 
     public List<Task> selectAll(){
@@ -46,11 +44,5 @@ public class TaskRecordsModel {
         mTasksDao.deleteAll();
     }
 
-    public void start(long taskIs, long timestamp){
-        mStatisticsDao.insert(new Statistics(taskIs, timestamp, Action.START));
-    }
 
-    public void end(long taskId, long timestamp){
-        mStatisticsDao.insert(new Statistics(taskId, timestamp, Action.END));
-    }
 }
