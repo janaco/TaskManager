@@ -27,8 +27,8 @@
     <string name="exit">Exit</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
-    <string name="reset_start_time">Reset start time</string>
-    <string name="reset_end_time">Reset end time</string>
+    <string name="reset_start">Reset start</string>
+    <string name="reset_end">Reset end</string>
     <string name="start">Start</string>
     <string name="finish">Finish</string>
     <string name="pause">Pause</string>

@@ -18,16 +18,15 @@
     </group>
 
     <group
-        android:id="@+id/group_reset_time"
-        android:visible="false">
+        android:id="@+id/group_reset_time">
         <item
             android:id="@+id/action_reset_start"
-            android:title="@string/reset_start_time"
+            android:title="@string/reset_start"
             app:showAsAction="never" />
 
         <item
             android:id="@+id/action_reset_end"
-            android:title="@string/reset_end_time"
+            android:title="@string/reset_end"
             app:showAsAction="never" />
     </group>
 </menu>

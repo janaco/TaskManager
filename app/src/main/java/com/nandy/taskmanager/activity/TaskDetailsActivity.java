@@ -3,9 +3,14 @@ package com.nandy.taskmanager.activity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -70,6 +75,7 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
     View mTimeSpentLayout;
 
     private TaskItemPresenter mPresenter;
+    private Menu mMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +101,9 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        mMenu = menu;
         getMenuInflater().inflate(R.menu.menu_task, menu);
+        mPresenter.setupMenu();
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -118,9 +126,11 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
                 break;
 
             case R.id.action_reset_start:
+                mPresenter.resetStart();
                 break;
 
             case R.id.action_reset_end:
+                mPresenter.resetEnd();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -230,6 +240,26 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
     @Override
     public void setTimeSpentVisible(boolean visible) {
         mTimeSpentLayout.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
 
+    @Override
+    public void setResetEndMenuOptionEnabled(boolean enabled) {
+        MenuItem item = mMenu.findItem(R.id.action_reset_end);
+        item.setTitle(getMenuItemText(R.string.reset_end, enabled));
+        item.setEnabled(enabled);
+    }
+
+    @Override
+    public void setResetStartMenuOptionEnabled(boolean enabled) {
+        MenuItem item = mMenu.findItem(R.id.action_reset_start);
+        item.setTitle(getMenuItemText(R.string.reset_start, enabled));
+        item.setEnabled(enabled);
+    }
+
+    private Spannable getMenuItemText(@StringRes int textResId, boolean enabled) {
+        SpannableString spannable = new SpannableString(getString(textResId));
+        int colorResId = enabled ? R.color.primaryTextColor : android.R.color.secondary_text_dark_nodisable;
+        spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getApplicationContext(), colorResId)), 0, spannable.length(), 0);
+        return spannable;
     }
 }

@@ -36,6 +36,34 @@ public class TaskModel {
         mTasksDao = AppDatabase.getInstance(context).tasksDao();
     }
 
+
+    public void resetStart(Task task) {
+        Metadata metadata = task.getMetadata();
+        metadata.setTimeSpent(0);
+        metadata.setActualStartDate(null);
+        task.setMetadata(metadata);
+
+        task.setStatus(TaskStatus.NEW);
+        mTasksDao.update(task);
+    }
+
+    public void resetEnd(Task task) {
+        Metadata metadata = task.getMetadata();
+        metadata.setTimeSpent(0);
+        task.setMetadata(metadata);
+
+        task.setStatus(TaskStatus.ACTIVE);
+        mTasksDao.update(task);
+    }
+
+    public void resetStart() {
+      resetStart(mTask);
+    }
+
+    public void resetEnd() {
+      resetEnd(mTask);
+    }
+
     public void start(){
         start(mTask);
     }

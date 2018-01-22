@@ -157,13 +157,13 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
 
     public void resetStart(int position) {
         Task task = getTask(position);
-        task.setStatus(TaskStatus.NEW);
-        mRecordsModel.update(task);
+        mTaskModel.resetStart(task);
         mTaskReminderMode.cancelReminder(task.getId());
     }
 
     public void resetEnd(int position) {
         Task task = getTask(position);
+        mTaskModel.resetStart(task);
         mTaskReminderMode.cancelReminder(task.getId());
         mTaskReminderMode.scheduleEndReminder(task.getId(), task.getScheduledDuration());
     }

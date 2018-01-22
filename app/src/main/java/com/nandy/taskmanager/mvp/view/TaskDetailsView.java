@@ -40,5 +40,10 @@ public interface TaskDetailsView {
 
     void setTimeSpentVisible(boolean visible);
 
+    void setResetStartMenuOptionEnabled(boolean enabled);
+
+    void setResetEndMenuOptionEnabled(boolean enabled);
+
+    void finish();
 
 }

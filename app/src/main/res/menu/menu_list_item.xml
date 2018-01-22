@@ -17,11 +17,11 @@
 
         <item
             android:id="@+id/action_reset_start"
-            android:title="@string/reset_start_time" />
+            android:title="@string/reset_start" />
 
         <item
             android:id="@+id/action_reset_end"
-            android:title="@string/reset_end_time" />
+            android:title="@string/reset_end" />
     </group>
 
 </menu>

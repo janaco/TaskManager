@@ -6,6 +6,7 @@ import android.content.Intent;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.model.Task;
+import com.nandy.taskmanager.model.TaskStatus;
 import com.nandy.taskmanager.mvp.BasePresenter;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskModel;
@@ -60,12 +61,12 @@ public class TaskItemPresenter extends BasePresenter {
                 task.getScheduledDuration()), R.string.minutes);
         mView.setRepeatPeriod(task.getRepeatPeriod().getTextResId());
 
-       displayLocation(task);
-       loadImage(task);
-       displayStatusInformation(task);
+        displayLocation(task);
+        loadImage(task);
+        displayStatusInformation(task);
     }
 
-    private void displayStatusInformation(Task task){
+    private void displayStatusInformation(Task task) {
         mView.setStatus(task.getStatus().name());
 
         switch (task.getStatus()) {
@@ -96,22 +97,28 @@ public class TaskItemPresenter extends BasePresenter {
         }
     }
 
-   private void displayLocation(Task task){
-       if (task.hasLocation()) {
-           mView.setLocationVisible(true);
-           mView.setLocation(task.getLocation().toString());
-       } else {
-           mView.setLocationVisible(false);
-       }
-   }
+    public void setupMenu() {
+        Task task = mTaskModel.getTask();
+        mView.setResetStartMenuOptionEnabled(task.getStatus() != TaskStatus.NEW);
+        mView.setResetEndMenuOptionEnabled(task.getStatus() == TaskStatus.COMPLETED);
+    }
 
-   private void loadImage(Task task){
-       if (task.hasImage()) {
-           mView.loadImage(task.getImage(), task.hasLocation());
-       } else {
-           mView.loadImage(R.mipmap.ic_task, task.hasLocation());
-       }
-   }
+    private void displayLocation(Task task) {
+        if (task.hasLocation()) {
+            mView.setLocationVisible(true);
+            mView.setLocation(task.getLocation().toString());
+        } else {
+            mView.setLocationVisible(false);
+        }
+    }
+
+    private void loadImage(Task task) {
+        if (task.hasImage()) {
+            mView.loadImage(task.getImage(), task.hasLocation());
+        } else {
+            mView.loadImage(R.mipmap.ic_task, task.hasLocation());
+        }
+    }
 
     public void toggleStatus() {
 
@@ -129,15 +136,34 @@ public class TaskItemPresenter extends BasePresenter {
         }
 
         displayStatusInformation(mTaskModel.getTask());
+        setupMenu();
     }
 
     public void delete() {
         mTaskReminderModel.cancelReminder(mTaskModel.getTask().getId());
         mTaskModel.delete();
+        mView.finish();
 
 //        if (task.hasLocation()){
 //            mShceduleModel.scheduleLocationUpdates();
 //        }
+    }
+
+
+    public void resetStart() {
+        mTaskModel.resetStart();
+        mTaskReminderModel.cancelReminder(mTaskModel.getTask().getId());
+        displayData(mTaskModel.getTask());
+        setupMenu();
+    }
+
+    public void resetEnd() {
+        Task task = mTaskModel.getTask();
+        mTaskModel.resetEnd();
+        mTaskReminderModel.cancelReminder(task.getId());
+        mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration());
+        displayData(mTaskModel.getTask());
+        setupMenu();
     }
 
     public void setTaskModel(TaskModel mTaskModel) {
