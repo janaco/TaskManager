@@ -4,10 +4,12 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.nandy.taskmanager.db.AppDatabase;
+import com.nandy.taskmanager.db.dao.EventsDao;
 import com.nandy.taskmanager.db.dao.StatisticsDao;
 import com.nandy.taskmanager.db.dao.TasksDao;
 import com.nandy.taskmanager.model.Action;
 import com.nandy.taskmanager.model.Metadata;
+import com.nandy.taskmanager.model.Statistics;
 import com.nandy.taskmanager.model.TaskEvent;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskStatus;
@@ -21,18 +23,20 @@ import java.util.List;
 
 public class TaskModel {
 
-    private StatisticsDao mStatisticsDao;
+    private EventsDao mEventsDao;
     private TasksDao mTasksDao;
+    private StatisticsDao mStatisticsDao;
     private Task mTask;
 
     public TaskModel(Context context, Task task){
         mTask = task;
-        mStatisticsDao = AppDatabase.getInstance(context).statisticsDao();
+        mEventsDao = AppDatabase.getInstance(context).taskEventsDao();
         mTasksDao = AppDatabase.getInstance(context).tasksDao();
+        mStatisticsDao = AppDatabase.getInstance(context).statisticsDao();
     }
 
     public TaskModel(Context context){
-        mStatisticsDao = AppDatabase.getInstance(context).statisticsDao();
+        mEventsDao = AppDatabase.getInstance(context).taskEventsDao();
         mTasksDao = AppDatabase.getInstance(context).tasksDao();
     }
 
@@ -80,7 +84,7 @@ public class TaskModel {
         task.setMetadata(metadata);
 
         mTasksDao.update(task);
-        mStatisticsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.START));
+        mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.START));
     }
 
     public void complete(){
@@ -99,7 +103,8 @@ public class TaskModel {
         task.setMetadata(metadata);
 
         mTasksDao.update(task);
-        mStatisticsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.END));
+        mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.END));
+        mStatisticsDao.insert(new Statistics(task.getId(), actualStartDate, spentTime));
     }
 
     public void delete(){

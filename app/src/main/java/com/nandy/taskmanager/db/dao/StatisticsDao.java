@@ -3,34 +3,26 @@ package com.nandy.taskmanager.db.dao;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
 
-import com.nandy.taskmanager.model.TaskEvent;
+import com.nandy.taskmanager.model.Statistics;
+import com.nandy.taskmanager.model.StatisticsResult;
 
 import java.util.List;
 
 /**
- * Created by yana on 21.01.18.
+ * Created by razomer on 22.01.18.
  */
 
 @Dao
-public interface StatisticsDao {
+public interface StatisticsDao{
 
-    @Query("SELECT * FROM events")
-    List<TaskEvent> getAll();
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(TaskEvent taskEvent);
-
-    @Update
-    void update(TaskEvent taskEvent);
+    @Insert
+    void insert(Statistics statistics);
 
     @Delete
-    void delete(TaskEvent taskEvent);
+    void  delete(Statistics statistics);
 
-    @Query("DELETE FROM events")
-    void deleteAll();
-
+    @Query("SELECT t.id AS mTaskId, t.title AS mTaskTitle, sum(s.spent_time) AS mSpentTime FROM statistics s, tasks t WHERE s.id_task == t.id AND s.start_date BETWEEN :dateStart AND :dateEnd")
+    List<StatisticsResult> select(long dateStart, long dateEnd);
 }

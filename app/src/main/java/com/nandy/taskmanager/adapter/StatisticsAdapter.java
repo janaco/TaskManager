@@ -1,6 +1,5 @@
 package com.nandy.taskmanager.adapter;
 
-import android.content.Context;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,9 +8,10 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
 import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.model.StatisticsResult;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by razomer on 22.01.18.
@@ -19,9 +19,9 @@ import java.util.List;
 
 public class StatisticsAdapter extends BaseExpandableListAdapter {
 
-    private List<Pair<String, ArrayList>> mData;
+    private List<Pair<String, List<StatisticsResult>>> mData;
 
-    public StatisticsAdapter (List<Pair<String, ArrayList>> data){
+    public StatisticsAdapter(List<Pair<String, List<StatisticsResult>>> data) {
         mData = data;
     }
 
@@ -41,7 +41,7 @@ public class StatisticsAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public Object getChild(int groupPosition, int childPosition) {
+    public StatisticsResult getChild(int groupPosition, int childPosition) {
         return mData.get(groupPosition).second.get(childPosition);
     }
 
@@ -67,7 +67,7 @@ public class StatisticsAdapter extends BaseExpandableListAdapter {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_statistics_group_view, null);
         }
 
-        TextView textGroup =  convertView.findViewById(R.id.text_title_group);
+        TextView textGroup = convertView.findViewById(R.id.text_title_group);
         textGroup.setText(mData.get(groupPosition).first);
 
         return convertView;
@@ -83,6 +83,11 @@ public class StatisticsAdapter extends BaseExpandableListAdapter {
 
         TextView titleTextView = convertView.findViewById(R.id.txt_title);
         TextView spentTimeTextView = convertView.findViewById(R.id.txt_spent_time);
+
+        StatisticsResult result = getChild(groupPosition, childPosition);
+        titleTextView.setText(result.getTaskTitle());
+        spentTimeTextView.setText(TimeUnit.MILLISECONDS.toMinutes(
+                result.getSpentTime()) + " mins");
 
 
         return convertView;

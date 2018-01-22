@@ -13,8 +13,11 @@ import android.widget.ExpandableListView;
 
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.adapter.StatisticsAdapter;
+import com.nandy.taskmanager.model.StatisticsResult;
+import com.nandy.taskmanager.mvp.model.StatisticsModel;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -37,19 +40,21 @@ public class StatisticsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        List<Pair<String, ArrayList>> data = new ArrayList<>();
-        data.add(new Pair<>(getString(R.string.january), new ArrayList()));
-        data.add(new Pair<>(getString(R.string.february), new ArrayList()));
-        data.add(new Pair<>(getString(R.string.march), new ArrayList()));
-        data.add(new Pair<>(getString(R.string.april), new ArrayList()));
-        data.add(new Pair<>(getString(R.string.may), new ArrayList()));
-        data.add(new Pair<>(getString(R.string.june), new ArrayList()));
-        data.add(new Pair<>(getString(R.string.july), new ArrayList()));
-        data.add(new Pair<>(getString(R.string.august), new ArrayList()));
-        data.add(new Pair<>(getString(R.string.september), new ArrayList()));
-        data.add(new Pair<>(getString(R.string.october), new ArrayList()));
-        data.add(new Pair<>(getString(R.string.november), new ArrayList()));
-        data.add(new Pair<>(getString(R.string.december), new ArrayList()));
+        StatisticsModel statisticsModel = new StatisticsModel(getContext());
+
+        List<Pair<String, List<StatisticsResult>>> data = new ArrayList<>();
+        data.add(new Pair<>(getString(R.string.january), statisticsModel.getStatistics(Calendar.JANUARY)));
+        data.add(new Pair<>(getString(R.string.february), statisticsModel.getStatistics(Calendar.FEBRUARY)));
+        data.add(new Pair<>(getString(R.string.march), statisticsModel.getStatistics(Calendar.MARCH)));
+        data.add(new Pair<>(getString(R.string.april), statisticsModel.getStatistics(Calendar.APRIL)));
+        data.add(new Pair<>(getString(R.string.may), statisticsModel.getStatistics(Calendar.MAY)));
+        data.add(new Pair<>(getString(R.string.june), statisticsModel.getStatistics(Calendar.JUNE)));
+        data.add(new Pair<>(getString(R.string.july), statisticsModel.getStatistics(Calendar.JULY)));
+        data.add(new Pair<>(getString(R.string.august), statisticsModel.getStatistics(Calendar.AUGUST)));
+        data.add(new Pair<>(getString(R.string.september), statisticsModel.getStatistics(Calendar.SEPTEMBER)));
+        data.add(new Pair<>(getString(R.string.october), statisticsModel.getStatistics(Calendar.OCTOBER)));
+        data.add(new Pair<>(getString(R.string.november), statisticsModel.getStatistics(Calendar.NOVEMBER)));
+        data.add(new Pair<>(getString(R.string.december), statisticsModel.getStatistics(Calendar.DECEMBER)));
 
         StatisticsAdapter adapter = new StatisticsAdapter(data);
         mListView.setAdapter(adapter);
