@@ -10,7 +10,7 @@ import com.nandy.taskmanager.model.TaskStatus;
 import com.nandy.taskmanager.mvp.BasePresenter;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
-import com.nandy.taskmanager.mvp.model.TaskStatusModel;
+import com.nandy.taskmanager.mvp.model.TaskModel;
 import com.nandy.taskmanager.mvp.view.TasksListView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -28,7 +28,7 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
     private TasksListView mView;
     private TaskRecordsModel mRecordsModel;
     private TaskRemindersModel mTaskReminderMode;
-    private TaskStatusModel mTaskStatusModel;
+    private TaskModel mTaskModel;
 
     private TasksAdapter mAdapter;
 
@@ -136,13 +136,13 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
 
             case NEW:
                 task.setStatus(TaskStatus.ACTIVE);
-                mTaskStatusModel.start(task);
+                mTaskModel.start(task);
                 mTaskReminderMode.scheduleStartReminder(task);
                 break;
 
             case ACTIVE:
                 task.setStatus(TaskStatus.COMPLETED);
-                mTaskStatusModel.complete(task);
+                mTaskModel.complete(task);
                 mTaskReminderMode.cancelReminder(task.getId());
                 break;
 
@@ -165,7 +165,7 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
     public void resetEnd(int position) {
         Task task = getTask(position);
         mTaskReminderMode.cancelReminder(task.getId());
-        mTaskReminderMode.scheduleEndReminder(task.getId(), task.getMaxDuration());
+        mTaskReminderMode.scheduleEndReminder(task.getId(), task.getScheduledDuration());
     }
 
 
@@ -173,7 +173,7 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
         this.mTaskReminderMode = mTaskReminderMode;
     }
 
-    public void setTaskStatusModel(TaskStatusModel mTaskStatusModel) {
-        this.mTaskStatusModel = mTaskStatusModel;
+    public void setTaskStatusModel(TaskModel mTaskModel) {
+        this.mTaskModel = mTaskModel;
     }
 }

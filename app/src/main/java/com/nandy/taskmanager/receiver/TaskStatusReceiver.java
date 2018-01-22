@@ -16,6 +16,7 @@ import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.TasksDao;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskStatus;
+import com.nandy.taskmanager.mvp.model.TaskModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 
 import java.util.List;
@@ -38,14 +39,12 @@ public class TaskStatusReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-
-        TasksDao tasksDao = AppDatabase.getInstance(context).tasksDao();
         long taskId = intent.getLongExtra("id", -1);
 
-        Log.d("TASK_RECEIVE_", "id: " + taskId + ", " + intent.getAction());
+        TaskModel taskModel = new TaskModel(context);
+        TaskRemindersModel remindersModel = new TaskRemindersModel(context);
 
-        Task task = getTask(tasksDao, taskId);
-        Log.d("TASK_RECEIVE_", "task: " + task);
+        Task task = taskModel.getTask(taskId);
 
         if (task == null || intent.getAction() == null) {
             return;
@@ -56,35 +55,23 @@ public class TaskStatusReceiver extends BroadcastReceiver {
             case ACTION_START:
                 if (task.getStatus() == TaskStatus.NEW
                         || (task.isPeriodical() && task.getStatus() == TaskStatus.COMPLETED)) {
-                    task.setStatus(TaskStatus.ACTIVE);
+                    taskModel.start(task);
                     showTaskStartedNotification(context, task.getTitle());
-                    new TaskRemindersModel(context).scheduleEndReminder(taskId, task.getMaxDuration());
+                    remindersModel.scheduleEndReminder(taskId, task.getScheduledDuration());
                 }
                 break;
 
             case ACTION_COMPLETE:
                 if (task.getStatus() == TaskStatus.ACTIVE) {
-                    task.setStatus(TaskStatus.COMPLETED);
+                    taskModel.complete(task);
                     showTaskCompletedNotification(context, task.getTitle());
                 }
                 break;
         }
 
-        tasksDao.update(task);
-
-
     }
 
-    @Nullable
-    private Task getTask(TasksDao tasksDao, long taskId) {
-        List<Task> tasks = tasksDao.getById(taskId);
 
-        if (tasks.size() > 0) {
-            return tasks.get(0);
-        } else {
-            return null;
-        }
-    }
 
 
     private void showTaskCompletedNotification(Context context, String title) {

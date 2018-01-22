@@ -29,10 +29,10 @@ public class TaskRemindersModel {
     }
 
     public void scheduleStartReminder(Task task) {
-        Log.d("TASK_", "scheduleStartReminder: " + task.getId() + ", " + task.getStartDate());
+        Log.d("TASK_", "scheduleStartReminder: " + task.getId() + ", " + task.getPlannedStartDate());
 
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(task.getStartDate());
+        calendar.setTime(task.getPlannedStartDate());
 
         Intent data = new Intent(mContext, TaskStatusReceiver.class);
         data.setAction(TaskStatusReceiver.ACTION_START);
@@ -45,7 +45,7 @@ public class TaskRemindersModel {
         if (task.isPeriodical()) {
             getAlarmManager()
                     .setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                            task.getPeriod().getValue(), pendingIntent);
+                            task.getRepeatPeriod().getValue(), pendingIntent);
 //            getAlarmManager()
 //                    .setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
 //                            TimeUnit.MINUTES.toMillis(2), pendingIntent);

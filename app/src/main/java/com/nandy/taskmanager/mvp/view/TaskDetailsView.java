@@ -12,7 +12,15 @@ public interface TaskDetailsView {
 
     void setDescription(String description);
 
-    void setTime(String time);
+    void setPlannedStartTime(String time);
+
+    void setActualStartTime(String time);
+
+    void setScheduledDuration(int value, @StringRes int textResId);
+
+    void setTimeSpent(int value, @StringRes int textResId);
+
+    void setRepeatPeriod(@StringRes int textResId);
 
     void setStatus(String status);
 
@@ -25,5 +33,12 @@ public interface TaskDetailsView {
     void loadImage(String image, boolean drawMapPin);
 
     void loadImage(int imageResId, boolean drawMapPin);
+
+    void setLocationVisible(boolean visible);
+
+    void setActualStartDateVisible(boolean visible);
+
+    void setTimeSpentVisible(boolean visible);
+
 
 }

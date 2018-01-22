@@ -8,22 +8,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.RequestBuilder;
-import com.nandy.taskmanager.image.ImageLoader;
 import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.image.ImageLoader;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
-import com.nandy.taskmanager.mvp.model.TaskDetailsModel;
-import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
+import com.nandy.taskmanager.mvp.model.TaskModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
-import com.nandy.taskmanager.mvp.model.TaskStatusModel;
 import com.nandy.taskmanager.mvp.presenter.TaskItemPresenter;
 import com.nandy.taskmanager.mvp.view.TaskDetailsView;
+
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,20 +36,38 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
 
     @BindView(R.id.image_task)
     ImageView mTaskImageView;
+
     @BindView(R.id.txt_title)
     TextView mTitleTextView;
     @BindView(R.id.txt_description)
     TextView mDescriptionTextView;
-    @BindView(R.id.txt_time)
-    TextView mTimeTextView;
+    @BindView(R.id.txt_planned_start_time)
+    TextView mPlannedStartTimeTextView;
+    @BindView(R.id.txt_actual_start_time)
+    TextView mActualStartTimeTextView;
     @BindView(R.id.txt_location)
     TextView mLocationTextView;
+    @BindView(R.id.hint_location)
+    TextView mLocationHintTextView;
     @BindView(R.id.txt_status)
     TextView mStatusTextView;
-    @BindView(R.id.toolbar)
-    Toolbar mToolbar;
+    @BindView(R.id.txt_scheduled_duration)
+    TextView mScheduledDurationTextView;
+    @BindView(R.id.txt_time_spent)
+    TextView mTimeSpentTextView;
+    @BindView(R.id.txt_period)
+    TextView mRepeatPeriodTextView;
+
     @BindView(R.id.btn_control)
     Button mControlButton;
+
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+
+    @BindView(R.id.layout_actual_start_time)
+    View mActualStartTimeLayout;
+    @BindView(R.id.layout_time_spent)
+    View mTimeSpentLayout;
 
     private TaskItemPresenter mPresenter;
 
@@ -60,18 +79,16 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
 
         setSupportActionBar(mToolbar);
 
-        Task task = getIntent().getParcelableExtra("task");
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        Task task = getIntent().getParcelableExtra("task");
         mPresenter = new TaskItemPresenter(this);
         mPresenter.setDateFormatModel(new DateFormatModel());
-        mPresenter.setDetailsModel(new TaskDetailsModel(task));
-        mPresenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
         mPresenter.setTaskReminderModel(new TaskRemindersModel(getApplicationContext()));
-        mPresenter.setTaskStatusModel(new TaskStatusModel(getApplicationContext()));
+        mPresenter.setTaskModel(new TaskModel(getApplicationContext(), task));
 
         mPresenter.start();
     }
@@ -135,8 +152,28 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
     }
 
     @Override
-    public void setTime(String time) {
-        mTimeTextView.setText(time);
+    public void setPlannedStartTime(String time) {
+        mPlannedStartTimeTextView.setText(time);
+    }
+
+    @Override
+    public void setActualStartTime(String time) {
+        mActualStartTimeTextView.setText(time);
+    }
+
+    @Override
+    public void setScheduledDuration(int value, int textResId) {
+        mScheduledDurationTextView.setText(String.format(Locale.getDefault(), "%d %s", value, getString(textResId)));
+    }
+
+    @Override
+    public void setTimeSpent(int value, int textResId) {
+        mTimeSpentTextView.setText(String.format(Locale.getDefault(), "%d %s", value, getString(textResId)));
+    }
+
+    @Override
+    public void setRepeatPeriod(int textResId) {
+        mRepeatPeriodTextView.setText(textResId);
     }
 
     @Override
@@ -176,5 +213,23 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
                         ImageLoader.load(getApplicationContext(), imageResId, R.mipmap.ic_map_marker)
                         : ImageLoader.load(getApplicationContext(), imageResId);
         requestBuilder.into(mTaskImageView);
+    }
+
+    @Override
+    public void setLocationVisible(boolean visible) {
+        int visibility = visible ? View.VISIBLE : View.GONE;
+        mLocationTextView.setVisibility(visibility);
+        mLocationHintTextView.setVisibility(visibility);
+    }
+
+    @Override
+    public void setActualStartDateVisible(boolean visible) {
+        mActualStartTimeLayout.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void setTimeSpentVisible(boolean visible) {
+        mTimeSpentLayout.setVisibility(visible ? View.VISIBLE : View.GONE);
+
     }
 }

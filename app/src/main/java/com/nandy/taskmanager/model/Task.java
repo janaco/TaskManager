@@ -1,8 +1,8 @@
 package com.nandy.taskmanager.model;
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -29,19 +29,20 @@ public class Task implements Parcelable{
     @ColumnInfo(name = "location")
     private LatLng mLocation;
 
-    @ColumnInfo(name = "date_start")
-    private Date mStartDate;
-    @ColumnInfo(name = "date_end")
-    private Date mEndDate;
+    @ColumnInfo(name = "planned_start_date")
+    private Date mPlannedStartDate;
 
     @ColumnInfo(name = "status")
     private TaskStatus mStatus;
 
-    @ColumnInfo(name = "max_duration")
-    private long mMaxDuration;
+    @ColumnInfo(name = "scheduled_duration")
+    private long mScheduledDuration;
 
     @ColumnInfo(name = "repeat_period")
-    private RepeatPeriod mPeriod;
+    private RepeatPeriod mRepeatPeriod;
+
+    @Embedded
+    private Metadata mMetadata;
 
 
     public Task(long id, String title, String description) {
@@ -56,11 +57,11 @@ public class Task implements Parcelable{
         mDescription = in.readString();
         mImage = in.readString();
         mLocation = in.readParcelable(LatLng.class.getClassLoader());
-        mMaxDuration = in.readLong();
-        mStartDate = (Date) in.readSerializable();
-        mEndDate = (Date) in.readSerializable();
+        mScheduledDuration = in.readLong();
+        mPlannedStartDate = (Date) in.readSerializable();
         mStatus = TaskStatus.valueOf(in.readString());
-        mPeriod = RepeatPeriod.valueOf(in.readString());
+        mRepeatPeriod = RepeatPeriod.valueOf(in.readString());
+        mMetadata = in.readParcelable(Metadata.class.getClassLoader());
     }
 
     @Override
@@ -70,11 +71,11 @@ public class Task implements Parcelable{
         dest.writeString(mDescription);
         dest.writeString(mImage);
         dest.writeParcelable(mLocation, flags);
-        dest.writeLong(mMaxDuration);
-        dest.writeSerializable(mStartDate);
-        dest.writeSerializable(mEndDate);
+        dest.writeLong(mScheduledDuration);
+        dest.writeSerializable(mPlannedStartDate);
         dest.writeString(mStatus.name());
-        dest.writeString(mPeriod.name());
+        dest.writeString(mRepeatPeriod.name());
+        dest.writeParcelable(mMetadata, flags);
     }
 
     @Override
@@ -95,23 +96,23 @@ public class Task implements Parcelable{
     };
 
     public boolean isPeriodical() {
-        return mPeriod != RepeatPeriod.NO_REPEAT;
+        return mRepeatPeriod != RepeatPeriod.NO_REPEAT;
     }
 
-    public long getMaxDuration() {
-        return mMaxDuration;
+    public long getScheduledDuration() {
+        return mScheduledDuration;
     }
 
-    public void setMaxDuration(long mMaxDuration) {
-        this.mMaxDuration = mMaxDuration;
+    public void setScheduledDuration(long mMaxDuration) {
+        this.mScheduledDuration = mMaxDuration;
     }
 
-    public RepeatPeriod getPeriod() {
-        return mPeriod;
+    public RepeatPeriod getRepeatPeriod() {
+        return mRepeatPeriod;
     }
 
-    public void setPeriod(RepeatPeriod mPeriod) {
-        this.mPeriod = mPeriod;
+    public void setRepeatPeriod(RepeatPeriod mPeriod) {
+        this.mRepeatPeriod = mPeriod;
     }
 
     public void setLocation(LatLng mLocation) {
@@ -170,32 +171,32 @@ public class Task implements Parcelable{
         this.mImage = mImage;
     }
 
-    public Date getStartDate() {
-        return mStartDate;
+    public Date getPlannedStartDate() {
+        return mPlannedStartDate;
     }
 
-    public void setStartDate(Date mStartDate) {
-        this.mStartDate = mStartDate;
+    public void setPlannedStartDate(Date mStartDate) {
+        this.mPlannedStartDate = mStartDate;
     }
 
-    public Date getEndDate() {
-        return mEndDate;
+    public Metadata getMetadata() {
+        return mMetadata;
     }
 
-    public void setEndDate(Date mEndDate) {
-        this.mEndDate = mEndDate;
+
+    public void setMetadata(Metadata mMetadata) {
+        this.mMetadata = mMetadata;
     }
+
 
     @Override
     public String toString() {
         return "Task{" +
                 "mId='" + mId + '\'' +
                 ", mTitle='" + mTitle + '\'' +
-                ", mDescription='" + mDescription + '\'' +
                 ", mImage='" + mImage + '\'' +
                 ", mLocation=" + mLocation +
-                ", mStartDate=" + mStartDate +
-                ", mEndDate=" + mEndDate +
+                ", mPlannedStartDate=" + mPlannedStartDate +
                 ", mStatus=" + mStatus +
                 '}';
     }

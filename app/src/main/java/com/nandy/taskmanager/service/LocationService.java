@@ -106,7 +106,7 @@ public class LocationService extends Service implements LocationModel.LocationLi
 
             case NEW:
                 task.setStatus(TaskStatus.ACTIVE);
-                mScheduleMode.scheduleEndReminder(task.getId(), task.getMaxDuration());
+                mScheduleMode.scheduleEndReminder(task.getId(), task.getScheduledDuration());
                 break;
 
             case ACTIVE:

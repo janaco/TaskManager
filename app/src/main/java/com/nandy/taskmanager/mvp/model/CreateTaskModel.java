@@ -1,10 +1,6 @@
 package com.nandy.taskmanager.mvp.model;
 
-import android.content.Context;
-
 import com.google.android.gms.maps.model.LatLng;
-import com.nandy.taskmanager.db.AppDatabase;
-import com.nandy.taskmanager.db.dao.TasksDao;
 import com.nandy.taskmanager.model.RepeatPeriod;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskStatus;
@@ -36,11 +32,11 @@ public class CreateTaskModel {
         mTask = task;
 
         if (task != null) {
-            mStartDate = task.getStartDate();
+            mStartDate = task.getPlannedStartDate();
             mLocation = task.getLocation();
             mImage = task.getImage();
-            mDuration = task.getMaxDuration();
-            mRepeatPeriod = task.getPeriod();
+            mDuration = task.getScheduledDuration();
+            mRepeatPeriod = task.getRepeatPeriod();
         }
     }
 
@@ -62,24 +58,14 @@ public class CreateTaskModel {
             mTask.setDescription(description);
         }
 
-        mTask.setStartDate(mStartDate);
-        mTask.setEndDate(calculateEndDate(mStartDate, mDuration));
+        mTask.setPlannedStartDate(mStartDate);
         mTask.setLocation(mLocation);
         mTask.setImage(mImage);
-        mTask.setMaxDuration(mDuration);
-        mTask.setPeriod(mRepeatPeriod);
+        mTask.setScheduledDuration(mDuration);
+        mTask.setRepeatPeriod(mRepeatPeriod);
 
         return mTask;
 
-    }
-
-    private Date calculateEndDate(Date startDate, long duration){
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(startDate);
-        calendar.add(Calendar.MILLISECOND,(int) duration);
-
-        return calendar.getTime();
     }
 
     public void setStartDate(int year, int month, int day) {

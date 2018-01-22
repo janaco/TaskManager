@@ -52,19 +52,19 @@ public class CreateTaskPresenter extends BasePresenter {
 
             mView.setTitle(task.getTitle());
             mView.setDescription(task.getDescription());
-            mView.displayStartDate(mDateFormatModel.formatDate(task.getStartDate()));
-            mView.displayStartTime(mDateFormatModel.formatTime(task.getStartDate()));
+            mView.displayStartDate(mDateFormatModel.formatDate(task.getPlannedStartDate()));
+            mView.displayStartTime(mDateFormatModel.formatTime(task.getPlannedStartDate()));
             mView.setStartTimeVisible(true);
 
-            int duration = mDateFormatModel.convertToMinutes(task.getMaxDuration());
+            int duration = mDateFormatModel.convertToMinutes(task.getScheduledDuration());
             int textResId = R.string.minutes;
 
             if (duration > 30) {
-                duration = mDateFormatModel.convertToHours(task.getMaxDuration());
+                duration = mDateFormatModel.convertToHours(task.getScheduledDuration());
                 textResId = R.string.hour;
             }
             mView.setDuration(duration, textResId);
-            mView.setRepeatPeriod(task.getPeriod().getTextResId());
+            mView.setRepeatPeriod(task.getRepeatPeriod().getTextResId());
             if (task.hasLocation()) {
                 mView.displayLocation(String.format(Locale.getDefault(), "%f, %f",
                         task.getLocation().latitude,

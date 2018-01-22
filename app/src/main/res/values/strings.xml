@@ -25,7 +25,6 @@
     <string name="fill_with_dummy_data">Fill with dummy data</string>
     <string name="clear_tasks">Clear tasks</string>
     <string name="exit">Exit</string>
-    <string name="due_time">Due time</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="reset_start_time">Reset start time</string>
@@ -74,8 +73,11 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="tasks">Tasks</string>
     <string name="statistics">Statistics</string>
+    <string name="planned_start_time">Planned start time</string>
+    <string name="actual_start_time">Actual start time</string>
+    <string name="scheduled_duration">Scheduled duration</string>
+    <string name="time_spent">Time spent</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

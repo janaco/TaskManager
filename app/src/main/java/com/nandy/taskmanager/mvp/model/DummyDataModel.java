@@ -60,11 +60,10 @@ public class DummyDataModel {
 
             Date startDate = generateDate(month, day, startHour, startMinute);
 
-            task.setStartDate(startDate);
-            task.setEndDate(calculateEndDate(startDate, duration));
+            task.setPlannedStartDate(startDate);
             task.setStatus(TaskStatus.NEW);
-            task.setMaxDuration(duration);
-            task.setPeriod(getRandomPeriod(RepeatPeriod.values()));
+            task.setScheduledDuration(duration);
+            task.setRepeatPeriod(getRandomPeriod(RepeatPeriod.values()));
 
             tasksDao.insert(task);
 
@@ -74,15 +73,6 @@ public class DummyDataModel {
         }
 
         return tasks;
-    }
-
-    private Date calculateEndDate(Date startDate, long duration){
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(startDate);
-        calendar.add(Calendar.MILLISECOND,(int) duration);
-
-        return calendar.getTime();
     }
 
     private RepeatPeriod getRandomPeriod(RepeatPeriod[] periods) {

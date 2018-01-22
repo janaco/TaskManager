@@ -6,16 +6,11 @@ import android.content.Intent;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.model.TaskStatus;
 import com.nandy.taskmanager.mvp.BasePresenter;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
-import com.nandy.taskmanager.mvp.model.TaskDetailsModel;
-import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
+import com.nandy.taskmanager.mvp.model.TaskModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
-import com.nandy.taskmanager.mvp.model.TaskStatusModel;
 import com.nandy.taskmanager.mvp.view.TaskDetailsView;
-
-import java.util.Locale;
 
 /**
  * Created by razomer on 18.01.18.
@@ -24,39 +19,18 @@ import java.util.Locale;
 public class TaskItemPresenter extends BasePresenter {
 
     private TaskDetailsView mView;
-    private TaskDetailsModel mDetailsModel;
-    private DateFormatModel mDateFormatModel;
-    private TaskRecordsModel mRecordsModel;
-    private TaskStatusModel mTaskStatusModel;
+
+    private TaskModel mTaskModel;
     private TaskRemindersModel mTaskReminderModel;
+    private DateFormatModel mDateFormatModel;
 
     public TaskItemPresenter(TaskDetailsView view) {
         mView = view;
     }
 
-    public void setDetailsModel(TaskDetailsModel mDetailsModel) {
-        this.mDetailsModel = mDetailsModel;
-    }
-
-    public void setTaskStatusModel(TaskStatusModel mTaskStatusModel) {
-        this.mTaskStatusModel = mTaskStatusModel;
-    }
-
-    public void setTaskReminderModel(TaskRemindersModel mTaskReminderModel) {
-        this.mTaskReminderModel = mTaskReminderModel;
-    }
-
-    public void setDateFormatModel(DateFormatModel mDateFormatModel) {
-        this.mDateFormatModel = mDateFormatModel;
-    }
-
-    public void setRecordsModel(TaskRecordsModel mRecordsModel) {
-        this.mRecordsModel = mRecordsModel;
-    }
-
     @Override
     public void start() {
-        displayData(mDetailsModel.getTask());
+        displayData(mTaskModel.getTask());
     }
 
     @Override
@@ -68,101 +42,113 @@ public class TaskItemPresenter extends BasePresenter {
 
         if (resultCode == Activity.RESULT_OK && requestCode == TaskDetailsActivity.REQUEST_CODE_EDIT) {
             Task task = data.getParcelableExtra("task");
-            mDetailsModel.setTask(task);
+            mTaskModel.setTask(task);
             displayData(task);
         }
     }
 
     public Task getTask() {
-        return mDetailsModel.getTask();
+        return mTaskModel.getTask();
     }
 
     private void displayData(Task task) {
 
-        mView.setStatus(task.getStatus().name());
         mView.setTitle(task.getTitle());
         mView.setDescription(task.getDescription());
-        mView.setTime(String.format(Locale.getDefault(), "%s",
-                mDateFormatModel.formatAsFullDate(task.getStartDate())));
+        mView.setPlannedStartTime(mDateFormatModel.formatAsFullDate(task.getPlannedStartDate()));
+        mView.setScheduledDuration(mDateFormatModel.convertToMinutes(
+                task.getScheduledDuration()), R.string.minutes);
+        mView.setRepeatPeriod(task.getRepeatPeriod().getTextResId());
 
-        if (task.hasLocation()) {
-            mView.setLocation(task.getLocation().toString());
-        }
-
-        if (task.hasImage()) {
-            mView.loadImage(task.getImage(), task.hasLocation());
-        } else {
-            mView.loadImage(R.mipmap.ic_task, task.hasLocation());
-        }
-
-        mView.setControlButtonEnabled(task.getStatus() != TaskStatus.COMPLETED);
-
-        if (task.getStatus() == TaskStatus.NEW) {
-            mView.setControlButtonText(R.string.start);
-        } else {
-            mView.setControlButtonText(R.string.finish);
-        }
-
-        setupControlButton(task.getStatus());
+       displayLocation(task);
+       loadImage(task);
+       displayStatusInformation(task);
     }
 
-    private void setupControlButton(TaskStatus status) {
-        mView.setControlButtonEnabled(status != TaskStatus.COMPLETED);
+    private void displayStatusInformation(Task task){
+        mView.setStatus(task.getStatus().name());
 
-        switch (status) {
+        switch (task.getStatus()) {
 
             case NEW:
                 mView.setControlButtonText(R.string.start);
-                break;
-
-            case COMPLETED:
-                mView.setControlButtonText(R.string.completed);
-                break;
-
-            default:
-                mView.setControlButtonText(R.string.finish);
-                break;
-        }
-    }
-
-    public void toggleStatus() {
-        Task task = mDetailsModel.getTask();
-        TaskStatus currentStatus = task.getStatus();
-        TaskStatus newStatus;
-
-        switch (currentStatus) {
-
-            case NEW:
-                newStatus = TaskStatus.ACTIVE;
-                mTaskStatusModel.start(task);
-                mTaskReminderModel.scheduleStartReminder(task);
+                mView.setControlButtonEnabled(true);
+                mView.setActualStartDateVisible(false);
+                mView.setTimeSpentVisible(false);
                 break;
 
             case ACTIVE:
-                newStatus = TaskStatus.COMPLETED;
-                mTaskStatusModel.complete(task);
-                mTaskReminderModel.cancelReminder(task.getId());
+                mView.setControlButtonEnabled(true);
+                mView.setControlButtonText(R.string.finish);
+                mView.setActualStartDateVisible(true);
+                mView.setTimeSpentVisible(false);
+                mView.setActualStartTime(mDateFormatModel.formatAsFullDate(task.getMetadata().getActualStartDate()));
                 break;
 
-            default:
-                newStatus = TaskStatus.NEW;
+            case COMPLETED:
+                mView.setControlButtonEnabled(false);
+                mView.setControlButtonText(R.string.completed);
+                mView.setActualStartDateVisible(true);
+                mView.setTimeSpentVisible(true);
+                mView.setTimeSpent(mDateFormatModel.convertToHours(task.getMetadata().getTimeSpent()), R.string.hour);
+                mView.setActualStartTime(mDateFormatModel.formatAsFullDate(task.getMetadata().getActualStartDate()));
+                break;
+        }
+    }
+
+   private void displayLocation(Task task){
+       if (task.hasLocation()) {
+           mView.setLocationVisible(true);
+           mView.setLocation(task.getLocation().toString());
+       } else {
+           mView.setLocationVisible(false);
+       }
+   }
+
+   private void loadImage(Task task){
+       if (task.hasImage()) {
+           mView.loadImage(task.getImage(), task.hasLocation());
+       } else {
+           mView.loadImage(R.mipmap.ic_task, task.hasLocation());
+       }
+   }
+
+    public void toggleStatus() {
+
+        switch (mTaskModel.getTask().getStatus()) {
+
+            case NEW:
+                mTaskModel.start();
+                mTaskReminderModel.scheduleStartReminder(mTaskModel.getTask());
+                break;
+
+            case ACTIVE:
+                mTaskModel.complete();
+                mTaskReminderModel.cancelReminder(mTaskModel.getTask().getId());
                 break;
         }
 
-        mDetailsModel.setStatus(newStatus);
-        mRecordsModel.update(mDetailsModel.getTask());
-        mView.setStatus(newStatus.name());
-        setupControlButton(newStatus);
-
+        displayStatusInformation(mTaskModel.getTask());
     }
 
     public void delete() {
-        Task task = mDetailsModel.getTask();
-        mRecordsModel.delete(task);
-        mTaskReminderModel.cancelReminder(task.getId());
+        mTaskReminderModel.cancelReminder(mTaskModel.getTask().getId());
+        mTaskModel.delete();
 
 //        if (task.hasLocation()){
 //            mShceduleModel.scheduleLocationUpdates();
 //        }
+    }
+
+    public void setTaskModel(TaskModel mTaskModel) {
+        this.mTaskModel = mTaskModel;
+    }
+
+    public void setTaskReminderModel(TaskRemindersModel mTaskReminderModel) {
+        this.mTaskReminderModel = mTaskReminderModel;
+    }
+
+    public void setDateFormatModel(DateFormatModel mDateFormatModel) {
+        this.mDateFormatModel = mDateFormatModel;
     }
 }

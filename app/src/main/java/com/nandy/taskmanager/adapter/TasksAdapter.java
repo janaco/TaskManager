@@ -124,7 +124,7 @@ public class TasksAdapter extends BaseSwipeAdapter {
                 holder.loadImage(R.mipmap.ic_task, task.hasLocation());
             }
             holder.setPeriodical(task.isPeriodical());
-            holder.setRepeatPeriod(task.getPeriod().getTextResId());
+            holder.setRepeatPeriod(task.getRepeatPeriod().getTextResId());
 
             switch (task.getStatus()) {
 

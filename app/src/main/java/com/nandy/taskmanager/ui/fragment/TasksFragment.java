@@ -23,7 +23,7 @@ import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
-import com.nandy.taskmanager.mvp.model.TaskStatusModel;
+import com.nandy.taskmanager.mvp.model.TaskModel;
 import com.nandy.taskmanager.mvp.presenter.TasksPresenter;
 import com.nandy.taskmanager.mvp.view.TasksListView;
 
@@ -177,7 +177,7 @@ public class TasksFragment extends Fragment implements TasksListView {
 
         TasksPresenter presenter = new TasksPresenter(fragment);
         presenter.setRecordsModel(new TaskRecordsModel(context));
-        presenter.setTaskStatusModel(new TaskStatusModel(context));
+        presenter.setTaskStatusModel(new TaskModel(context));
         presenter.setTaskReminderMode(new TaskRemindersModel(context));
 
         fragment.setTasksPresenter(presenter);
