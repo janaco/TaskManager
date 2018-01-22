@@ -119,7 +119,7 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
 
     @Override
     public void onDeleteOptionSelected(Task task, int position) {
-        mRecordsModel.delete(task);
+        mTaskModel.delete(task);
         mTaskReminderMode.cancelReminder(task.getId());
         mAdapter.remove(position);
     }

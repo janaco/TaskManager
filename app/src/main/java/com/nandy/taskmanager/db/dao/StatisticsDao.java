@@ -23,6 +23,12 @@ public interface StatisticsDao{
     @Delete
     void  delete(Statistics statistics);
 
-    @Query("SELECT t.id AS mTaskId, t.title AS mTaskTitle, sum(s.spent_time) AS mSpentTime FROM statistics s, tasks t WHERE s.id_task == t.id AND s.start_date BETWEEN :dateStart AND :dateEnd")
+    @Query("SELECT t.id AS mTaskId, t.title AS mTaskTitle, sum(s.spent_time) AS mSpentTime FROM statistics s, tasks t WHERE s.id_task == t.id AND s.start_date BETWEEN :dateStart AND :dateEnd AND t.status LIKE('COMPLETED') GROUP BY t.id")
     List<StatisticsResult> select(long dateStart, long dateEnd);
+
+    @Query("DELETE FROM statistics WHERE id_task LIKE :taskId")
+    void deleteAll(long taskId);
+
+    @Query("DELETE FROM statistics")
+    void deleteAll();
 }

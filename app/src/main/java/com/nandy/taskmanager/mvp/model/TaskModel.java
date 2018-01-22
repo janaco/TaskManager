@@ -113,6 +113,7 @@ public class TaskModel {
 
     public void delete(Task task){
         mTasksDao.delete(task);
+        mStatisticsDao.deleteAll(task.getId());
     }
 
     public Task getTask() {
