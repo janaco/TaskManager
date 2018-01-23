@@ -22,7 +22,7 @@ import static android.content.Context.ALARM_SERVICE;
 
 public class TaskRemindersModel {
 
-    private Context mContext;
+    private final Context mContext;
 
     public TaskRemindersModel(Context context) {
         mContext = context;
@@ -79,6 +79,15 @@ public class TaskRemindersModel {
                 .set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
 
+    public void cancelReminder(long requestCode) {
+
+        Intent intent = new Intent(mContext, TaskStatusReceiver.class);
+        PendingIntent pendingIntent = PendingIntent
+                .getBroadcast(mContext, (int) requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        getAlarmManager().cancel(pendingIntent);
+        pendingIntent.cancel();
+    }
+
     private AlarmManager getAlarmManager() {
         return (AlarmManager) mContext.getSystemService(ALARM_SERVICE);
     }
@@ -91,26 +100,13 @@ public class TaskRemindersModel {
                         PackageManager.DONT_KILL_APP);
     }
 
-    public void cancelReminder(long requestCode) {
-        ComponentName componentName = new ComponentName(mContext, TaskStatusReceiver.class);
-        PackageManager packageManager = mContext.getPackageManager();
-        packageManager.setComponentEnabledSetting(componentName,
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP);
 
-        Intent intent = new Intent(mContext, TaskStatusReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext,
-                (int) requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        getAlarmManager().cancel(pendingIntent);
-        pendingIntent.cancel();
-    }
-
-    public void scheduleLocationUpdates(){
+    public void scheduleLocationUpdates() {
         mContext.startService(new Intent(mContext, LocationService.class));
     }
 
 
-    public void cancelLocationUpdates(){
+    public void cancelLocationUpdates() {
         mContext.stopService(new Intent(mContext, LocationService.class));
     }
 }

@@ -46,4 +46,7 @@ public interface CreateTaskView {
     void showTimePickerDialog(TimePickerDialog.OnTimeSetListener onTimeSetListener, int hour, int minute);
 
     void showMessage(@StringRes int textResId);
+
+    void showMessage(String message);
+
 }

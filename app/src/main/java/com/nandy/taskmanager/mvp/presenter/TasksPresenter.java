@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItemOptionSelectedListener {
 
-    private TasksListView mView;
+    private final TasksListView mView;
     private TaskRecordsModel mRecordsModel;
     private TaskRemindersModel mTaskReminderMode;
     private TaskModel mTaskModel;
@@ -62,10 +62,6 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
         EventBus.getDefault().unregister(this);
     }
 
-    private void refreshList() {
-        mAdapter.refresh(mRecordsModel.selectAll());
-    }
-
     @Override
     public void saveInstanceState(Bundle outState) {
         outState.putParcelableArrayList("tasks", mAdapter.getItems());
@@ -88,6 +84,10 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
         mAdapter.clearAll();
     }
 
+    private void refreshList() {
+        mAdapter.refresh(mRecordsModel.selectAll());
+    }
+
     public Bundle getArguments(int position) {
         Bundle args = new Bundle();
         args.putParcelable("task", mAdapter.getItem(position));
@@ -102,11 +102,6 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
 
     public void displayTask(Task task) {
         mAdapter.add(task);
-    }
-
-
-    public void setRecordsModel(TaskRecordsModel mRecordsModel) {
-        this.mRecordsModel = mRecordsModel;
     }
 
     public void delete(int position) {
@@ -176,4 +171,9 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
     public void setTaskStatusModel(TaskModel mTaskModel) {
         this.mTaskModel = mTaskModel;
     }
+
+    public void setRecordsModel(TaskRecordsModel mRecordsModel) {
+        this.mRecordsModel = mRecordsModel;
+    }
+
 }

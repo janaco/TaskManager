@@ -20,16 +20,13 @@ import java.util.Locale;
 
 public class LocationService extends Service implements LocationModel.LocationListener {
 
+    private static final int NOTIFICATION_LOCATION_REQUEST = 4;
     private static final int RADIUS = 500;
 
     private LocationModel mLocationModel;
     private TasksDao mTasksDao;
     private TaskRemindersModel mScheduleMode;
     private List<Task> mTasks;
-
-
-    private static final int NOTIFICATION_LOCATION_REQUEST = 4;
-
 
     @Override
     public void onCreate() {
@@ -90,8 +87,6 @@ public class LocationService extends Service implements LocationModel.LocationLi
             if (distance < RADIUS) {
                 toggleStatus(task);
             }
-
-
         }
     }
 

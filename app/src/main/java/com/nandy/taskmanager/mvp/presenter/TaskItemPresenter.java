@@ -19,7 +19,7 @@ import com.nandy.taskmanager.mvp.view.TaskDetailsView;
 
 public class TaskItemPresenter extends BasePresenter {
 
-    private TaskDetailsView mView;
+    private final TaskDetailsView mView;
 
     private TaskModel mTaskModel;
     private TaskRemindersModel mTaskReminderModel;
@@ -178,7 +178,7 @@ public class TaskItemPresenter extends BasePresenter {
     }
 
     public void pause(){
-        mTaskModel.pause(mTaskModel.getTask());
+        mTaskModel.pause();
         mTaskReminderModel.cancelReminder(mTaskModel.getTask().getId());
         displayData(mTaskModel.getTask());
         setupMenu();

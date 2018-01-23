@@ -22,12 +22,11 @@ import static android.app.Activity.RESULT_OK;
 
 public class TaskCoverModel {
 
-    public static final int DEFAULT_COVER_SIZE_PX = 50;
-    public static final String DEFAULT_CAMERA_OUTPUT_NAME = "temp_cover.jpg";
+    private static final int DEFAULT_COVER_SIZE_PX = 50;
 
     private static final String COVER_PREFIX = "tcover_";
     private static final String COVER_EXTENSION = ".png";
-
+    private static final String DEFAULT_CAMERA_OUTPUT_NAME = "temp_cover.jpg";
     private static final String DEFAULT_TEMP_COVER_NAME = "ctemp";
 
     private final Context mContext;

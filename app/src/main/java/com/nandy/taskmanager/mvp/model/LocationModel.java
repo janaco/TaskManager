@@ -53,7 +53,6 @@ public class LocationModel {
         mLocationListener = locationListener;
     }
 
-
     private LocationRequest createLocationRequest() {
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setInterval(UPDATE_INTERVAL);
@@ -64,7 +63,6 @@ public class LocationModel {
         return locationRequest;
     }
 
-
     public void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -73,11 +71,9 @@ public class LocationModel {
         }
     }
 
-
     public void stopLocationUpdates() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
-
 
     public interface LocationListener {
         void onLocationChanged(Location location);

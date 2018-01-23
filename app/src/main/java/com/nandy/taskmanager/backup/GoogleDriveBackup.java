@@ -115,7 +115,7 @@
 //                        @Override
 //                        public void onResult(DriveApi.DriveContentsResult result) {
 //                            if (!result.getStatus().isSuccess()) {
-//                                Log.e("BACKUP_", "Error while trying to create new file contents");
+//                                Log.e("BACKUP_", "Error while trying to createOrUpdate new file contents");
 //                                showErrorDialog();
 //                                return;
 //                            }
@@ -155,13 +155,13 @@
 //                                            .setMimeType("text/plain")
 //                                            .build();
 //
-//                                    // create a file in selected folder
+//                                    // createOrUpdate a file in selected folder
 //                                    folder.createFile(googleApiClient, changeSet, driveContents)
 //                                            .setResultCallback(new ResultCallback<DriveFolder.DriveFileResult>() {
 //                                                @Override
 //                                                public void onResult(DriveFolder.DriveFileResult result) {
 //                                                    if (!result.getStatus().isSuccess()) {
-//                                                        Log.d(TAG, "Error while trying to create the file");
+//                                                        Log.d(TAG, "Error while trying to createOrUpdate the file");
 //                                                        showErrorDialog();
 //                                                        finish();
 //                                                        return;

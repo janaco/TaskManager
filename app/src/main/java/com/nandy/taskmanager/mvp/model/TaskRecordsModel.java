@@ -15,8 +15,8 @@ import java.util.List;
 
 public class TaskRecordsModel {
 
-    private TasksDao mTasksDao;
-    private StatisticsDao mStatisticsDao;
+    private final TasksDao mTasksDao;
+    private final StatisticsDao mStatisticsDao;
 
     public TaskRecordsModel(Context context){
 

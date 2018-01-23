@@ -18,7 +18,7 @@ import com.nandy.taskmanager.mvp.view.SettingsView;
 
 public class SettingsPresenter extends BasePresenter implements GoogleDriveClientCallback, ProgressListener {
 
-    private SettingsView mView;
+    private final SettingsView mView;
     private CreateBackupModel mCreateBackupModel;
     private RestoreFromBackupModel mRestoreDataModel;
     private GoogleDriveConnectionModel mGoogleDriveConnectionModel;

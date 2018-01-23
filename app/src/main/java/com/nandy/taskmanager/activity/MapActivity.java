@@ -38,6 +38,7 @@ public class MapActivity extends AppCompatActivity
     private static final int REQUEST_LOCATION_PERMISSIONS_CODE = 4;
     private static final int REQUEST_LOCATION_RESOLUTION = 5;
     private static final int DEFAULT_ZOOM = 12;
+
     private GoogleMap mMap;
     private Marker mMarker;
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -104,16 +105,10 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
-    private void requestLocationPermission() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                REQUEST_LOCATION_PERMISSIONS_CODE);
-    }
-
     @Override
     public void onMapClick(LatLng latLng) {
         if (mMarker == null) {
-            mMarker = mMap.addMarker(new MarkerOptions().position(latLng).draggable(true));
+            mMarker = addMarker(latLng);
         } else {
             mMarker.setPosition(latLng);
         }
@@ -152,7 +147,13 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
-    protected void createLocationRequest() {
+    private void requestLocationPermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                REQUEST_LOCATION_PERMISSIONS_CODE);
+    }
+
+    private void createLocationRequest() {
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setInterval(10000);
         locationRequest.setFastestInterval(5000);
@@ -200,8 +201,16 @@ public class MapActivity extends AppCompatActivity
 
     private void moveToPosition(LatLng position, int zoom) {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, zoom));
+
+        if (mMarker == null) {
+            mMarker = addMarker(position);
+        }
     }
 
+
+    private Marker addMarker(LatLng position) {
+        return mMap.addMarker(new MarkerOptions().position(position).draggable(true));
+    }
 
     private void onSaveLocationActionSelected() {
 

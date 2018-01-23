@@ -27,8 +27,8 @@ public class OverlayTransformation extends BitmapTransformation {
 
     private static final float RADIUS_CORNER_PX = 10;
 
-    private Bitmap mBitmapOverlay;
-    private DisplayMetrics mDisplayMetrics;
+    private final Bitmap mBitmapOverlay;
+    private final DisplayMetrics mDisplayMetrics;
 
     public OverlayTransformation(Bitmap bitmapOverlay, DisplayMetrics displayMetrics) {
         mBitmapOverlay = bitmapOverlay;
@@ -37,7 +37,7 @@ public class OverlayTransformation extends BitmapTransformation {
 
 
     @Override
-    protected Bitmap transform(BitmapPool pool, Bitmap source, int outWidth, int outHeight) {
+    protected Bitmap transform(@NonNull BitmapPool pool, @NonNull Bitmap source, int outWidth, int outHeight) {
 
         Bitmap resultBitmap = Bitmap.createBitmap(source.getWidth(), source.getHeight(),
                 Bitmap.Config.ARGB_8888);

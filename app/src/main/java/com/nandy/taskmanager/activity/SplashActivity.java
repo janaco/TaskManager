@@ -1,12 +1,8 @@
 package com.nandy.taskmanager.activity;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
-import com.nandy.taskmanager.R;
-
-import java.util.Timer;
+import android.support.v7.app.AppCompatActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -16,6 +12,5 @@ public class SplashActivity extends AppCompatActivity {
 
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
         finish();
-
     }
 }

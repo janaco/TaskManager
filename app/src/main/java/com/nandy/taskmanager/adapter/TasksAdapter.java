@@ -40,47 +40,6 @@ public class TasksAdapter extends BaseSwipeAdapter {
         mTasks = new ArrayList<>();
     }
 
-    public void setOnItemOptionSelectedListener(OnItemOptionSelectedListener mOnItemOptionSelectedListener) {
-        this.mOnItemOptionSelectedListener = mOnItemOptionSelectedListener;
-    }
-
-    public void clearAll() {
-        mTasks.clear();
-        notifyDataSetChanged();
-    }
-
-
-    public void add(Task task) {
-        mTasks.add(task);
-        notifyDataSetChanged();
-    }
-
-
-    public void addAll(Collection<Task> tasks) {
-        mTasks.addAll(tasks);
-        notifyDataSetChanged();
-    }
-
-
-    public void refresh(Collection<Task> tasks) {
-        mTasks.clear();
-        addAll(tasks);
-    }
-
-    public void set(Task task, int position) {
-        mTasks.set(position, task);
-        notifyDataSetChanged();
-    }
-
-    public void remove(int position) {
-        mTasks.remove(position);
-        notifyDataSetChanged();
-    }
-
-    public ArrayList<Task> getItems() {
-        return mTasks;
-    }
-
     @Override
     public int getSwipeLayoutResourceId(int position) {
         return R.id.swipe;
@@ -106,7 +65,6 @@ public class TasksAdapter extends BaseSwipeAdapter {
     public View generateView(int position, ViewGroup parent) {
         return LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list, parent, false);
     }
-
 
     @Override
     public void fillValues(int position, View convertView) {
@@ -153,88 +111,130 @@ public class TasksAdapter extends BaseSwipeAdapter {
 
     }
 
+
+    public void setOnItemOptionSelectedListener(OnItemOptionSelectedListener mOnItemOptionSelectedListener) {
+        this.mOnItemOptionSelectedListener = mOnItemOptionSelectedListener;
+    }
+
+    public void clearAll() {
+        mTasks.clear();
+        notifyDataSetChanged();
+    }
+
+
+    public void add(Task task) {
+        mTasks.add(task);
+        notifyDataSetChanged();
+    }
+
+
+    public void addAll(Collection<Task> tasks) {
+        mTasks.addAll(tasks);
+        notifyDataSetChanged();
+    }
+
+
+    public void refresh(Collection<Task> tasks) {
+        mTasks.clear();
+        addAll(tasks);
+    }
+
+    public void set(Task task, int position) {
+        mTasks.set(position, task);
+        notifyDataSetChanged();
+    }
+
+    public void remove(int position) {
+        mTasks.remove(position);
+        notifyDataSetChanged();
+    }
+
+    public ArrayList<Task> getItems() {
+        return mTasks;
+    }
+
+
     static class ViewHolder {
 
         @BindView(R.id.task_image)
-        ImageView imageTask;
+        ImageView mImageTask;
         @BindView(R.id.txt_status)
-        TextView textViewStatus;
+        TextView mTextViewStatus;
         @BindView(R.id.txt_title)
-        TextView textViewTitle;
+        TextView mTextViewTitle;
         @BindView(R.id.txt_description)
-        TextView textViewComment;
+        TextView mTextViewComment;
         @BindView(R.id.txt_period)
-        TextView textViewPeriod;
+        TextView mTextViewPeriod;
         @BindView(R.id.btn_delete)
-        Button buttonDelete;
+        Button mButtonDelete;
         @BindView(R.id.btn_edit)
-        Button buttonEdit;
+        Button mButtonEdit;
         @BindView(R.id.btn_control)
-        Button buttonToggleStatus;
+        Button mButtonToggleStatus;
         @BindView(R.id.swipe)
         SwipeLayout mSwipeLayout;
-
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);
         }
 
         void setTitle(String title) {
-            textViewTitle.setText(title);
+            mTextViewTitle.setText(title);
         }
 
         void setComment(String comment) {
-            textViewComment.setText(comment);
+            mTextViewComment.setText(comment);
         }
 
         void setStatus(String status) {
-            textViewStatus.setText(status);
+            mTextViewStatus.setText(status);
         }
 
         void setControlButtonText(@StringRes int textResId) {
-            buttonToggleStatus.setText(textResId);
+            mButtonToggleStatus.setText(textResId);
         }
 
         void loadImage(String image, boolean drawMapPin) {
 
             if (drawMapPin) {
-                ImageLoader.load(imageTask.getContext(), image, R.mipmap.ic_map_marker)
-                        .into(imageTask);
+                ImageLoader.load(mImageTask.getContext(), image, R.mipmap.ic_map_marker)
+                        .into(mImageTask);
             } else {
-                ImageLoader.load(imageTask.getContext(), image)
-                        .into(imageTask);
+                ImageLoader.load(mImageTask.getContext(), image)
+                        .into(mImageTask);
             }
         }
 
         void loadImage(int resId, boolean drawMapPin) {
 
             if (drawMapPin) {
-                ImageLoader.load(imageTask.getContext(), resId, R.mipmap.ic_map_marker)
-                        .into(imageTask);
+                ImageLoader.load(mImageTask.getContext(), resId, R.mipmap.ic_map_marker)
+                        .into(mImageTask);
             } else {
-                ImageLoader.load(imageTask.getContext(), resId)
-                        .into(imageTask);
+                ImageLoader.load(mImageTask.getContext(), resId)
+                        .into(mImageTask);
             }
         }
 
         void setPeriodical(boolean periodical) {
-            textViewPeriod.setVisibility(periodical ? View.VISIBLE : View.GONE);
+            mTextViewPeriod.setVisibility(periodical ? View.VISIBLE : View.GONE);
         }
 
         void setRepeatPeriod(@StringRes int textResId) {
-            textViewPeriod.setText(textResId);
+            mTextViewPeriod.setText(textResId);
         }
 
         void setOnDeleteButtonClickListener(View.OnClickListener onClickListener) {
-            buttonDelete.setOnClickListener(onClickListener);
+            mButtonDelete.setOnClickListener(onClickListener);
         }
 
         void setOnEditButtonClickListener(View.OnClickListener onClickListener) {
-            buttonEdit.setOnClickListener(onClickListener);
+            mButtonEdit.setOnClickListener(onClickListener);
         }
 
         void setOnControlButtonClickListener(View.OnClickListener onClickListener) {
-            buttonToggleStatus.setOnClickListener(onClickListener);
+            mButtonToggleStatus.setOnClickListener(onClickListener);
         }
 
         void closeSwipeLayout(boolean smooth) {

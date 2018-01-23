@@ -34,13 +34,12 @@ public abstract class AppDatabase extends RoomDatabase {
     public static final String DB_NAME = "tasks";
     private static AppDatabase INSTANCE = null;
 
-
     public synchronized static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             INSTANCE = create(context);
         }
 
-        return (INSTANCE);
+        return INSTANCE;
     }
 
     private static AppDatabase create(Context context) {

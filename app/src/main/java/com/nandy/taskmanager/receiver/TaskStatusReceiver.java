@@ -71,9 +71,6 @@ public class TaskStatusReceiver extends BroadcastReceiver {
 
     }
 
-
-
-
     private void showTaskCompletedNotification(Context context, String title) {
 
         showNotification(context,

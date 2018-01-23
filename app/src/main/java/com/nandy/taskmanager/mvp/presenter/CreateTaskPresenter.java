@@ -34,14 +34,14 @@ import static android.app.Activity.RESULT_OK;
 
 public class CreateTaskPresenter extends BasePresenter {
 
-    private CreateTaskView mView;
+    private final CreateTaskView mView;
+
     private CreateTaskModel mCreateTaskMode;
-    private ValidationModel mValidationModel;
     private DateFormatModel mDateFormatModel;
     private TaskCoverModel mCoverModel;
-
     private TaskRecordsModel mRecordsModel;
     private TaskRemindersModel mScheduleModel;
+    private ValidationModel mValidationModel;
 
     public CreateTaskPresenter(CreateTaskView view) {
         mView = view;
@@ -52,7 +52,6 @@ public class CreateTaskPresenter extends BasePresenter {
 
         Task task = mCreateTaskMode.getTask();
         if (task != null) {
-
             mView.setTitle(task.getTitle());
             mView.setDescription(task.getDescription());
             mView.displayStartDate(mDateFormatModel.formatDate(task.getPlannedStartDate()));
@@ -82,34 +81,26 @@ public class CreateTaskPresenter extends BasePresenter {
 
     @Override
     public void stop() {
-
     }
 
     public boolean saveChanges(String title, String description) {
 
-        if (mValidationModel.isEmpty(title)) {
-            mView.setTitleError(R.string.empty_field);
+        if (!isInputValid(title, description)) {
             return false;
         }
 
-        if (!mValidationModel.isTitleValid(title)) {
-            mView.setTitleError(R.string.title_is_too_short);
-            return false;
+        Task task = mCreateTaskMode.createOrUpdate(title, description);
+
+        if (task.getImage() != null) {
+            try {
+                String reducedImagePath = mCoverModel.saveImage(task.getId(), task.getImage());
+                task.setImage(reducedImagePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+                mView.showMessage(R.string.image_saving_error);
+            }
         }
 
-        if (mValidationModel.isEmpty(description)) {
-            mView.setCommentError(R.string.empty_field);
-            return false;
-        }
-
-        Task task = mCreateTaskMode.create(title, description);
-        try {
-            task.setImage(saveImage(task.getId(), task.getImage()));
-        } catch (IOException e) {
-            e.printStackTrace();
-            task.setImage(null);
-            mView.showMessage(R.string.image_saving_error);
-        }
         if (mCreateTaskMode.getMode() == CreateTaskModel.MODE_CREATE) {
             mRecordsModel.insert(task);
         } else {
@@ -118,7 +109,6 @@ public class CreateTaskPresenter extends BasePresenter {
         }
 
         mScheduleModel.scheduleStartReminder(task);
-
         if (task.hasLocation()) {
             mScheduleModel.scheduleLocationUpdates();
         }
@@ -131,27 +121,42 @@ public class CreateTaskPresenter extends BasePresenter {
         return true;
     }
 
-    private String saveImage(long taskId, String image) throws IOException {
-        if (image != null) {
-            return mCoverModel.saveImage(taskId, image);
+    private boolean isInputValid(String title, String description) {
+
+        boolean isInputValid = true;
+
+        if (mValidationModel.isEmpty(title)) {
+            mView.setTitleError(R.string.empty_field);
+            isInputValid = false;
         }
-        return null;
+
+        if (!mValidationModel.isTitleValid(title)) {
+            mView.setTitleError(R.string.title_is_too_short);
+            isInputValid = false;
+        }
+
+        if (mValidationModel.isEmpty(description)) {
+            mView.setCommentError(R.string.empty_field);
+            isInputValid = false;
+        }
+
+        return isInputValid;
     }
 
-
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
 
         switch (requestCode) {
 
             case CreateTaskActivity.REQUEST_CODE_LOCATION:
                 if (resultCode == RESULT_OK) {
                     LatLng latLng = data.getParcelableExtra("location");
-                    onLocationSpecified(latLng);
+                    mCreateTaskMode.setLocation(latLng);
+                    mView.displayLocation(String.format(Locale.getDefault(), "%f, %f", latLng.latitude, latLng.longitude));
+
                 }
                 break;
 
-            case CreateTaskActivity.REQUEST_CODE_VIOCE_INPUT:
+            case CreateTaskActivity.REQUEST_CODE_VOICE_INPUT:
                 if (resultCode == RESULT_OK) {
                     ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     if (matches.size() > 0) {
@@ -193,42 +198,18 @@ public class CreateTaskPresenter extends BasePresenter {
                     mView.displayImage(imageFile.getPath());
                 } catch (Exception e) {
                     e.printStackTrace();
-                    //TODO: show error
+                    mView.showMessage(e.getMessage());
                 }
 
                 break;
-
         }
 
-    }
-
-
-    public void setDateFormatModel(DateFormatModel mDateFormatModel) {
-        this.mDateFormatModel = mDateFormatModel;
-    }
-
-    public void setCreateTaskMode(CreateTaskModel mCreateTaskMode) {
-        this.mCreateTaskMode = mCreateTaskMode;
-    }
-
-    public void setValidationModel(ValidationModel mValidationModel) {
-        this.mValidationModel = mValidationModel;
-    }
-
-    public void setCoverModel(TaskCoverModel mCoverModel) {
-        this.mCoverModel = mCoverModel;
-    }
-
-    public void onLocationSpecified(LatLng latLng) {
-        mCreateTaskMode.setLocation(latLng);
-        mView.displayLocation(String.format(Locale.getDefault(), "%f, %f", latLng.latitude, latLng.longitude));
     }
 
     public void clearLocation() {
         mCreateTaskMode.clearLocation();
         mView.clearLocation();
     }
-
 
     public void setStartDate() {
 
@@ -342,9 +323,23 @@ public class CreateTaskPresenter extends BasePresenter {
     private void setRepeatPeriod(RepeatPeriod repeatPeriod) {
         mCreateTaskMode.setRepeatPeriod(repeatPeriod);
         mView.setRepeatPeriod(repeatPeriod.getTextResId());
-
     }
 
+    public void setDateFormatModel(DateFormatModel mDateFormatModel) {
+        this.mDateFormatModel = mDateFormatModel;
+    }
+
+    public void setCreateTaskMode(CreateTaskModel mCreateTaskMode) {
+        this.mCreateTaskMode = mCreateTaskMode;
+    }
+
+    public void setValidationModel(ValidationModel mValidationModel) {
+        this.mValidationModel = mValidationModel;
+    }
+
+    public void setCoverModel(TaskCoverModel mCoverModel) {
+        this.mCoverModel = mCoverModel;
+    }
 
     public void setRecordsModel(TaskRecordsModel mRecordsModel) {
         this.mRecordsModel = mRecordsModel;

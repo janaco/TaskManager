@@ -23,21 +23,20 @@ import java.util.List;
 
 public class TaskModel {
 
-    private EventsDao mEventsDao;
-    private TasksDao mTasksDao;
-    private StatisticsDao mStatisticsDao;
+    private final EventsDao mEventsDao;
+    private final TasksDao mTasksDao;
+    private final StatisticsDao mStatisticsDao;
     private Task mTask;
 
     public TaskModel(Context context, Task task) {
+        this(context);
         mTask = task;
-        mEventsDao = AppDatabase.getInstance(context).taskEventsDao();
-        mTasksDao = AppDatabase.getInstance(context).tasksDao();
-        mStatisticsDao = AppDatabase.getInstance(context).statisticsDao();
     }
 
     public TaskModel(Context context) {
         mEventsDao = AppDatabase.getInstance(context).taskEventsDao();
         mTasksDao = AppDatabase.getInstance(context).tasksDao();
+        mStatisticsDao = AppDatabase.getInstance(context).statisticsDao();
     }
 
 

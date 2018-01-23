@@ -1,16 +1,10 @@
 package com.nandy.taskmanager.mvp.model;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.model.RepeatPeriod;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskStatus;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -23,15 +17,14 @@ public class CreateTaskModel {
     public static final int MODE_CREATE = 1;
     public static final int MODE_EDIT = 2;
 
-    private Date mStartDate;
-    private LatLng mLocation;
-    private String mImage;
+    private final int mMode;
     private long mDuration;
-    private RepeatPeriod mRepeatPeriod;
 
     private Task mTask;
-
-    private int mMode;
+    private Date mStartDate;
+    private LatLng mLocation;
+    private RepeatPeriod mRepeatPeriod;
+    private String mImage;
 
     public CreateTaskModel(Task task, int mode) {
         mMode = mode;
@@ -54,7 +47,7 @@ public class CreateTaskModel {
         return mTask;
     }
 
-    public Task create(String title, String description) {
+    public Task createOrUpdate(String title, String description) {
 
         if (mMode == MODE_CREATE) {
             mTask = new Task(System.currentTimeMillis(), title, description);
@@ -74,9 +67,6 @@ public class CreateTaskModel {
         return mTask;
 
     }
-
-
-
 
     public void setStartDate(int year, int month, int day) {
         Calendar calendar = Calendar.getInstance();
@@ -118,13 +108,11 @@ public class CreateTaskModel {
 
     public void setRepeatPeriod(RepeatPeriod repeatPeriod){
         mRepeatPeriod = repeatPeriod;
-
     }
 
     public Date getStartDate() {
         return mStartDate;
     }
-
 
     public void setLocation(LatLng location) {
         this.mLocation = location;

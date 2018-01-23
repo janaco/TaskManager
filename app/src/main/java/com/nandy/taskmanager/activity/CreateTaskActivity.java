@@ -16,7 +16,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,7 +50,7 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
     public final static int REQUEST_CODE_LOCATION = 52;
     public final static int REQUEST_PERMISSIONS_CODE = 53;
     public static final int REQUEST_CODE_CHOOSE_IMAGE = 54;
-    public static final int REQUEST_CODE_VIOCE_INPUT = 55;
+    public static final int REQUEST_CODE_VOICE_INPUT = 55;
 
     @BindView(R.id.input_title)
     EditText mInputTitle;
@@ -72,13 +71,12 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
     @BindView(R.id.txt_location)
     TextView mLocationTextView;
 
-    private CreateTaskPresenter mPresener;
+    private CreateTaskPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_task);
-
         ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);
@@ -92,20 +90,18 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         registerForContextMenu(mDurationTextView);
         registerForContextMenu(mRepeatPeriodTextView);
 
-
         Task task = getIntent().getParcelableExtra("task");
         int mode = getIntent().getIntExtra("mode", CreateTaskModel.MODE_CREATE);
 
+        mPresenter = new CreateTaskPresenter(this);
+        mPresenter.setCreateTaskMode(new CreateTaskModel(task, mode));
+        mPresenter.setValidationModel(new ValidationModel());
+        mPresenter.setDateFormatModel(new DateFormatModel());
+        mPresenter.setCoverModel(new TaskCoverModel(getApplicationContext()));
+        mPresenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
+        mPresenter.setScheduleModel(new TaskRemindersModel(getApplicationContext()));
 
-        mPresener = new CreateTaskPresenter(this);
-        mPresener.setCreateTaskMode(new CreateTaskModel(task, mode));
-        mPresener.setValidationModel(new ValidationModel());
-        mPresener.setDateFormatModel(new DateFormatModel());
-        mPresener.setCoverModel(new TaskCoverModel(getApplicationContext()));
-        mPresener.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
-        mPresener.setScheduleModel(new TaskRemindersModel(getApplicationContext()));
-
-        mPresener.start();
+        mPresenter.start();
     }
 
     @Override
@@ -155,23 +151,20 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         switch (item.getGroupId()) {
 
             case R.id.group_duration:
-                Log.d("CONTEXT_MENU", "onDurationSelected: " + item);
-                return mPresener.onDurationSelected(item.getItemId());
+                return mPresenter.onDurationSelected(item.getItemId());
 
             case R.id.group_period:
-                Log.d("CONTEXT_MENU", "onRepeatPeriodSelected: " + item);
-                return mPresener.onRepeatPeriodSelected(item.getItemId());
+                return mPresenter.onRepeatPeriodSelected(item.getItemId());
 
             default:
                 return super.onContextItemSelected(item);
         }
-
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mPresener.onActivityResult(requestCode, resultCode, data);
+        mPresenter.onActivityResult(requestCode, resultCode, data);
     }
 
 
@@ -182,12 +175,12 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
 
     @OnClick(R.id.txt_start_date)
     void onSetStartDateButtonClick() {
-        mPresener.setStartDate();
+        mPresenter.setStartDate();
     }
 
     @OnClick(R.id.txt_start_time)
     void onSetStartTimeButtonClick() {
-        mPresener.setStartTime();
+        mPresenter.setStartTime();
     }
 
     @OnClick(R.id.txt_duration)
@@ -205,13 +198,13 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.description));
-        startActivityForResult(intent, REQUEST_CODE_VIOCE_INPUT);
+        startActivityForResult(intent, REQUEST_CODE_VOICE_INPUT);
     }
 
 
     @OnClick(R.id.btn_clear_location)
     void onClearLocationButtonClick() {
-        mPresener.clearLocation();
+        mPresenter.clearLocation();
     }
 
 
@@ -239,12 +232,6 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
     }
 
 
-    private boolean isPermissionsGranted() {
-        return Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 || ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-
-    }
-
-
     @Override
     public void setTitleError(int textResId) {
         mInputTitle.setError(getString(textResId));
@@ -254,7 +241,6 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
     public void setCommentError(int textResId) {
         mInputDescription.setError(getString(textResId));
     }
-
 
     @Override
     public void clearLocation() {
@@ -324,7 +310,18 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
 
     @Override
     public void showMessage(int textResId) {
-        Toast.makeText(this, textResId, Toast.LENGTH_SHORT).show();
+        showMessage(getString(textResId));
+    }
+
+    @Override
+    public void showMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+
+    }
+
+    private boolean isPermissionsGranted() {
+        return Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 || ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+
     }
 
     private void showPickImagePopup() {
@@ -345,7 +342,7 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         String title = mInputTitle.getText().toString().trim();
         String comment = mInputDescription.getText().toString().trim();
 
-        boolean success = mPresener.saveChanges(title, comment);
+        boolean success = mPresenter.saveChanges(title, comment);
         if (success) {
             finish();
         }

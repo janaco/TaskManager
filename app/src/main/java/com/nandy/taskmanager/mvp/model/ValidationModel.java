@@ -13,6 +13,6 @@ public class ValidationModel {
 
     public boolean isTitleValid(String text){
 
-        return text.length() > 5;
+        return text.length() >= 5;
     }
 }

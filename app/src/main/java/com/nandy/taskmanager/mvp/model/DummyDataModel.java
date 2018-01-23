@@ -23,13 +23,13 @@ import java.util.concurrent.TimeUnit;
 
 public class DummyDataModel {
 
-    public static final int DEFAULT_CAPACITY = 30;
+    private static final int DEFAULT_CAPACITY = 30;
 
     private static final String TITLE_TEMPLATE = "Task #";
     private static final String DESCRIPTION_TEMPLATE = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
-    private Random mRandom;
-    private Context mContext;
+    private final Random mRandom;
+    private final Context mContext;
 
     public DummyDataModel(Context context){
         mContext = context;
@@ -66,9 +66,6 @@ public class DummyDataModel {
             task.setRepeatPeriod(getRandomPeriod(RepeatPeriod.values()));
 
             tasksDao.insert(task);
-
-            Log.d("TASK_", "insert: " + task);
-
             tasks.add(task);
         }
 
