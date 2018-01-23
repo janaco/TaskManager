@@ -1,6 +1,7 @@
 package com.nandy.taskmanager.activity;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,6 +22,7 @@ import com.nandy.taskmanager.adapter.TabsPagerAdapter;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.DummyDataModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
+import com.nandy.taskmanager.mvp.model.ZipModel;
 import com.nandy.taskmanager.mvp.presenter.MainPresenter;
 import com.nandy.taskmanager.ui.fragment.StatisticsFragment;
 import com.nandy.taskmanager.ui.fragment.TasksFragment;
@@ -38,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Snackbar mExitSnackBar;
     private MainPresenter mPresenter;
+
+    private ZipModel mZipModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        mZipModel = new ZipModel(getApplicationContext());
     }
 
     @OnClick(R.id.btn_create_task)
@@ -84,6 +90,26 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+
+            case R.id.action_zip:
+                new AsyncTask<Void, Void, Void>(){
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        mZipModel.zip();
+                        return null;
+                    }
+                }.execute();
+                return true;
+
+            case R.id.action_unzip:
+                new AsyncTask<Void, Void, Void>(){
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        mZipModel.unzip();
+                        return null;
+                    }
+                }.execute();
+                return true;
 
             case R.id.action_backup:
                 startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
