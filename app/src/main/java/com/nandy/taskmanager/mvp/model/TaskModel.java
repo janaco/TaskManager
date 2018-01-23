@@ -10,8 +10,8 @@ import com.nandy.taskmanager.db.dao.TasksDao;
 import com.nandy.taskmanager.model.Action;
 import com.nandy.taskmanager.model.Metadata;
 import com.nandy.taskmanager.model.Statistics;
-import com.nandy.taskmanager.model.TaskEvent;
 import com.nandy.taskmanager.model.Task;
+import com.nandy.taskmanager.model.TaskEvent;
 import com.nandy.taskmanager.model.TaskStatus;
 
 import java.util.Date;
@@ -28,14 +28,14 @@ public class TaskModel {
     private StatisticsDao mStatisticsDao;
     private Task mTask;
 
-    public TaskModel(Context context, Task task){
+    public TaskModel(Context context, Task task) {
         mTask = task;
         mEventsDao = AppDatabase.getInstance(context).taskEventsDao();
         mTasksDao = AppDatabase.getInstance(context).tasksDao();
         mStatisticsDao = AppDatabase.getInstance(context).statisticsDao();
     }
 
-    public TaskModel(Context context){
+    public TaskModel(Context context) {
         mEventsDao = AppDatabase.getInstance(context).taskEventsDao();
         mTasksDao = AppDatabase.getInstance(context).tasksDao();
     }
@@ -61,23 +61,23 @@ public class TaskModel {
     }
 
     public void resetStart() {
-      resetStart(mTask);
+        resetStart(mTask);
     }
 
     public void resetEnd() {
-      resetEnd(mTask);
+        resetEnd(mTask);
     }
 
-    public void start(){
+    public void start() {
         start(mTask);
     }
 
 
-    public void start(Task task){
+    public void start(Task task) {
 
         task.setStatus(TaskStatus.ACTIVE);
-        Metadata metadata  = task.getMetadata();
-        if (metadata == null){
+        Metadata metadata = task.getMetadata();
+        if (metadata == null) {
             metadata = new Metadata();
         }
         metadata.setActualStartDate(new Date());
@@ -87,31 +87,85 @@ public class TaskModel {
         mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.START));
     }
 
-    public void complete(){
+    public void complete() {
         complete(mTask);
     }
 
-    public void complete(Task task){
-
-        task.setStatus(TaskStatus.COMPLETED);
+    public void complete(Task task) {
 
         Metadata metadata = task.getMetadata();
         Date actualStartDate = metadata.getActualStartDate();
-        long spentTime = System.currentTimeMillis() - actualStartDate.getTime();
-        metadata.setTimeSpent(spentTime);
+        long duration = System.currentTimeMillis() - actualStartDate.getTime();
+        long downtime = 0;
+
+        switch (task.getStatus()) {
+
+            case ACTIVE:
+                downtime = metadata.getDownTime();
+                break;
+
+            case PAUSED:
+                downtime = duration - metadata.getTimeSpent();
+                break;
+        }
+
+        long timeSpent = duration - downtime;
+
+        metadata.setTimeSpent(timeSpent);
+        metadata.setDownTime(downtime);
+        task.setMetadata(metadata);
+
+        task.setStatus(TaskStatus.COMPLETED);
+        mTasksDao.update(task);
+        mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.END));
+        mStatisticsDao.insert(new Statistics(task.getId(), actualStartDate, timeSpent));
+    }
+
+    public void pause(Task task) {
+        task.setStatus(TaskStatus.PAUSED);
+
+        Metadata metadata = task.getMetadata();
+        Date actualStartDate = metadata.getActualStartDate();
+        long downtime = metadata.getDownTime();
+        long duration = System.currentTimeMillis() - actualStartDate.getTime();
+        long timeSpent = duration - downtime;
+
+        metadata.setTimeSpent(timeSpent);
 
         task.setMetadata(metadata);
 
         mTasksDao.update(task);
-        mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.END));
-        mStatisticsDao.insert(new Statistics(task.getId(), actualStartDate, spentTime));
+        mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.PAUSE));
     }
 
-    public void delete(){
+    public void pause(){
+        pause(mTask);
+    }
+
+    public void resume(){
+        resume(mTask);
+    }
+    public void resume(Task task) {
+        task.setStatus(TaskStatus.ACTIVE);
+
+        Metadata metadata = task.getMetadata();
+        Date actualStartDate = metadata.getActualStartDate();
+        long timeSpent = metadata.getTimeSpent();
+        long duration = System.currentTimeMillis() - actualStartDate.getTime();
+        long downtime = duration - timeSpent;
+        metadata.setDownTime(downtime);
+
+        task.setMetadata(metadata);
+
+        mTasksDao.update(task);
+        mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.RESUME));
+    }
+
+    public void delete() {
         delete(mTask);
     }
 
-    public void delete(Task task){
+    public void delete(Task task) {
         mTasksDao.delete(task);
         mStatisticsDao.deleteAll(task.getId());
     }

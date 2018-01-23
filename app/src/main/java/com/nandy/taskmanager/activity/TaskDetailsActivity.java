@@ -132,6 +132,14 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
             case R.id.action_reset_end:
                 mPresenter.resetEnd();
                 break;
+
+            case R.id.action_pause:
+                mPresenter.pause();
+                break;
+
+            case R.id.action_resume:
+                mPresenter.resume();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -254,6 +262,17 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
         MenuItem item = mMenu.findItem(R.id.action_reset_start);
         item.setTitle(getMenuItemText(R.string.reset_start, enabled));
         item.setEnabled(enabled);
+    }
+
+
+    @Override
+    public void setPauseOptionVisible(boolean visible) {
+       mMenu.findItem(R.id.action_pause).setVisible(visible);
+    }
+
+    @Override
+    public void setResumeOptionVisible(boolean visible) {
+        mMenu.findItem(R.id.action_resume).setVisible(visible);
     }
 
     private Spannable getMenuItemText(@StringRes int textResId, boolean enabled) {

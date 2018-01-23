@@ -6,5 +6,5 @@ package com.nandy.taskmanager.model;
 
 public enum Action {
 
-    START, END
+    START, END, PAUSE, RESUME
 }

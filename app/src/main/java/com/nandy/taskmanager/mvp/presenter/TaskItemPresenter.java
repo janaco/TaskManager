@@ -57,8 +57,7 @@ public class TaskItemPresenter extends BasePresenter {
         mView.setTitle(task.getTitle());
         mView.setDescription(task.getDescription());
         mView.setPlannedStartTime(mDateFormatModel.formatAsFullDate(task.getPlannedStartDate()));
-        mView.setScheduledDuration(mDateFormatModel.convertToMinutes(
-                task.getScheduledDuration()), R.string.minutes);
+        mView.setScheduledDuration(mDateFormatModel.convertToMinutes(task.getScheduledDuration()), R.string.minutes);
         mView.setRepeatPeriod(task.getRepeatPeriod().getTextResId());
 
         displayLocation(task);
@@ -86,12 +85,22 @@ public class TaskItemPresenter extends BasePresenter {
                 mView.setActualStartTime(mDateFormatModel.formatAsFullDate(task.getMetadata().getActualStartDate()));
                 break;
 
+            case PAUSED:
+                mView.setControlButtonEnabled(true);
+                mView.setControlButtonText(R.string.finish);
+                mView.setActualStartDateVisible(true);
+                mView.setActualStartTime(mDateFormatModel.formatAsFullDate(task.getMetadata().getActualStartDate()));
+                mView.setTimeSpentVisible(true);
+                mView.setTimeSpent(mDateFormatModel.convertToSeconds(task.getMetadata().getTimeSpent()), R.string.hour);
+
+                break;
+
             case COMPLETED:
                 mView.setControlButtonEnabled(false);
                 mView.setControlButtonText(R.string.completed);
                 mView.setActualStartDateVisible(true);
                 mView.setTimeSpentVisible(true);
-                mView.setTimeSpent(mDateFormatModel.convertToHours(task.getMetadata().getTimeSpent()), R.string.hour);
+                mView.setTimeSpent(mDateFormatModel.convertToSeconds(task.getMetadata().getTimeSpent()), R.string.hour);
                 mView.setActualStartTime(mDateFormatModel.formatAsFullDate(task.getMetadata().getActualStartDate()));
                 break;
         }
@@ -101,6 +110,8 @@ public class TaskItemPresenter extends BasePresenter {
         Task task = mTaskModel.getTask();
         mView.setResetStartMenuOptionEnabled(task.getStatus() != TaskStatus.NEW);
         mView.setResetEndMenuOptionEnabled(task.getStatus() == TaskStatus.COMPLETED);
+        mView.setPauseOptionVisible(task.getStatus() == TaskStatus.ACTIVE);
+        mView.setResumeOptionVisible(task.getStatus() == TaskStatus.PAUSED);
     }
 
     private void displayLocation(Task task) {
@@ -162,6 +173,22 @@ public class TaskItemPresenter extends BasePresenter {
         mTaskModel.resetEnd();
         mTaskReminderModel.cancelReminder(task.getId());
         mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration());
+        displayData(mTaskModel.getTask());
+        setupMenu();
+    }
+
+    public void pause(){
+        mTaskModel.pause(mTaskModel.getTask());
+        mTaskReminderModel.cancelReminder(mTaskModel.getTask().getId());
+        displayData(mTaskModel.getTask());
+        setupMenu();
+    }
+
+    public void resume(){
+        mTaskModel.resume();
+        Task task = mTaskModel.getTask();
+        long duration = task.getScheduledDuration() - task.getMetadata().getTimeSpent();
+        mTaskReminderModel.scheduleEndReminder(task.getId(), duration);
         displayData(mTaskModel.getTask());
         setupMenu();
     }

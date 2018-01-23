@@ -60,7 +60,7 @@ public class CreateTaskPresenter extends BasePresenter {
             int textResId = R.string.minutes;
 
             if (duration > 30) {
-                duration = mDateFormatModel.convertToHours(task.getScheduledDuration());
+                duration = mDateFormatModel.convertToSeconds(task.getScheduledDuration());
                 textResId = R.string.hour;
             }
             mView.setDuration(duration, textResId);

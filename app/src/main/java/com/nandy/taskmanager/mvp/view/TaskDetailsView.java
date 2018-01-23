@@ -46,4 +46,8 @@ public interface TaskDetailsView {
 
     void finish();
 
+    void setPauseOptionVisible(boolean visible);
+
+    void  setResumeOptionVisible(boolean visible);
+
 }

@@ -45,6 +45,7 @@ public class Task implements Parcelable{
     private Metadata mMetadata;
 
 
+
     public Task(long id, String title, String description) {
         mId = id;
         mTitle = title;

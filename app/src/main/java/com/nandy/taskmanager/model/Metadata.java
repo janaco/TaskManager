@@ -18,18 +18,23 @@ public class Metadata implements Parcelable{
     @ColumnInfo(name = "time_spent")
     private long mTimeSpent;
 
+    @ColumnInfo(name = "downtime")
+    private long mDownTime;
+
     public Metadata(){}
 
     @Ignore
     protected Metadata(Parcel in) {
         mTimeSpent = in.readLong();
         mActualStartDate = (Date) in.readSerializable();
+        mDownTime = in.readLong();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(mTimeSpent);
         dest.writeSerializable(mActualStartDate);
+        dest.writeLong(mDownTime);
     }
 
     @Override
@@ -63,5 +68,14 @@ public class Metadata implements Parcelable{
 
     public long getTimeSpent() {
         return mTimeSpent;
+    }
+
+
+    public long getDownTime() {
+        return mDownTime;
+    }
+
+    public void setDownTime(long mDownTime) {
+        this.mDownTime = mDownTime;
     }
 }

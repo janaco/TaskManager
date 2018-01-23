@@ -41,9 +41,9 @@ public class DateFormatModel {
         return mTimeFormat.format(date);
     }
 
-    public int convertToHours(long millis){
+    public int convertToSeconds(long millis){
 
-        return (int) TimeUnit.MILLISECONDS.toHours(millis);
+        return (int) TimeUnit.MILLISECONDS.toSeconds(millis);
     }
 
 
