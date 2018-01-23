@@ -1,6 +1,7 @@
 package com.nandy.taskmanager.mvp.presenter;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.speech.RecognizerIntent;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -10,8 +11,8 @@ import com.nandy.taskmanager.model.RepeatPeriod;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.BasePresenter;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
-import com.nandy.taskmanager.mvp.model.CropImageModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
+import com.nandy.taskmanager.mvp.model.TaskCoverModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
@@ -19,6 +20,7 @@ import com.nandy.taskmanager.mvp.view.CreateTaskView;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
@@ -36,7 +38,8 @@ public class CreateTaskPresenter extends BasePresenter {
     private CreateTaskModel mCreateTaskMode;
     private ValidationModel mValidationModel;
     private DateFormatModel mDateFormatModel;
-    private CropImageModel mCropImageModel;
+    private TaskCoverModel mCoverModel;
+
     private TaskRecordsModel mRecordsModel;
     private TaskRemindersModel mScheduleModel;
 
@@ -100,6 +103,13 @@ public class CreateTaskPresenter extends BasePresenter {
         }
 
         Task task = mCreateTaskMode.create(title, description);
+        try {
+            task.setImage(saveImage(task.getId(), task.getImage()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            task.setImage(null);
+            mView.showMessage(R.string.image_saving_error);
+        }
         if (mCreateTaskMode.getMode() == CreateTaskModel.MODE_CREATE) {
             mRecordsModel.insert(task);
         } else {
@@ -109,7 +119,7 @@ public class CreateTaskPresenter extends BasePresenter {
 
         mScheduleModel.scheduleStartReminder(task);
 
-        if (task.hasLocation()){
+        if (task.hasLocation()) {
             mScheduleModel.scheduleLocationUpdates();
         }
 
@@ -119,6 +129,13 @@ public class CreateTaskPresenter extends BasePresenter {
 
 
         return true;
+    }
+
+    private String saveImage(long taskId, String image) throws IOException {
+        if (image != null) {
+            return mCoverModel.saveImage(taskId, image);
+        }
+        return null;
     }
 
 
@@ -146,13 +163,32 @@ public class CreateTaskPresenter extends BasePresenter {
             case CreateTaskActivity.REQUEST_CODE_CHOOSE_IMAGE:
 
                 if (resultCode == RESULT_OK) {
-                    mView.startCropActivity(mCropImageModel.buildImageCropper(data));
+
+                    Uri fileUri;
+
+                    if (data == null || data.getData() == null) {
+                        fileUri = mCoverModel.getOutputFromCamera();
+                    } else if (data.getData().getScheme().equals("file")) {
+                        fileUri = data.getData();
+                    } else {
+                        try {
+                            fileUri = mCoverModel.getCoverFromFiles(data.getData());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            mView.showMessage(R.string.image_loading_error);
+                            return;
+                        }
+
+                    }
+
+                    mView.startCropActivity(CropImage.activity(fileUri));
+
                 }
                 break;
 
             case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
                 try {
-                    File imageFile = mCropImageModel.getCroppedImage(data, resultCode);
+                    File imageFile = mCoverModel.getCroppedImage(data, resultCode);
                     mCreateTaskMode.setImage(imageFile.getPath());
                     mView.displayImage(imageFile.getPath());
                 } catch (Exception e) {
@@ -179,8 +215,8 @@ public class CreateTaskPresenter extends BasePresenter {
         this.mValidationModel = mValidationModel;
     }
 
-    public void setCropImageModel(CropImageModel mCropImageModel) {
-        this.mCropImageModel = mCropImageModel;
+    public void setCoverModel(TaskCoverModel mCoverModel) {
+        this.mCoverModel = mCoverModel;
     }
 
     public void onLocationSpecified(LatLng latLng) {

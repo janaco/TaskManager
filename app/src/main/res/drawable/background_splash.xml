@@ -4,10 +4,8 @@
     <item
         android:drawable="@drawable/gradient_splash_screen"/>
 
-    <item>
-        <bitmap
+    <item
             android:gravity="center"
-            android:src="@mipmap/ic_launcher"/>
-    </item>
+            android:drawable="@drawable/ic_check_outline"/>
 
 </layer-list>

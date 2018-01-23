@@ -1,10 +1,16 @@
 package com.nandy.taskmanager.mvp.model;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.model.RepeatPeriod;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskStatus;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -53,6 +59,7 @@ public class CreateTaskModel {
         if (mMode == MODE_CREATE) {
             mTask = new Task(System.currentTimeMillis(), title, description);
             mTask.setStatus(TaskStatus.NEW);
+
         } else {
             mTask.setTitle(title);
             mTask.setDescription(description);
@@ -67,6 +74,9 @@ public class CreateTaskModel {
         return mTask;
 
     }
+
+
+
 
     public void setStartDate(int year, int month, int day) {
         Calendar calendar = Calendar.getInstance();

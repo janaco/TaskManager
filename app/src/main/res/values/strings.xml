@@ -89,6 +89,8 @@
     <string name="october">October</string>
     <string name="november">November</string>
     <string name="december">December</string>
+    <string name="image_saving_error">Failed to save image.</string>
+    <string name="image_loading_error">Failed to load image.</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

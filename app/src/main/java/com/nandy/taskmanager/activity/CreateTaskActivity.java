@@ -24,13 +24,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.nandy.taskmanager.image.ImageLoader;
 import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.image.ImageLoader;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
-import com.nandy.taskmanager.mvp.model.CropImageModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
+import com.nandy.taskmanager.mvp.model.TaskCoverModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
@@ -100,7 +101,7 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         mPresener.setCreateTaskMode(new CreateTaskModel(task, mode));
         mPresener.setValidationModel(new ValidationModel());
         mPresener.setDateFormatModel(new DateFormatModel());
-        mPresener.setCropImageModel(new CropImageModel(getApplicationContext()));
+        mPresener.setCoverModel(new TaskCoverModel(getApplicationContext()));
         mPresener.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
         mPresener.setScheduleModel(new TaskRemindersModel(getApplicationContext()));
 
@@ -319,6 +320,11 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
     @Override
     public void showTimePickerDialog(TimePickerDialog.OnTimeSetListener onTimeSetListener, int hour, int minute) {
         new TimePickerDialog(this, onTimeSetListener, hour, minute, true).show();
+    }
+
+    @Override
+    public void showMessage(int textResId) {
+        Toast.makeText(this, textResId, Toast.LENGTH_SHORT).show();
     }
 
     private void showPickImagePopup() {

@@ -44,4 +44,6 @@ public interface CreateTaskView {
     void showDatePickerDialog(DatePickerDialog.OnDateSetListener onDateSetListener, int year, int month, int day);
 
     void showTimePickerDialog(TimePickerDialog.OnTimeSetListener onTimeSetListener, int hour, int minute);
+
+    void showMessage(@StringRes int textResId);
 }
