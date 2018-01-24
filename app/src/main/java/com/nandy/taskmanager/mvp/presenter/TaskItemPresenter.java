@@ -2,40 +2,44 @@ package com.nandy.taskmanager.mvp.presenter;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 
 import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskStatus;
 import com.nandy.taskmanager.mvp.BasePresenter;
+import com.nandy.taskmanager.mvp.contract.TaskDetailsContract;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
-import com.nandy.taskmanager.mvp.view.TaskDetailsView;
 
 /**
  * Created by razomer on 18.01.18.
  */
 
-public class TaskItemPresenter extends BasePresenter {
+public class TaskItemPresenter implements TaskDetailsContract.Presenter {
 
-    private final TaskDetailsView mView;
+    private TaskDetailsContract.View mView;
 
     private TaskModel mTaskModel;
     private TaskRemindersModel mTaskReminderModel;
     private DateFormatModel mDateFormatModel;
 
-    public TaskItemPresenter(TaskDetailsView view) {
-        mView = view;
-    }
-
     @Override
-    public void start() {
+    public void onAttachView(TaskDetailsContract.View view) {
+        mView = view;
         displayData(mTaskModel.getTask());
     }
 
     @Override
-    public void stop() {
+    public void onDetachView() {
+        mView = null;
+    }
+
+    @Override
+    public void onDestroy() {
 
     }
 
@@ -48,9 +52,6 @@ public class TaskItemPresenter extends BasePresenter {
         }
     }
 
-    public Task getTask() {
-        return mTaskModel.getTask();
-    }
 
     private void displayData(Task task) {
 
@@ -63,6 +64,15 @@ public class TaskItemPresenter extends BasePresenter {
         displayLocation(task);
         loadImage(task);
         displayStatusInformation(task);
+    }
+
+    @Override
+    public void edit() {
+        Bundle args = new Bundle();
+        args.putParcelable("task", mTaskModel.getTask());
+        args.putInt("mode", CreateTaskActivity.MODE_EDIT);
+
+        mView.launchActivityForResult(args, CreateTaskActivity.class, TaskDetailsActivity.REQUEST_CODE_EDIT);
     }
 
     private void displayStatusInformation(Task task) {
@@ -177,14 +187,14 @@ public class TaskItemPresenter extends BasePresenter {
         setupMenu();
     }
 
-    public void pause(){
+    public void pause() {
         mTaskModel.pause();
         mTaskReminderModel.cancelReminder(mTaskModel.getTask().getId());
         displayData(mTaskModel.getTask());
         setupMenu();
     }
 
-    public void resume(){
+    public void resume() {
         mTaskModel.resume();
         Task task = mTaskModel.getTask();
         long duration = task.getScheduledDuration() - task.getMetadata().getTimeSpent();
@@ -204,4 +214,5 @@ public class TaskItemPresenter extends BasePresenter {
     public void setDateFormatModel(DateFormatModel mDateFormatModel) {
         this.mDateFormatModel = mDateFormatModel;
     }
+
 }

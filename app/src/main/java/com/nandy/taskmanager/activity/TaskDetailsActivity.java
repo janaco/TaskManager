@@ -22,12 +22,14 @@ import com.bumptech.glide.RequestBuilder;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.image.ImageLoader;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.mvp.model.CreateTaskModel;
+import com.nandy.taskmanager.mvp.contract.TaskDetailsContract;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
+import com.nandy.taskmanager.mvp.model.TaskCoverModel;
 import com.nandy.taskmanager.mvp.model.TaskModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 import com.nandy.taskmanager.mvp.presenter.TaskItemPresenter;
-import com.nandy.taskmanager.mvp.view.TaskDetailsView;
+
+import org.kaerdan.presenterretainer.PresenterActivity;
 
 import java.util.Locale;
 
@@ -35,7 +37,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class TaskDetailsActivity extends AppCompatActivity implements TaskDetailsView {
+public class TaskDetailsActivity extends PresenterActivity<TaskDetailsContract.Presenter, TaskDetailsContract.View>
+        implements TaskDetailsContract.View {
 
     public static final int REQUEST_CODE_EDIT = 61;
 
@@ -74,7 +77,6 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
     @BindView(R.id.layout_time_spent)
     View mTimeSpentLayout;
 
-    private TaskItemPresenter mPresenter;
     private Menu mMenu;
 
     @Override
@@ -90,20 +92,32 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        Task task = getIntent().getParcelableExtra("task");
-        mPresenter = new TaskItemPresenter(this);
-        mPresenter.setDateFormatModel(new DateFormatModel());
-        mPresenter.setTaskReminderModel(new TaskRemindersModel(getApplicationContext()));
-        mPresenter.setTaskModel(new TaskModel(getApplicationContext(), task));
 
-        mPresenter.start();
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    protected TaskDetailsContract.Presenter onCreatePresenter() {
+        Task task = getIntent().getExtras().getParcelable("task");
+
+        TaskItemPresenter presenter = new TaskItemPresenter();
+        presenter.setDateFormatModel(new DateFormatModel());
+        presenter.setTaskReminderModel(new TaskRemindersModel(getApplicationContext()));
+        presenter.setTaskModel(new TaskModel(getApplicationContext(), task));
+
+        return presenter;
+    }
+
+    @Override
+    protected TaskDetailsContract.View getPresenterView() {
+        return this;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mMenu = menu;
         getMenuInflater().inflate(R.menu.menu_task, menu);
-        mPresenter.setupMenu();
+        getPresenter().setupMenu();
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -113,48 +127,49 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
         switch (item.getItemId()) {
 
             case R.id.action_edit:
-                Intent intent = new Intent(this, CreateTaskActivity.class);
-                Bundle args = new Bundle();
-                args.putParcelable("task", mPresenter.getTask());
-                args.putInt("mode", CreateTaskActivity.MODE_EDIT);
-                intent.putExtras(args);
-                startActivityForResult(intent, REQUEST_CODE_EDIT);
-
+                getPresenter().edit();
                 break;
 
             case R.id.action_delete:
-                mPresenter.delete();
+                getPresenter().delete();
                 finish();
                 break;
 
             case R.id.action_reset_start:
-                mPresenter.resetStart();
+                getPresenter().resetStart();
                 break;
 
             case R.id.action_reset_end:
-                mPresenter.resetEnd();
+                getPresenter().resetEnd();
                 break;
 
             case R.id.action_pause:
-                mPresenter.pause();
+                getPresenter().pause();
                 break;
 
             case R.id.action_resume:
-                mPresenter.resume();
+                getPresenter().resume();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
+    public void launchActivityForResult(Bundle args, Class<?> cls, int requestCode) {
+        Intent intent = new Intent( getApplicationContext(), cls);
+        intent.putExtras(args);
+        startActivityForResult(intent, requestCode);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mPresenter.onActivityResult(requestCode, resultCode, data);
+        getPresenter().onActivityResult(requestCode, resultCode, data);
     }
 
     @OnClick(R.id.btn_control)
     void onControlButtonClick() {
-        mPresenter.toggleStatus();
+        getPresenter().toggleStatus();
     }
 
     @Override
@@ -269,7 +284,7 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
 
     @Override
     public void setPauseOptionVisible(boolean visible) {
-       mMenu.findItem(R.id.action_pause).setVisible(visible);
+        mMenu.findItem(R.id.action_pause).setVisible(visible);
     }
 
     @Override

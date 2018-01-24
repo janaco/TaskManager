@@ -30,7 +30,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAuYH6PhPLPRYjKHn3dPsrgNYafOkbzRAs" />
 
-        <activity android:name=".activity.BackupActivity" />
         <activity
             android:name=".activity.MapActivity"
             android:label="@string/title_activity_map">
