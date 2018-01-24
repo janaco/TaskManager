@@ -9,28 +9,28 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.SimpleOnPageChangedListener;
 import com.nandy.taskmanager.adapter.TabsPagerAdapter;
-import com.nandy.taskmanager.mvp.model.CreateTaskModel;
+import com.nandy.taskmanager.mvp.contract.MainActivityContract;
 import com.nandy.taskmanager.mvp.model.DummyDataModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
-import com.nandy.taskmanager.mvp.model.ZipModel;
 import com.nandy.taskmanager.mvp.presenter.MainPresenter;
 import com.nandy.taskmanager.ui.fragment.StatisticsFragment;
 import com.nandy.taskmanager.ui.fragment.TasksFragment;
+
+import org.kaerdan.presenterretainer.PresenterActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends PresenterActivity<MainPresenter, MainActivityContract.View>
+        implements MainActivityContract.View {
 
     @BindView(R.id.container)
     ViewPager mViewPager;
@@ -38,9 +38,6 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton mFab;
 
     private Snackbar mExitSnackBar;
-    private MainPresenter mPresenter;
-
-    private ZipModel mZipModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +46,6 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(findViewById(R.id.toolbar));
-
-        mPresenter = new MainPresenter();
-        mPresenter.setDummyDataMode(new DummyDataModel(getApplicationContext()));
-        mPresenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
 
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
@@ -68,15 +61,40 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
-        mZipModel = new ZipModel(getApplicationContext());
+
+    @Override
+    protected MainPresenter onCreatePresenter() {
+        MainPresenter presenter = new MainPresenter();
+        presenter.setDummyDataMode(new DummyDataModel(getApplicationContext()));
+        presenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
+
+        return presenter;
+    }
+
+    @Override
+    protected MainActivityContract.View getPresenterView() {
+        return this;
+    }
+
+    @Override
+    public void launchActivity(Bundle args, Class<?> cls) {
+        Intent intent = new Intent(getApplicationContext(), cls);
+        intent.putExtras(args);
+        startActivity(intent);
+    }
+
+    @Override
+    public void launchActivityForResult(Bundle args, Class<?> cls, int requestCode) {
+        Intent intent = new Intent(getApplicationContext(), cls);
+        intent.putExtras(args);
+        startActivityForResult(intent, requestCode);
     }
 
     @OnClick(R.id.btn_create_task)
     void onCreateTaskClick() {
-        Intent intent = new Intent(getApplicationContext(), CreateTaskActivity.class);
-        intent.putExtra("mode", CreateTaskModel.MODE_CREATE);
-        startActivityForResult(intent, Constants.REQUEST_CREATE_TASK);
+        getPresenter().onCreateTaskClick();
     }
 
     @Override
@@ -90,16 +108,12 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
 
-            case R.id.action_backup:
-                startActivity(new Intent(getApplicationContext(), BackupActivity.class));
-                return true;
-
             case R.id.action_create_task:
                 onCreateTaskClick();
                 return true;
 
             case R.id.action_fill_list:
-                mPresenter.generateDummyData();
+                getPresenter().onFillListOptionSelected();
                 return true;
 
             case R.id.action_clear_all:
@@ -107,11 +121,11 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_settings:
-                startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                getPresenter().onSettingsOptionSelected();
                 return true;
 
             case R.id.action_exit:
-                finish();
+                getPresenter().onExitOptionSelected();
                 return true;
 
             default:
@@ -123,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     private void onClearAllOptionSelected() {
         new AlertDialog.Builder(this)
                 .setMessage(R.string.clear_all_data)
-                .setPositiveButton(R.string.clear_all, (dialogInterface, i) -> mPresenter.clearAllTasks())
+                .setPositiveButton(R.string.clear_all, (dialogInterface, i) -> getPresenter().onClearAllOptionSelected())
                 .setNegativeButton(R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
                 .show();
     }
@@ -150,12 +164,10 @@ public class MainActivity extends AppCompatActivity {
         return snackbar;
     }
 
-    private TabsPagerAdapter createPagerAdapter(){
+    private TabsPagerAdapter createPagerAdapter() {
         return new TabsPagerAdapter(
                 getSupportFragmentManager(),
-                new Fragment[]{
-                        TasksFragment.newInstance(getApplicationContext()),
-                        StatisticsFragment.newInstance(getApplicationContext())});
+                new Fragment[]{new TasksFragment(), new StatisticsFragment()});
     }
 
 }

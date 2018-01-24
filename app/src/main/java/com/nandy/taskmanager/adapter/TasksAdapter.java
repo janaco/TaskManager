@@ -33,12 +33,8 @@ public class TasksAdapter extends BaseSwipeAdapter {
 
     }
 
-    private final ArrayList<Task> mTasks;
+    private final ArrayList<Task> mTasks = new ArrayList<>();
     private OnItemOptionSelectedListener mOnItemOptionSelectedListener;
-
-    public TasksAdapter() {
-        mTasks = new ArrayList<>();
-    }
 
     @Override
     public int getSwipeLayoutResourceId(int position) {
@@ -134,7 +130,7 @@ public class TasksAdapter extends BaseSwipeAdapter {
     }
 
 
-    public void refresh(Collection<Task> tasks) {
+    public void setItems(Collection<Task> tasks) {
         mTasks.clear();
         addAll(tasks);
     }

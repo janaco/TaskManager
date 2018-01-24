@@ -1,11 +1,10 @@
 package com.nandy.taskmanager.ui.fragment;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -17,33 +16,26 @@ import android.widget.ListView;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
-import com.nandy.taskmanager.activity.CreateTaskActivity;
-import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.mvp.model.CreateTaskModel;
+import com.nandy.taskmanager.mvp.contract.TasksContract;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 import com.nandy.taskmanager.mvp.model.TaskModel;
 import com.nandy.taskmanager.mvp.presenter.TasksPresenter;
-import com.nandy.taskmanager.mvp.view.TasksListView;
+
+import org.kaerdan.presenterretainer.PresenterFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.nandy.taskmanager.activity.TaskDetailsActivity.REQUEST_CODE_EDIT;
 
 /**
  * Created by yana on 21.01.18.
  */
 
-public class TasksFragment extends Fragment implements TasksListView {
-
+public class TasksFragment extends PresenterFragment<TasksPresenter, TasksContract.View> implements TasksContract.View {
 
     @BindView(R.id.list_tasks)
     ListView mTaskLisView;
-
-    private TasksPresenter mTasksPresenter;
-
 
     @Nullable
     @Override
@@ -59,22 +51,13 @@ public class TasksFragment extends Fragment implements TasksListView {
         registerForContextMenu(mTaskLisView);
 
         mTaskLisView.setOnItemClickListener((adapterView, itemView, position, l) ->
-                openDetails(mTasksPresenter.getArguments(position)));
+                getPresenter().openDetails(position));
 
-
-        mTasksPresenter.start();
-
-        if (savedInstanceState == null) {
-            mTasksPresenter.loadTasks();
-        } else {
-            mTasksPresenter.restoreInstanceState(savedInstanceState);
+        Log.d("SCREEN_ROTATION_", "onCreate: " + savedInstanceState + "\npresenter: " + getPresenter());
+        if (savedInstanceState != null &&
+                getPresenter() != null) {
+            getPresenter().setSavedViewState(savedInstanceState);
         }
-
-    }
-
-
-    public void setTasksPresenter(TasksPresenter mTasksPresenter) {
-        this.mTasksPresenter = mTasksPresenter;
     }
 
     @Override
@@ -94,21 +77,21 @@ public class TasksFragment extends Fragment implements TasksListView {
 
 
             case R.id.action_delete:
-                mTasksPresenter.delete(position);
+                getPresenter().delete(position);
                 return true;
 
 
             case R.id.action_edit:
-                startEditTaskActivity(mTasksPresenter.getTask(position));
+                getPresenter().edit(position);
                 return true;
 
 
             case R.id.action_reset_start:
-                mTasksPresenter.resetStart(position);
+                getPresenter().resetStart(position);
                 return true;
 
             case R.id.action_reset_end:
-                mTasksPresenter.resetEnd(position);
+                getPresenter().resetEnd(position);
                 return true;
 
             default:
@@ -119,41 +102,23 @@ public class TasksFragment extends Fragment implements TasksListView {
 
 
     @Override
-    public void startEditTaskActivity(Task task) {
-        Intent intent = new Intent(getContext(), CreateTaskActivity.class);
-        intent.putExtra("task", task);
-        intent.putExtra("mode", CreateTaskModel.MODE_EDIT);
-        startActivityForResult(intent, REQUEST_CODE_EDIT);
-
+    public void launchActivityForResult(Bundle args, Class<?> cls, int requestCode) {
+        Intent intent = new Intent(getContext(), cls);
+        intent.putExtras(args);
+        startActivityForResult(intent, requestCode);
     }
-
 
     @Override
     public void onResume() {
         super.onResume();
-        mTasksPresenter.resume();
+        getPresenter().resume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mTasksPresenter.pause();
+        getPresenter().pause();
     }
-
-    private void openDetails(Bundle args) {
-        Intent intent = new Intent(getContext(), TaskDetailsActivity.class);
-        intent.putExtras(args);
-
-        startActivity(intent);
-    }
-
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        mTasksPresenter.saveInstanceState(outState);
-        super.onSaveInstanceState(outState);
-    }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -161,9 +126,16 @@ public class TasksFragment extends Fragment implements TasksListView {
 
         if (resultCode == Activity.RESULT_OK && requestCode == Constants.REQUEST_CREATE_TASK) {
             Task task = data.getParcelableExtra(Constants.TASK);
-            mTasksPresenter.displayTask(task);
+            getPresenter().openDetails(task);
 
         }
+    }
+
+    @Override
+    public void launchActivity(Bundle args, Class<?> cls) {
+        Intent intent = new Intent(getContext(), cls);
+        intent.putExtras(args);
+        startActivity(intent);
     }
 
     @Override
@@ -171,18 +143,31 @@ public class TasksFragment extends Fragment implements TasksListView {
         mTaskLisView.setAdapter(adapter);
     }
 
-    public static TasksFragment newInstance(Context context) {
+    @Override
+    protected TasksPresenter onCreatePresenter() {
+        TasksPresenter presenter = new TasksPresenter();
+        presenter.setRecordsModel(new TaskRecordsModel(getContext()));
+        presenter.setTaskStatusModel(new TaskModel(getContext()));
+        presenter.setTaskReminderMode(new TaskRemindersModel(getContext()));
 
-        TasksFragment fragment = new TasksFragment();
+        return presenter;
+    }
 
-        TasksPresenter presenter = new TasksPresenter(fragment);
-        presenter.setRecordsModel(new TaskRecordsModel(context));
-        presenter.setTaskStatusModel(new TaskModel(context));
-        presenter.setTaskReminderMode(new TaskRemindersModel(context));
+    @Override
+    protected TasksFragment getPresenterView() {
+        return this;
+    }
 
-        fragment.setTasksPresenter(presenter);
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (getPresenter() != null) {
+            getPresenter().saveInstanceState(outState, mTaskLisView.getFirstVisiblePosition());
+        }
+        super.onSaveInstanceState(outState);
+    }
 
-        return fragment;
-
+    @Override
+    public void scrollToPosition(int position) {
+        mTaskLisView.setSelection(position);
     }
 }

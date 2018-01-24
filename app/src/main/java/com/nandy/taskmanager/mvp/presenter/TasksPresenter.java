@@ -3,76 +3,89 @@ package com.nandy.taskmanager.mvp.presenter;
 import android.os.Bundle;
 
 import com.daimajia.swipe.util.Attributes;
+import com.nandy.taskmanager.activity.CreateTaskActivity;
+import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.adapter.TasksAdapter;
 import com.nandy.taskmanager.eventbus.TaskListChangedEvent;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskStatus;
-import com.nandy.taskmanager.mvp.BasePresenter;
+import com.nandy.taskmanager.mvp.contract.TasksContract;
+import com.nandy.taskmanager.mvp.model.CreateTaskModel;
+import com.nandy.taskmanager.mvp.model.TaskModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
-import com.nandy.taskmanager.mvp.model.TaskModel;
-import com.nandy.taskmanager.mvp.view.TasksListView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import static com.nandy.taskmanager.activity.TaskDetailsActivity.REQUEST_CODE_EDIT;
 
 /**
  * Created by yana on 16.01.18.
  */
 
-public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItemOptionSelectedListener {
+public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnItemOptionSelectedListener {
 
-    private final TasksListView mView;
+    private static final String PARAM_FIRST_VISIBLE_POSITION = "first_visible_position";
+    private static final String PARAM_TASKS = "tasks";
+
+    private TasksContract.View mView;
     private TaskRecordsModel mRecordsModel;
     private TaskRemindersModel mTaskReminderMode;
     private TaskModel mTaskModel;
 
     private TasksAdapter mAdapter;
 
-    public TasksPresenter(TasksListView view) {
+    private Bundle mSavedInstanceState;
+
+    @Override
+    public void onAttachView(TasksContract.View view) {
         mView = view;
-    }
 
-    @Override
-    public void start() {
-        mAdapter = new TasksAdapter();
-        mAdapter.setOnItemOptionSelectedListener(this);
-        mAdapter.setMode(Attributes.Mode.Single);
+        if (mAdapter == null) {
+            mAdapter = new TasksAdapter();
+            mAdapter.setOnItemOptionSelectedListener(this);
+            mAdapter.setMode(Attributes.Mode.Single);
+        }
         mView.setAdapter(mAdapter);
+
+        if (mSavedInstanceState != null) {
+            restoreViewState();
+        }
+
+    }
+
+    private void restoreViewState() {
+        List<Task> tasks = mSavedInstanceState.getParcelableArrayList(PARAM_TASKS);
+        mAdapter.setItems(tasks);
+        mView.scrollToPosition(mSavedInstanceState.getInt(PARAM_FIRST_VISIBLE_POSITION));
+        mSavedInstanceState = null;
     }
 
     @Override
-    public void stop() {
+    public void onDetachView() {
+        mView = null;
+    }
+
+    @Override
+    public void onDestroy() {
 
     }
 
     @Override
     public void resume() {
-        super.resume();
         EventBus.getDefault().register(this);
-        refreshList();
+        loadTasks();
     }
 
     @Override
     public void pause() {
-        super.pause();
         EventBus.getDefault().unregister(this);
     }
 
-    @Override
-    public void saveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("tasks", mAdapter.getItems());
-
-    }
-
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        ArrayList<Task> tasksList = savedInstanceState.getParcelableArrayList("tasks");
-        mAdapter.addAll(tasksList);
-    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onTaskListChangedEvent(TaskListChangedEvent event) {
@@ -84,32 +97,31 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
         mAdapter.clearAll();
     }
 
-    private void refreshList() {
-        mAdapter.refresh(mRecordsModel.selectAll());
+    @Override
+    public void openDetails(int position) {
+        openDetails(getTask(position));
     }
 
-    public Bundle getArguments(int position) {
+    @Override
+    public void openDetails(Task task) {
         Bundle args = new Bundle();
-        args.putParcelable("task", mAdapter.getItem(position));
-
-        return args;
+        args.putParcelable("task", task);
+        mView.launchActivity(args, TaskDetailsActivity.class);
 
     }
 
-    public void loadTasks() {
-        mAdapter.addAll(mRecordsModel.selectAll());
+    private void loadTasks() {
+        mAdapter.setItems(mRecordsModel.selectAll());
     }
 
-    public void displayTask(Task task) {
+    @Override
+    public void add(Task task) {
         mAdapter.add(task);
     }
 
+    @Override
     public void delete(int position) {
-        onDeleteOptionSelected(mAdapter.getItem(position), position);
-    }
-
-    public Task getTask(int position) {
-        return mAdapter.getItem(position);
+        onDeleteOptionSelected(getTask(position), position);
     }
 
     @Override
@@ -120,8 +132,16 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
     }
 
     @Override
+    public void edit(int position) {
+        onEditOptionSelected(getTask(position), position);
+    }
+
+    @Override
     public void onEditOptionSelected(Task task, int position) {
-        mView.startEditTaskActivity(task);
+        Bundle args = new Bundle();
+        args.putParcelable("task", getTask(position));
+        args.putInt("mode", CreateTaskModel.MODE_EDIT);
+        mView.launchActivityForResult(args, CreateTaskActivity.class, REQUEST_CODE_EDIT);
     }
 
     @Override
@@ -150,12 +170,15 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
         mAdapter.set(task, position);
     }
 
+    @Override
+
     public void resetStart(int position) {
         Task task = getTask(position);
         mTaskModel.resetStart(task);
         mTaskReminderMode.cancelReminder(task.getId());
     }
 
+    @Override
     public void resetEnd(int position) {
         Task task = getTask(position);
         mTaskModel.resetStart(task);
@@ -163,6 +186,21 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
         mTaskReminderMode.scheduleEndReminder(task.getId(), task.getScheduledDuration());
     }
 
+
+    @Override
+    public void saveInstanceState(Bundle outState, int firstVisiblePosition) {
+        outState.putInt(PARAM_FIRST_VISIBLE_POSITION, firstVisiblePosition);
+        outState.putParcelableArrayList(PARAM_TASKS, mAdapter.getItems());
+    }
+
+    @Override
+    public void setSavedViewState(Bundle savedInstanceState) {
+        mSavedInstanceState = savedInstanceState;
+    }
+
+    private Task getTask(int position) {
+        return mAdapter.getItem(position);
+    }
 
     public void setTaskReminderMode(TaskRemindersModel mTaskReminderMode) {
         this.mTaskReminderMode = mTaskReminderMode;
@@ -175,5 +213,6 @@ public class TasksPresenter extends BasePresenter implements TasksAdapter.OnItem
     public void setRecordsModel(TaskRecordsModel mRecordsModel) {
         this.mRecordsModel = mRecordsModel;
     }
+
 
 }
