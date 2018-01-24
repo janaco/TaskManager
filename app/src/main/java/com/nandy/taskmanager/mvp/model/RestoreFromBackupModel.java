@@ -4,14 +4,25 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.events.OpenFileCallback;
-import com.nandy.taskmanager.ProgressListener;
 import com.nandy.taskmanager.db.AppDatabase;
+import com.nandy.taskmanager.db.converters.ActionConverter;
+import com.nandy.taskmanager.db.converters.DateTypeConverter;
+import com.nandy.taskmanager.db.converters.LocationTypeConverter;
+import com.nandy.taskmanager.db.converters.RepeatPeriodConverter;
+import com.nandy.taskmanager.db.converters.TaskStatusConventer;
+import com.nandy.taskmanager.db.dao.EventsDao;
+import com.nandy.taskmanager.db.dao.StatisticsDao;
 import com.nandy.taskmanager.db.dao.TasksDao;
+import com.nandy.taskmanager.model.Metadata;
+import com.nandy.taskmanager.model.Statistics;
+import com.nandy.taskmanager.model.Task;
+import com.nandy.taskmanager.model.TaskEvent;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,95 +36,49 @@ import java.io.OutputStream;
 
 public class RestoreFromBackupModel extends BackupModel {
 
-    private Context mContext;
-    private DriveResourceClient mDriveResourceClient;
-    private ProgressListener mProgressListener;
-
     public RestoreFromBackupModel(Context context) {
-        mContext = context;
-    }
-
-    public void setDriveResourceClient(DriveResourceClient mDriveResourceClient) {
-        this.mDriveResourceClient = mDriveResourceClient;
-    }
-
-    public void setProgressListener(ProgressListener mProgressListener) {
-        this.mProgressListener = mProgressListener;
-    }
-
-    public void restoreBackup() {
-
-        mDriveResourceClient.query(buildBackupFilesQuery())
-                .addOnSuccessListener(
-                        metadataBuffer -> {
-
-                            if (metadataBuffer.getCount() > 0) {
-                                retrieveContents(metadataBuffer.get(0).getDriveId().asDriveFile());
-                            } else {
-                                //TODO: no backup files
-                            }
-
-                        })
-                .addOnFailureListener(Throwable::printStackTrace);
+        super(context);
     }
 
 
-    private void retrieveContents(DriveFile file) {
-        OpenFileCallback openCallback = new OpenFileCallback() {
-            @Override
-            public void onProgress(long bytesDownloaded, long bytesExpected) {
-                int progress = (int) (bytesDownloaded * 100 / bytesExpected);
-                mProgressListener.onProgressChanged(progress);
-            }
-
-            @Override
-            public void onContents(@NonNull DriveContents driveContents) {
-                try {
-                    unzipDB(driveContents.getInputStream());
-                    File backupFile = getLocalTempBackupFile();
-                    importData(backupFile);
-                    backupFile.delete();
-                    mDriveResourceClient.discardContents(driveContents);
-                } catch (IOException e) {
-                    onError(e);
-                }
-            }
-
-            @Override
-            public void onError(@NonNull Exception e) {
-                e.printStackTrace();
-            }
-        };
-
-        mDriveResourceClient.openFile(file, DriveFile.MODE_READ_ONLY, openCallback);
+    public void openFile(DriveFile driveFile, OpenFileCallback openFileCallback) {
+        mDriveResourceClient.openFile(driveFile, DriveFile.MODE_READ_ONLY, openFileCallback);
     }
 
-    private void importData(File dbFile) {
-        SQLiteDatabase db = SQLiteDatabase.openDatabase(dbFile.getPath(), null, 0);
-        TasksDao tasksDao = AppDatabase.getInstance(mContext).tasksDao();
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public void restoreBackup(DriveContents driveContents) throws IOException {
+        Log.d("BACKUP_", "backupFile.exists: " + new File(mContext.getFilesDir(), BACKUP_FILE_NAME).exists());
 
-        Cursor cursor = db.rawQuery("SELECT * FROM tasks", null);
+        File backupFile = retrieveContents(driveContents);
+        Log.d("BACKUP_", "backupFile: " + backupFile);
+        unzip(BACKUP_FILE_NAME);
 
-        if (cursor.moveToFirst()) {
+boolean deleted=         backupFile.delete();
+        Log.d("BACKUP_", "backupFile.deleted: " + deleted);
 
-            do {
-                long id = cursor.getLong(cursor.getColumnIndex("id"));
-                String title = cursor.getString(cursor.getColumnIndex("title"));
-                String comment = cursor.getString(cursor.getColumnIndex("comment"));
-
-                tasksDao.insert(new com.nandy.taskmanager.model.Task(id, title, comment));
-
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
     }
 
-    private void unzipDB(InputStream inputStream) throws IOException {
+    public File getBackupDbFile(){
+        return new File(mContext.getFilesDir(), BACKUP_DB_FILE);
+
+    }
+
+    private File retrieveContents(DriveContents driveContents) throws  IOException{
+        File backupFile = new File(mContext.getFilesDir(), BACKUP_FILE_NAME);
+        Log.d("BACKUP_", "backupFile: " + backupFile);
+        write(driveContents.getInputStream(), backupFile);
+        mDriveResourceClient.discardContents(driveContents);
+        unzip(BACKUP_FILE_NAME);
+
+        return backupFile;
+
+    }
+
+    private void write(InputStream inputStream, File file) throws IOException {
         OutputStream outputStream = null;
 
         try {
-            outputStream = new FileOutputStream(getLocalTempBackupFile());
+            outputStream = new FileOutputStream(file);
 
             int read = 0;
             byte[] bytes = new byte[1024];
@@ -143,7 +108,4 @@ public class RestoreFromBackupModel extends BackupModel {
 
     }
 
-    private File getLocalTempBackupFile(){
-        return new File(mContext.getFilesDir(), "backup.db");
-    }
 }

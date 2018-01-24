@@ -2,13 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:title="Zip"
-        android:id="@+id/action_zip"/>
-
-    <item  android:title="Unzip"
-        android:id="@+id/action_unzip"/>
-
     <item android:icon="@drawable/cloud_upload"
         android:title="@string/backup"
         android:id="@+id/action_backup"/>
@@ -28,6 +21,10 @@
         app:showAsAction="never"
         android:id="@+id/action_clear_all"/>
 
+    <item
+        android:title="@string/settings"
+        app:showAsAction="never"
+        android:id="@+id/action_settings"/>
 
     <item
         app:showAsAction="never"

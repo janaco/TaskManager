@@ -18,7 +18,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity android:name=".activity.CreateTaskActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
@@ -31,7 +30,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAuYH6PhPLPRYjKHn3dPsrgNYafOkbzRAs" />
 
-        <activity android:name=".activity.SettingsActivity" />
+        <activity android:name=".activity.BackupActivity" />
         <activity
             android:name=".activity.MapActivity"
             android:label="@string/title_activity_map">
@@ -61,7 +60,8 @@
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
+        <activity android:name=".activity.SettingsActivity" />
     </application>
 
 </manifest>

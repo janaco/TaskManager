@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:padding="15dp"
     android:layout_height="match_parent"
-    tools:context="com.nandy.taskmanager.activity.SettingsActivity">
+    tools:context="com.nandy.taskmanager.activity.BackupActivity">
 
     <Button
     android:id="@+id/btn_backup"
@@ -19,10 +19,5 @@
     android:layout_height="wrap_content"
     android:text="@string/restore_from_backup"/>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
 </LinearLayout>

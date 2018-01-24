@@ -11,12 +11,12 @@ import java.util.Date;
 public class DateTypeConverter {
 
     @TypeConverter
-    public Date fromTimestamp(Long timestamp) {
+    public static Date fromTimestamp(Long timestamp) {
         return timestamp == null ? null : new Date(timestamp);
     }
 
     @TypeConverter
-    public Long toTimestamp(Date date) {
+    public static Long toTimestamp(Date date) {
         if (date == null) {
             return null;
         } else {

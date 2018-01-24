@@ -25,19 +25,18 @@ import java.util.zip.ZipOutputStream;
 
 public class ZipModel {
     private static final int BUFFER_SIZE = 2048;
-    private static final String BACKUP_FILE_NAME = "backup.zip";
-    private static final String BACKUP_DB_FILE = "backup.db";
     private static final String IMAGE_EXTENSION = ".png";
     private static final String DB_EXTENSION = ".db";
+
     private final Context mContext;
 
     public ZipModel(Context context) {
         mContext = context;
     }
 
-    public File compress(File []files) {
+    public File compress(File[] files, String zipFileName, String dbFileName) {
 
-        File zipFile = createBackupZipFile(mContext.getFilesDir(), BACKUP_FILE_NAME);
+        File zipFile = createBackupZipFile(mContext.getFilesDir(), zipFileName);
         byte buffer[] = new byte[BUFFER_SIZE];
 
         try {
@@ -49,8 +48,7 @@ public class ZipModel {
                 if (file.isDirectory()) {
                     checkDir(zipOutputStream, file, buffer);
                 } else if (file.getPath().endsWith(AppDatabase.DB_NAME)) {
-                    String fileName = getFileName(file).concat(DB_EXTENSION);
-                    compress(zipOutputStream, file, fileName, buffer);
+                    compress(zipOutputStream, file, dbFileName, buffer);
                 } else if (file.getPath().endsWith(IMAGE_EXTENSION)) {
                     compress(zipOutputStream, file, getFileName(file), buffer);
                 }
@@ -65,19 +63,16 @@ public class ZipModel {
         return zipFile;
     }
 
-    public void unzip() {
+    public void unzip(String zipFileName) {
         FileInputStream inputStream = null;
         ZipInputStream zipInputStream = null;
 
         try {
-            inputStream = mContext.openFileInput(BACKUP_FILE_NAME);
+            inputStream = mContext.openFileInput(zipFileName);
             zipInputStream = new ZipInputStream(inputStream);
             ZipEntry zipEntry;
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-
-                if (zipEntry.getName().contains(DB_EXTENSION)) {
-                    unzip(zipInputStream, BACKUP_DB_FILE);
-                } else if (!zipEntry.isDirectory()) {
+                if (!zipEntry.isDirectory()) {
                     unzip(zipInputStream, zipEntry.getName());
                 }
             }

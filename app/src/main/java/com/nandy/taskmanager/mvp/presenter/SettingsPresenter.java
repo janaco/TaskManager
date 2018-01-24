@@ -1,22 +1,22 @@
 package com.nandy.taskmanager.mvp.presenter;
 
 import android.content.Intent;
-import android.os.Bundle;
 
 import com.google.android.gms.drive.DriveResourceClient;
 import com.nandy.taskmanager.GoogleDriveClientCallback;
-import com.nandy.taskmanager.ProgressListener;
 import com.nandy.taskmanager.mvp.BasePresenter;
+import com.nandy.taskmanager.mvp.model.BackupModel;
 import com.nandy.taskmanager.mvp.model.CreateBackupModel;
 import com.nandy.taskmanager.mvp.model.GoogleDriveConnectionModel;
 import com.nandy.taskmanager.mvp.model.RestoreFromBackupModel;
+import com.nandy.taskmanager.mvp.model.ZipModel;
 import com.nandy.taskmanager.mvp.view.SettingsView;
 
 /**
  * Created by yana on 16.01.18.
  */
 
-public class SettingsPresenter extends BasePresenter implements GoogleDriveClientCallback, ProgressListener {
+public class SettingsPresenter extends BasePresenter implements GoogleDriveClientCallback {
 
     private final SettingsView mView;
     private CreateBackupModel mCreateBackupModel;
@@ -29,7 +29,7 @@ public class SettingsPresenter extends BasePresenter implements GoogleDriveClien
 
     @Override
     public void start() {
-        mGoogleDriveConnectionModel.signIn();
+//        mGoogleDriveConnectionModel.signIn();
     }
 
     @Override
@@ -37,10 +37,6 @@ public class SettingsPresenter extends BasePresenter implements GoogleDriveClien
 
     }
 
-    @Override
-    public void onProgressChanged(int progress) {
-        mView.setUploadingProgress(progress);
-    }
 
     @Override
     public void onGoogleDriveClientReady(DriveResourceClient driveResourceClient) {
@@ -54,11 +50,16 @@ public class SettingsPresenter extends BasePresenter implements GoogleDriveClien
     }
 
     public void backupData() {
-        mCreateBackupModel.createBackup();
+//        mCreateBackupModel.postBackup(
+//                mZipModel.compress(
+//                        mCreateBackupModel.getFilesToBackup(),
+//                        BackupModel.BACKUP_FILE_NAME,
+//                        BackupModel.BACKUP_DB_FILE
+//                ));
     }
 
     public void restoreData() {
-        mRestoreDataModel.restoreBackup();
+//        mRestoreDataModel.restoreBackup();
     }
 
     public void setCreateBackupModel(CreateBackupModel mCreateBackupModel) {
@@ -72,6 +73,5 @@ public class SettingsPresenter extends BasePresenter implements GoogleDriveClien
     public void setGoogleDriveConnectionModel(GoogleDriveConnectionModel mGoogleDriveConnectionModel) {
         this.mGoogleDriveConnectionModel = mGoogleDriveConnectionModel;
     }
-
 
 }

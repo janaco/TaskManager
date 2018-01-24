@@ -26,16 +26,13 @@ public class GoogleDriveConnectionModel {
 
     protected static final int REQUEST_CODE_SIGN_IN = 0;
 
+    private Activity mActivity;
     private GoogleDriveClientCallback mGoogleDriveClientCallback;
-    private Activity activity;
 
     public GoogleDriveConnectionModel(Activity activity){
-        this.activity = activity;
+        this.mActivity = activity;
     }
 
-    public void setGoogleDriveClientCallback(GoogleDriveClientCallback mGoogleDriveClientCallback) {
-        this.mGoogleDriveClientCallback = mGoogleDriveClientCallback;
-    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -48,7 +45,7 @@ public class GoogleDriveConnectionModel {
                 Task<GoogleSignInAccount> getAccountTask =
                         GoogleSignIn.getSignedInAccountFromIntent(data);
                 if (getAccountTask.isSuccessful()) {
-                    initializeDriveClient(getAccountTask.getResult());
+                    mGoogleDriveClientCallback.onGoogleDriveClientReady(Drive.getDriveResourceClient(mActivity, getAccountTask.getResult()));
                 } else {
                     //TODO: failed to sign in
                 }
@@ -57,27 +54,26 @@ public class GoogleDriveConnectionModel {
         }
     }
 
-    public void signIn() {
+    public void signIn(GoogleDriveClientCallback googleDriveClientCallback) {
+        mGoogleDriveClientCallback = googleDriveClientCallback;
+
         Set<Scope> requiredScopes = new HashSet<>(2);
         requiredScopes.add(Drive.SCOPE_FILE);
         requiredScopes.add(Drive.SCOPE_APPFOLDER);
-        GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(activity);
+        GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(mActivity);
         if (signInAccount != null && signInAccount.getGrantedScopes().containsAll(requiredScopes)) {
-            initializeDriveClient(signInAccount);
+            mGoogleDriveClientCallback.onGoogleDriveClientReady(Drive.getDriveResourceClient(mActivity, signInAccount));
         } else {
             GoogleSignInOptions signInOptions =
                     new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                             .requestScopes(Drive.SCOPE_FILE)
                             .requestScopes(Drive.SCOPE_APPFOLDER)
                             .build();
-            GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(activity, signInOptions);
-            activity.startActivityForResult(googleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+            GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(mActivity, signInOptions);
+            mActivity.startActivityForResult(googleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
         }
     }
 
-    private void initializeDriveClient(GoogleSignInAccount signInAccount) {
-        mGoogleDriveClientCallback.onGoogleDriveClientReady(Drive.getDriveResourceClient(activity, signInAccount));
-    }
 
 
 }
