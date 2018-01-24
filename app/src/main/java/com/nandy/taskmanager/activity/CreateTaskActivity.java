@@ -8,13 +8,13 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
 import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.image.ImageLoader;
 import com.nandy.taskmanager.model.Task;
+import com.nandy.taskmanager.mvp.contract.CreateTaskContract;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskCoverModel;
@@ -35,8 +36,9 @@ import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
 import com.nandy.taskmanager.mvp.presenter.CreateTaskPresenter;
-import com.nandy.taskmanager.mvp.view.CreateTaskView;
 import com.theartofdev.edmodo.cropper.CropImage;
+
+import org.kaerdan.presenterretainer.PresenterActivity;
 
 import java.io.File;
 import java.util.Locale;
@@ -45,12 +47,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class CreateTaskActivity extends AppCompatActivity implements CreateTaskView {
+public class CreateTaskActivity extends PresenterActivity<CreateTaskContract.Presenter, CreateTaskContract.View>
+        implements CreateTaskContract.View {
 
     public final static int REQUEST_CODE_LOCATION = 52;
     public final static int REQUEST_PERMISSIONS_CODE = 53;
     public static final int REQUEST_CODE_CHOOSE_IMAGE = 54;
     public static final int REQUEST_CODE_VOICE_INPUT = 55;
+
+    public static final int MODE_CREATE = 1;
+    public static final int MODE_EDIT = 2;
 
     @BindView(R.id.input_title)
     EditText mInputTitle;
@@ -71,8 +77,6 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
     @BindView(R.id.txt_location)
     TextView mLocationTextView;
 
-    private CreateTaskPresenter mPresenter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,18 +94,47 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         registerForContextMenu(mDurationTextView);
         registerForContextMenu(mRepeatPeriodTextView);
 
-        Task task = getIntent().getParcelableExtra("task");
-        int mode = getIntent().getIntExtra("mode", CreateTaskModel.MODE_CREATE);
+    }
 
-        mPresenter = new CreateTaskPresenter(this);
-        mPresenter.setCreateTaskMode(new CreateTaskModel(task, mode));
-        mPresenter.setValidationModel(new ValidationModel());
-        mPresenter.setDateFormatModel(new DateFormatModel());
-        mPresenter.setCoverModel(new TaskCoverModel(getApplicationContext()));
-        mPresenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
-        mPresenter.setScheduleModel(new TaskRemindersModel(getApplicationContext()));
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        getPresenter().saveInstanceState(outState,
+                mInputTitle.getText().toString(),
+                mInputDescription.getText().toString());
+        super.onSaveInstanceState(outState);
+    }
 
-        mPresenter.start();
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        getPresenter().restoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected CreateTaskContract.Presenter onCreatePresenter() {
+
+        Bundle args = getIntent().getExtras();
+        Task task = null;
+        int mode = MODE_CREATE;
+        if (args != null) {
+            task = args.getParcelable("task");
+            mode = args.getInt("mode", MODE_CREATE);
+        }
+        CreateTaskPresenter presenter = new CreateTaskPresenter();
+        presenter.setCreateTaskMode(new CreateTaskModel(task, mode));
+        presenter.setValidationModel(new ValidationModel());
+        presenter.setDateFormatModel(new DateFormatModel());
+        presenter.setCoverModel(new TaskCoverModel(getApplicationContext()));
+        presenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
+        presenter.setScheduleModel(new TaskRemindersModel(getApplicationContext()));
+
+
+        return presenter;
+    }
+
+    @Override
+    protected CreateTaskContract.View getPresenterView() {
+        return this;
     }
 
     @Override
@@ -151,10 +184,10 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         switch (item.getGroupId()) {
 
             case R.id.group_duration:
-                return mPresenter.onDurationSelected(item.getItemId());
+                return getPresenter().onDurationSelected(item.getItemId());
 
             case R.id.group_period:
-                return mPresenter.onRepeatPeriodSelected(item.getItemId());
+                return getPresenter().onRepeatPeriodSelected(item.getItemId());
 
             default:
                 return super.onContextItemSelected(item);
@@ -164,7 +197,7 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mPresenter.onActivityResult(requestCode, resultCode, data);
+        getPresenter().onActivityResult(requestCode, resultCode, data);
     }
 
 
@@ -175,12 +208,12 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
 
     @OnClick(R.id.txt_start_date)
     void onSetStartDateButtonClick() {
-        mPresenter.setStartDate();
+        getPresenter().setStartDate();
     }
 
     @OnClick(R.id.txt_start_time)
     void onSetStartTimeButtonClick() {
-        mPresenter.setStartTime();
+        getPresenter().setStartTime();
     }
 
     @OnClick(R.id.txt_duration)
@@ -204,7 +237,7 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
 
     @OnClick(R.id.btn_clear_location)
     void onClearLocationButtonClick() {
-        mPresenter.clearLocation();
+        getPresenter().clearLocation();
     }
 
 
@@ -319,6 +352,12 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
 
     }
 
+    @Override
+    public void finishWithResult(int resultCode, Intent data) {
+        setResult(resultCode, data);
+        finish();
+    }
+
     private boolean isPermissionsGranted() {
         return Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 || ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 
@@ -342,10 +381,7 @@ public class CreateTaskActivity extends AppCompatActivity implements CreateTaskV
         String title = mInputTitle.getText().toString().trim();
         String comment = mInputDescription.getText().toString().trim();
 
-        boolean success = mPresenter.saveChanges(title, comment);
-        if (success) {
-            finish();
-        }
+        getPresenter().saveChanges(title, comment);
 
     }
 

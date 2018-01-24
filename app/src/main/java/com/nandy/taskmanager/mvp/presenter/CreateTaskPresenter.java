@@ -2,6 +2,7 @@ package com.nandy.taskmanager.mvp.presenter;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.speech.RecognizerIntent;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -9,20 +10,20 @@ import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.model.RepeatPeriod;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.mvp.BasePresenter;
+import com.nandy.taskmanager.mvp.contract.CreateTaskContract;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskCoverModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
-import com.nandy.taskmanager.mvp.view.CreateTaskView;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -32,9 +33,12 @@ import static android.app.Activity.RESULT_OK;
  * Created by yana on 16.01.18.
  */
 
-public class CreateTaskPresenter extends BasePresenter {
+public class CreateTaskPresenter implements CreateTaskContract.Presenter {
 
-    private final CreateTaskView mView;
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_DESCRIPTION = "description";
+
+    private CreateTaskContract.View mView;
 
     private CreateTaskModel mCreateTaskMode;
     private DateFormatModel mDateFormatModel;
@@ -43,53 +47,87 @@ public class CreateTaskPresenter extends BasePresenter {
     private TaskRemindersModel mScheduleModel;
     private ValidationModel mValidationModel;
 
-    public CreateTaskPresenter(CreateTaskView view) {
+    private Bundle mSavedInstanceState;
+
+    @Override
+    public void onAttachView(CreateTaskContract.View view) {
         mView = view;
+        displayData();
+
+        if (mSavedInstanceState != null) {
+            restoreViewState();
+        }
+    }
+
+    private void restoreViewState() {
+
+        mView.setTitle(mSavedInstanceState.getString(KEY_TITLE));
+        mView.setDescription(mSavedInstanceState.getString(KEY_DESCRIPTION));
     }
 
     @Override
-    public void start() {
+    public void onDetachView() {
+    }
+
+    @Override
+    public void onDestroy() {
+        mView = null;
+    }
+
+    private void displayData() {
 
         Task task = mCreateTaskMode.getTask();
-        if (task != null) {
-            mView.setTitle(task.getTitle());
-            mView.setDescription(task.getDescription());
-            mView.displayStartDate(mDateFormatModel.formatDate(task.getPlannedStartDate()));
-            mView.displayStartTime(mDateFormatModel.formatTime(task.getPlannedStartDate()));
-            mView.setStartTimeVisible(true);
+        mView.setTitle(task.getTitle());
+        mView.setDescription(task.getDescription());
 
-            int duration = mDateFormatModel.convertToMinutes(task.getScheduledDuration());
-            int textResId = R.string.minutes;
+        if (task.getPlannedStartDate() != null) {
+            displayPlannedStartTime(task.getPlannedStartDate());
+        }
 
-            if (duration > 30) {
-                duration = mDateFormatModel.convertToSeconds(task.getScheduledDuration());
-                textResId = R.string.hour;
-            }
-            mView.setDuration(duration, textResId);
+        if (task.getScheduledDuration() > 0) {
+            displayScheduledDuration(task.getScheduledDuration());
+        }
+
+        if (task.getRepeatPeriod() != null) {
             mView.setRepeatPeriod(task.getRepeatPeriod().getTextResId());
-            if (task.hasLocation()) {
-                mView.displayLocation(String.format(Locale.getDefault(), "%f, %f",
-                        task.getLocation().latitude,
-                        task.getLocation().longitude));
-            }
+        }
 
-            if (task.hasImage()) {
-                mView.displayImage(task.getImage());
-            }
+        if (task.hasLocation()) {
+            mView.displayLocation(String.format(Locale.getDefault(), "%f, %f",
+                    task.getLocation().latitude,
+                    task.getLocation().longitude));
+        }
+
+        if (task.hasImage()) {
+            mView.displayImage(task.getImage());
         }
     }
 
-    @Override
-    public void stop() {
+    private void displayScheduledDuration(long scheduledDuration) {
+        int duration = mDateFormatModel.convertToMinutes(scheduledDuration);
+        int textResId = R.string.minutes;
+        if (duration > 30) {
+            duration = mDateFormatModel.convertToSeconds(scheduledDuration);
+            textResId = R.string.hour;
+        }
+        mView.setDuration(duration, textResId);
     }
 
-    public boolean saveChanges(String title, String description) {
+    private void displayPlannedStartTime(Date plannedStartTime) {
+        mView.displayStartDate(mDateFormatModel.formatDate(plannedStartTime));
+        mView.displayStartTime(mDateFormatModel.formatTime(plannedStartTime));
+        mView.setStartTimeVisible(true);
+    }
+
+    public void saveChanges(String title, String description) {
 
         if (!isInputValid(title, description)) {
-            return false;
+            return;
         }
 
-        Task task = mCreateTaskMode.createOrUpdate(title, description);
+        Task task = mCreateTaskMode.getTask();
+        task.setTitle(title);
+        task.setDescription(description);
 
         if (task.getImage() != null) {
             try {
@@ -101,7 +139,7 @@ public class CreateTaskPresenter extends BasePresenter {
             }
         }
 
-        if (mCreateTaskMode.getMode() == CreateTaskModel.MODE_CREATE) {
+        if (mCreateTaskMode.getMode() == CreateTaskActivity.MODE_CREATE) {
             mRecordsModel.insert(task);
         } else {
             mRecordsModel.update(task);
@@ -114,11 +152,10 @@ public class CreateTaskPresenter extends BasePresenter {
         }
 
         Intent intent = new Intent();
-        intent.putExtra("task", task);
-        mView.setResult(RESULT_OK, intent);
-
-
-        return true;
+        Bundle args = new Bundle();
+        args.putParcelable("task", task);
+        intent.putExtras(args);
+        mView.finishWithResult(RESULT_OK, intent);
     }
 
     private boolean isInputValid(String title, String description) {
@@ -221,7 +258,7 @@ public class CreateTaskPresenter extends BasePresenter {
                     mCreateTaskMode.setStartDate(year, month, day);
                     mView.setStartTimeVisible(true);
                     mView.displayStartDate(
-                            mDateFormatModel.formatDate(mCreateTaskMode.getStartDate()));
+                            mDateFormatModel.formatDate(mCreateTaskMode.getTask().getPlannedStartDate()));
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -236,7 +273,7 @@ public class CreateTaskPresenter extends BasePresenter {
                 {
                     mCreateTaskMode.setStartTime(hour, minute);
                     mView.displayStartTime(
-                            mDateFormatModel.formatTime(mCreateTaskMode.getStartDate()));
+                            mDateFormatModel.formatTime(mCreateTaskMode.getTask().getPlannedStartDate()));
                 },
                 calendar.get(Calendar.HOUR_OF_DAY),
                 calendar.get(Calendar.MINUTE));
@@ -286,6 +323,17 @@ public class CreateTaskPresenter extends BasePresenter {
         mCreateTaskMode.setDuration(timeUnit.toMillis(value));
         mView.setDuration(value, timeUnit == TimeUnit.MINUTES ? R.string.minutes : R.string.hour);
 
+    }
+
+    @Override
+    public void saveInstanceState(Bundle outState, String title, String description) {
+        outState.putString(KEY_TITLE, title);
+        outState.putString(KEY_DESCRIPTION, description);
+    }
+
+    @Override
+    public void restoreInstanceState(Bundle savedInstanceState) {
+        mSavedInstanceState = savedInstanceState;
     }
 
     public boolean onRepeatPeriodSelected(int optionId) {
@@ -348,4 +396,6 @@ public class CreateTaskPresenter extends BasePresenter {
     public void setScheduleModel(TaskRemindersModel mScheduleModel) {
         this.mScheduleModel = mScheduleModel;
     }
+
+
 }

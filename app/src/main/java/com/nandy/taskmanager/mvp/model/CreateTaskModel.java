@@ -14,28 +14,18 @@ import java.util.Date;
 
 public class CreateTaskModel {
 
-    public static final int MODE_CREATE = 1;
-    public static final int MODE_EDIT = 2;
 
     private final int mMode;
-    private long mDuration;
 
     private Task mTask;
-    private Date mStartDate;
-    private LatLng mLocation;
-    private RepeatPeriod mRepeatPeriod;
-    private String mImage;
 
     public CreateTaskModel(Task task, int mode) {
         mMode = mode;
         mTask = task;
 
-        if (task != null) {
-            mStartDate = task.getPlannedStartDate();
-            mLocation = task.getLocation();
-            mImage = task.getImage();
-            mDuration = task.getScheduledDuration();
-            mRepeatPeriod = task.getRepeatPeriod();
+        if (task == null) {
+            mTask = new Task(System.currentTimeMillis());
+            mTask.setStatus(TaskStatus.NEW);
         }
     }
 
@@ -47,32 +37,12 @@ public class CreateTaskModel {
         return mTask;
     }
 
-    public Task createOrUpdate(String title, String description) {
-
-        if (mMode == MODE_CREATE) {
-            mTask = new Task(System.currentTimeMillis(), title, description);
-            mTask.setStatus(TaskStatus.NEW);
-
-        } else {
-            mTask.setTitle(title);
-            mTask.setDescription(description);
-        }
-
-        mTask.setPlannedStartDate(mStartDate);
-        mTask.setLocation(mLocation);
-        mTask.setImage(mImage);
-        mTask.setScheduledDuration(mDuration);
-        mTask.setRepeatPeriod(mRepeatPeriod);
-
-        return mTask;
-
-    }
 
     public void setStartDate(int year, int month, int day) {
         Calendar calendar = Calendar.getInstance();
 
-        if (mStartDate != null) {
-            calendar.setTime(mStartDate);
+        if (mTask.getPlannedStartDate() != null) {
+            calendar.setTime(mTask.getPlannedStartDate());
         }
 
         calendar.set(Calendar.YEAR, year);
@@ -85,8 +55,8 @@ public class CreateTaskModel {
     public void setStartTime(int hour, int minute) {
         Calendar calendar = Calendar.getInstance();
 
-        if (mStartDate != null) {
-            calendar.setTime(mStartDate);
+        if (mTask.getPlannedStartDate() != null) {
+            calendar.setTime(mTask.getPlannedStartDate());
         }
 
         calendar.set(Calendar.HOUR_OF_DAY, hour);
@@ -95,35 +65,27 @@ public class CreateTaskModel {
     }
 
     private void setStartDate(Date date) {
-        if (mStartDate != null) {
-            mStartDate.setTime(date.getTime());
-        } else {
-            mStartDate = date;
-        }
+        mTask.setPlannedStartDate(date);
     }
 
-    public void setDuration(long duration){
-        mDuration = duration;
+    public void setDuration(long duration) {
+        mTask.setScheduledDuration(duration);
     }
 
-    public void setRepeatPeriod(RepeatPeriod repeatPeriod){
-        mRepeatPeriod = repeatPeriod;
-    }
-
-    public Date getStartDate() {
-        return mStartDate;
+    public void setRepeatPeriod(RepeatPeriod repeatPeriod) {
+        mTask.setRepeatPeriod(repeatPeriod);
     }
 
     public void setLocation(LatLng location) {
-        this.mLocation = location;
+        mTask.setLocation(location);
     }
 
     public void clearLocation() {
-        mLocation = null;
+        mTask.setLocation(null);
     }
 
-    public void setImage(String mImage) {
-        this.mImage = mImage;
+    public void setImage(String image) {
+        mTask.setImage(image);
     }
 
 

@@ -140,7 +140,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
     public void onEditOptionSelected(Task task, int position) {
         Bundle args = new Bundle();
         args.putParcelable("task", getTask(position));
-        args.putInt("mode", CreateTaskModel.MODE_EDIT);
+        args.putInt("mode", CreateTaskActivity.MODE_EDIT);
         mView.launchActivityForResult(args, CreateTaskActivity.class, REQUEST_CODE_EDIT);
     }
 

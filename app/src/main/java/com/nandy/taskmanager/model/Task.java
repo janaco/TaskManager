@@ -3,6 +3,7 @@ package com.nandy.taskmanager.model;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -13,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.Date;
 
 @Entity(tableName = "tasks")
-public class Task implements Parcelable{
+public class Task implements Parcelable {
 
     @PrimaryKey
     @NonNull
@@ -45,11 +46,8 @@ public class Task implements Parcelable{
     private Metadata mMetadata;
 
 
-
-    public Task(long id, String title, String description) {
+    public Task(long id) {
         mId = id;
-        mTitle = title;
-        mDescription = description;
     }
 
     protected Task(Parcel in) {
@@ -124,7 +122,7 @@ public class Task implements Parcelable{
         return mLocation;
     }
 
-    public boolean hasLocation(){
+    public boolean hasLocation() {
         return mLocation != null;
     }
 
@@ -164,7 +162,7 @@ public class Task implements Parcelable{
         return mImage;
     }
 
-    public boolean hasImage(){
+    public boolean hasImage() {
         return mImage != null;
     }
 

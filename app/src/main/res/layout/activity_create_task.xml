@@ -9,218 +9,220 @@
 
     <include layout="@layout/layout_toolbar" />
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp">
-
-        <ImageView
-            android:id="@+id/image_task"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginEnd="15dp"
-            android:layout_marginRight="15dp"
-            app:srcCompat="@drawable/image_plus" />
-
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/input_layout_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/image_task"
-            android:layout_alignBottom="@+id/image_task"
-            android:layout_toRightOf="@+id/image_task">
-
-            <EditText
-                android:id="@+id/input_title"
-                style="@style/EditTextStyle"
-                android:background="@android:color/transparent"
-                android:hint="@string/title"
-                android:maxLines="1"
-                android:padding="5dp"
-                android:singleLine="true"
-                android:textColor="@color/primaryTextColor"
-                android:textColorHint="@color/secondaryColor"
-                android:textSize="16sp" />
-
-        </android.support.design.widget.TextInputLayout>
-
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_alignEnd="@+id/input_layout_title"
-            android:layout_alignLeft="@+id/input_layout_title"
-            android:layout_alignRight="@+id/input_layout_title"
-            android:layout_alignStart="@+id/input_layout_title"
-            android:layout_below="@+id/input_layout_title"
-            android:background="@color/secondaryColor" />
+        android:layout_height="match_parent">
 
         <RelativeLayout
-            android:id="@+id/layout_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/image_task"
-            android:layout_marginTop="15dp">
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/image_task"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginRight="15dp"
+                app:srcCompat="@drawable/image_plus" />
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/input_layout_description"
+                android:id="@+id/input_layout_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toLeftOf="@+id/btn_microphone"
-                android:layout_toStartOf="@+id/btn_microphone">
+                android:layout_alignBottom="@+id/image_task"
+                android:layout_toEndOf="@+id/image_task"
+                android:layout_toRightOf="@+id/image_task">
 
                 <EditText
-                    android:id="@+id/input_description"
+                    android:id="@+id/input_title"
                     style="@style/EditTextStyle"
-                    android:layout_centerVertical="true"
                     android:background="@android:color/transparent"
-                    android:hint="@string/description"
-                    android:maxLines="3"
+                    android:hint="@string/title"
+                    android:maxLines="1"
                     android:padding="5dp"
+                    android:singleLine="true"
                     android:textColor="@color/primaryTextColor"
                     android:textColorHint="@color/secondaryColor"
                     android:textSize="16sp" />
+
             </android.support.design.widget.TextInputLayout>
+
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0.5dp"
-                android:layout_alignEnd="@+id/input_layout_description"
-                android:layout_alignLeft="@+id/input_layout_description"
-                android:layout_alignRight="@+id/input_layout_description"
-                android:layout_alignStart="@+id/input_layout_description"
-                android:layout_below="@+id/input_layout_description"
+                android:layout_alignEnd="@+id/input_layout_title"
+                android:layout_alignLeft="@+id/input_layout_title"
+                android:layout_alignRight="@+id/input_layout_title"
+                android:layout_alignStart="@+id/input_layout_title"
+                android:layout_below="@+id/input_layout_title"
                 android:background="@color/secondaryColor" />
 
+            <RelativeLayout
+                android:id="@+id/layout_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/image_task"
+                android:layout_marginTop="15dp">
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/input_layout_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/btn_microphone"
+                    android:layout_toStartOf="@+id/btn_microphone">
+
+                    <EditText
+                        android:id="@+id/input_description"
+                        style="@style/EditTextStyle"
+                        android:layout_centerVertical="true"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/description"
+                        android:maxLines="3"
+                        android:padding="5dp"
+                        android:textColor="@color/primaryTextColor"
+                        android:textColorHint="@color/secondaryColor"
+                        android:textSize="16sp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignEnd="@+id/input_layout_description"
+                    android:layout_alignLeft="@+id/input_layout_description"
+                    android:layout_alignRight="@+id/input_layout_description"
+                    android:layout_alignStart="@+id/input_layout_description"
+                    android:layout_below="@+id/input_layout_description"
+                    android:background="@color/secondaryColor" />
+
+                <Button
+                    android:id="@+id/btn_microphone"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/microphone" />
+            </RelativeLayout>
+
+
+            <TextView
+                android:id="@+id/hint_start_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/layout_description"
+                android:layout_marginTop="25dp"
+                android:text="@string/start_time"
+                android:textColor="@color/secondaryColor"
+                android:textColorHint="@color/secondaryColor"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/txt_start_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/hint_start_time"
+                android:drawableLeft="@drawable/ic_calendar"
+                android:drawablePadding="10dp"
+                android:drawableStart="@drawable/ic_calendar"
+                android:padding="5dp"
+                android:text="@string/start_date"
+                android:textColor="@color/secondaryDarkColor"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/txt_start_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_start_date"
+                android:drawableLeft="@drawable/ic_clock"
+                android:drawablePadding="10dp"
+                android:drawableStart="@drawable/ic_clock"
+                android:padding="5dp"
+                android:text="@string/start_time"
+                android:textColor="@color/secondaryDarkColor"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/hint_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_start_time"
+                android:layout_marginTop="10dp"
+                android:text="@string/duration"
+                android:textColor="@color/secondaryColor"
+                android:textColorHint="@color/secondaryColor"
+                android:textSize="12sp" />
+
+
+            <TextView
+                android:id="@+id/txt_duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/hint_duration"
+                android:padding="5dp"
+                android:text="@string/set_duration"
+                android:textColor="@color/secondaryDarkColor"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/hint_repeat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_duration"
+                android:layout_marginTop="10dp"
+                android:text="@string/repeat"
+                android:textColor="@color/secondaryColor"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/txt_repeat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/hint_repeat"
+                android:padding="5dp"
+                android:text="@string/no_repeat"
+                android:textColor="@color/secondaryDarkColor"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/hint_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_repeat"
+                android:layout_marginTop="25dp"
+                android:text="@string/location"
+                android:textColor="@color/secondaryColor"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/txt_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/hint_location"
+                android:layout_toLeftOf="@+id/btn_clear_location"
+                android:layout_toStartOf="@+id/btn_clear_location"
+                android:padding="5dp"
+                android:text="@string/set_location"
+                android:textColor="@color/secondaryDarkColor"
+                android:textSize="16sp" />
+
             <Button
-                android:id="@+id/btn_microphone"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:id="@+id/btn_clear_location"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignBottom="@id/txt_location"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
-                android:background="@drawable/microphone" />
+                android:background="@drawable/close_circle" />
+
         </RelativeLayout>
-
-
-
-
-        <TextView
-            android:id="@+id/hint_start_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/layout_description"
-            android:layout_marginTop="25dp"
-            android:text="@string/start_time"
-            android:textColor="@color/secondaryColor"
-            android:textColorHint="@color/secondaryColor"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/txt_start_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/hint_start_time"
-            android:padding="5dp"
-            android:text="@string/start_date"
-            android:drawableStart="@drawable/ic_calendar"
-            android:drawableLeft="@drawable/ic_calendar"
-            android:drawablePadding="10dp"
-            android:textColor="@color/secondaryDarkColor"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/txt_start_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txt_start_date"
-            android:drawableStart="@drawable/ic_clock"
-            android:drawableLeft="@drawable/ic_clock"
-            android:drawablePadding="10dp"
-            android:padding="5dp"
-            android:visibility="gone"
-            android:text="@string/start_time"
-            android:textColor="@color/secondaryDarkColor"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/hint_duration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txt_start_time"
-            android:layout_marginTop="10dp"
-            android:text="@string/duration"
-            android:textColor="@color/secondaryColor"
-            android:textColorHint="@color/secondaryColor"
-            android:textSize="12sp" />
-
-
-        <TextView
-            android:id="@+id/txt_duration"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/hint_duration"
-            android:padding="5dp"
-            android:text="@string/set_duration"
-            android:textColor="@color/secondaryDarkColor"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/hint_repeat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txt_duration"
-            android:layout_marginTop="10dp"
-            android:text="@string/repeat"
-            android:textColor="@color/secondaryColor"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/txt_repeat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/hint_repeat"
-            android:padding="5dp"
-            android:text="@string/no_repeat"
-            android:textColor="@color/secondaryDarkColor"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/hint_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txt_repeat"
-            android:layout_marginTop="25dp"
-            android:text="@string/location"
-            android:textColor="@color/secondaryColor"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/txt_location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/hint_location"
-            android:layout_toLeftOf="@+id/btn_clear_location"
-            android:layout_toStartOf="@+id/btn_clear_location"
-            android:padding="5dp"
-            android:text="@string/set_location"
-            android:textColor="@color/secondaryDarkColor"
-            android:textSize="16sp" />
-
-        <Button
-            android:id="@+id/btn_clear_location"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignBottom="@id/txt_location"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:background="@drawable/close_circle" />
-
-    </RelativeLayout>
-
+    </ScrollView>
 
 </LinearLayout>

@@ -1,9 +1,6 @@
 package com.nandy.taskmanager.mvp.contract;
 
-import android.content.Intent;
 import android.os.Bundle;
-
-import com.nandy.taskmanager.R;
 
 /**
  * Created by yana on 24.01.18.

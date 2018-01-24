@@ -114,8 +114,10 @@ public class TaskDetailsActivity extends AppCompatActivity implements TaskDetail
 
             case R.id.action_edit:
                 Intent intent = new Intent(this, CreateTaskActivity.class);
-                intent.putExtra("task", mPresenter.getTask());
-                intent.putExtra("mode", CreateTaskModel.MODE_EDIT);
+                Bundle args = new Bundle();
+                args.putParcelable("task", mPresenter.getTask());
+                args.putInt("mode", CreateTaskActivity.MODE_EDIT);
+                intent.putExtras(args);
                 startActivityForResult(intent, REQUEST_CODE_EDIT);
 
                 break;

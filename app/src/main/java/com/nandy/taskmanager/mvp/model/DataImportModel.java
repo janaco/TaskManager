@@ -102,7 +102,9 @@ public class DataImportModel {
                 long timeSpent = cursor.getLong(cursor.getColumnIndex("time_spent"));
                 long downtime = cursor.getLong(cursor.getColumnIndex("downtime"));
 
-                Task task = new Task(id, title, description);
+                Task task = new Task(id);
+                task.setTitle(title);
+                task.setDescription(description);
                 task.setImage(image);
                 task.setStatus(TaskStatusConventer.toTaskStatus(status));
                 task.setLocation(LocationTypeConverter.toLatLng(location));

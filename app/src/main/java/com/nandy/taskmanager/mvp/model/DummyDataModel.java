@@ -49,7 +49,9 @@ public class DummyDataModel {
         for (int index = startIndex; index < startIndex + capacity; index++) {
 
             String title = String.format(Locale.getDefault(), "%s %d", TITLE_TEMPLATE, index);
-            Task task = new Task(System.currentTimeMillis(), title, DESCRIPTION_TEMPLATE);
+            Task task = new Task(System.currentTimeMillis());
+            task.setTitle(title);
+            task.setDescription(DESCRIPTION_TEMPLATE);
 
             int day = getRandomDayOfTheMonth();
             int month = getRandomMonth();

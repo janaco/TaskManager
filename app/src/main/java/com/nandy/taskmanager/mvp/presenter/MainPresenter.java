@@ -47,7 +47,7 @@ public class MainPresenter implements Presenter<MainActivityContract.View>, Main
     @Override
     public void onCreateTaskClick() {
         Bundle args = new Bundle();
-        args.putInt("mode", CreateTaskModel.MODE_CREATE);
+        args.putInt("mode", CreateTaskActivity.MODE_CREATE);
         mView.launchActivityForResult(args, CreateTaskActivity.class, Constants.REQUEST_CREATE_TASK);
     }
 
