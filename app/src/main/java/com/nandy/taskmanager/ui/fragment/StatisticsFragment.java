@@ -25,7 +25,6 @@ public class StatisticsFragment
         extends PresenterFragment<StatisticsPresenter, StatisticsContract.View>
         implements StatisticsContract.View {
 
-    public static final String PARAM_KEYS = "keys";
     public static final String PARAM_LIST_STATE = "list_state";
 
     @BindView(R.id.list_view)

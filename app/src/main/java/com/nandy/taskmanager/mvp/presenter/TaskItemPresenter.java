@@ -4,11 +4,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.model.TaskStatus;
+import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.mvp.contract.TaskDetailsContract;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskModel;
@@ -42,8 +43,8 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (resultCode == Activity.RESULT_OK && requestCode == TaskDetailsActivity.REQUEST_CODE_EDIT) {
-            Task task = data.getParcelableExtra("task");
+        if (resultCode == Activity.RESULT_OK && requestCode == Constants.REQUEST_CODE_EDIT) {
+            Task task = data.getParcelableExtra(Constants.PARAM_TASK);
             mTaskModel.setTask(task);
             displayData(task);
         }
@@ -66,10 +67,10 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
     @Override
     public void edit() {
         Bundle args = new Bundle();
-        args.putParcelable("task", mTaskModel.getTask());
-        args.putInt("mode", CreateTaskActivity.MODE_EDIT);
+        args.putParcelable(Constants.PARAM_TASK, mTaskModel.getTask());
+        args.putInt(Constants.PARAM_MODE, Constants.MODE_EDIT);
 
-        mView.launchActivityForResult(args, CreateTaskActivity.class, TaskDetailsActivity.REQUEST_CODE_EDIT);
+        mView.launchActivityForResult(args, CreateTaskActivity.class, Constants.REQUEST_CODE_EDIT);
     }
 
     private void displayStatusInformation(Task task) {
@@ -158,10 +159,6 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
     public void delete() {
         mTaskModel.delete();
         mView.finish();
-
-//        if (task.hasLocation()){
-//            mShceduleModel.scheduleLocationUpdates();
-//        }
     }
 
 
@@ -189,12 +186,12 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
         setupMenu();
     }
 
-    public void setTaskModel(TaskModel mTaskModel) {
-        this.mTaskModel = mTaskModel;
+    public void setTaskModel(TaskModel taskModel) {
+        mTaskModel = taskModel;
     }
 
-    public void setDateFormatModel(DateFormatModel mDateFormatModel) {
-        this.mDateFormatModel = mDateFormatModel;
+    public void setDateFormatModel(DateFormatModel dateFormatModel) {
+        mDateFormatModel = dateFormatModel;
     }
 
 }

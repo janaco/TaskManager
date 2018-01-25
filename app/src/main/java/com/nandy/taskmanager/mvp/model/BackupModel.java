@@ -29,11 +29,11 @@ import java.util.zip.ZipOutputStream;
 
 public abstract class BackupModel {
 
-    public final static String BACKUP_FILE_NAME = "tasks_backup.zip";
+    public static final String BACKUP_FILE_NAME = "tasks_backup.zip";
     public static final String BACKUP_DB_FILE = "backup.db";
-    private static final int BUFFER_SIZE = 2048;
-    private static final String IMAGE_EXTENSION = ".png";
     public static final String BACKUP_MIME_TYPE = "application/zip";
+    private static final String IMAGE_EXTENSION = ".png";
+    private static final int BUFFER_SIZE = 2048;
 
 
     protected final Context mContext;
@@ -44,12 +44,12 @@ public abstract class BackupModel {
         mContext = context;
     }
 
-    public boolean isGoogleClient(){
+    public boolean isGoogleClient() {
         return mDriveResourceClient != null;
     }
 
-    public void setDriveResourceClient(DriveResourceClient mDriveResourceClient) {
-        this.mDriveResourceClient = mDriveResourceClient;
+    public void setDriveResourceClient(DriveResourceClient driveResourceClient) {
+        mDriveResourceClient = driveResourceClient;
     }
 
     public Task<MetadataBuffer> requestExistingBackupFiles() {
@@ -64,7 +64,6 @@ public abstract class BackupModel {
                                 Filters.eq(SearchableField.MIME_TYPE, BACKUP_MIME_TYPE)))
                 .build();
     }
-
 
 
     protected File compress(File[] files, String zipFileName, String dbFileName) {

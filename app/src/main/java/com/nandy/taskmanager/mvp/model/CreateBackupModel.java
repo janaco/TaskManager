@@ -1,16 +1,12 @@
 package com.nandy.taskmanager.mvp.model;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
-import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.MetadataBuffer;
 import com.google.android.gms.drive.MetadataChangeSet;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.nandy.taskmanager.db.AppDatabase;
@@ -69,7 +65,6 @@ public class CreateBackupModel extends BackupModel {
 
 
     private void deleteFile(DriveFile file) {
-        Log.d("BACKUP_", "deleteFile: " + file);
         mDriveResourceClient.delete(file);
     }
 

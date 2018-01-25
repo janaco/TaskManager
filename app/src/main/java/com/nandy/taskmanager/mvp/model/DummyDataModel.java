@@ -1,13 +1,12 @@
 package com.nandy.taskmanager.mvp.model;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.TasksDao;
-import com.nandy.taskmanager.model.RepeatPeriod;
+import com.nandy.taskmanager.enums.RepeatPeriod;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.model.TaskStatus;
+import com.nandy.taskmanager.enums.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.Calendar;

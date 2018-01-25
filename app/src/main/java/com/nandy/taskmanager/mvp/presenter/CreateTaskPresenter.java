@@ -6,9 +6,9 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
-import com.nandy.taskmanager.activity.CreateTaskActivity;
-import com.nandy.taskmanager.model.RepeatPeriod;
+import com.nandy.taskmanager.enums.RepeatPeriod;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.contract.CreateTaskContract;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
@@ -35,8 +35,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class CreateTaskPresenter implements CreateTaskContract.Presenter {
 
-    private static final String KEY_TITLE = "title";
-    private static final String KEY_DESCRIPTION = "description";
+
 
     private CreateTaskContract.View mView;
 
@@ -61,8 +60,8 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
 
     private void restoreViewState() {
 
-        mView.setTitle(mSavedInstanceState.getString(KEY_TITLE));
-        mView.setDescription(mSavedInstanceState.getString(KEY_DESCRIPTION));
+        mView.setTitle(mSavedInstanceState.getString(Constants.PARAM_TITLE));
+        mView.setDescription(mSavedInstanceState.getString(Constants.PARAM_DESCRIPTION));
     }
 
     @Override
@@ -139,7 +138,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
             }
         }
 
-        if (mCreateTaskMode.getMode() == CreateTaskActivity.MODE_CREATE) {
+        if (mCreateTaskMode.getMode() == Constants.MODE_CREATE) {
             mRecordsModel.insert(task);
         } else {
             mRecordsModel.update(task);
@@ -184,7 +183,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
 
         switch (requestCode) {
 
-            case CreateTaskActivity.REQUEST_CODE_LOCATION:
+            case Constants.REQUEST_CODE_LOCATION:
                 if (resultCode == RESULT_OK) {
                     LatLng latLng = data.getParcelableExtra("location");
                     mCreateTaskMode.setLocation(latLng);
@@ -193,7 +192,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
                 }
                 break;
 
-            case CreateTaskActivity.REQUEST_CODE_VOICE_INPUT:
+            case Constants.REQUEST_CODE_VOICE_INPUT:
                 if (resultCode == RESULT_OK) {
                     ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     if (matches.size() > 0) {
@@ -202,7 +201,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
                 }
                 break;
 
-            case CreateTaskActivity.REQUEST_CODE_CHOOSE_IMAGE:
+            case Constants.REQUEST_CODE_CHOOSE_IMAGE:
 
                 if (resultCode == RESULT_OK) {
 
@@ -327,8 +326,8 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
 
     @Override
     public void saveInstanceState(Bundle outState, String title, String description) {
-        outState.putString(KEY_TITLE, title);
-        outState.putString(KEY_DESCRIPTION, description);
+        outState.putString(Constants.PARAM_TITLE, title);
+        outState.putString(Constants.PARAM_DESCRIPTION, description);
     }
 
     @Override
@@ -373,28 +372,28 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
         mView.setRepeatPeriod(repeatPeriod.getTextResId());
     }
 
-    public void setDateFormatModel(DateFormatModel mDateFormatModel) {
-        this.mDateFormatModel = mDateFormatModel;
+    public void setDateFormatModel(DateFormatModel dateFormatModel) {
+        mDateFormatModel = dateFormatModel;
     }
 
-    public void setCreateTaskMode(CreateTaskModel mCreateTaskMode) {
-        this.mCreateTaskMode = mCreateTaskMode;
+    public void setCreateTaskMode(CreateTaskModel createTaskMode) {
+        mCreateTaskMode = createTaskMode;
     }
 
-    public void setValidationModel(ValidationModel mValidationModel) {
-        this.mValidationModel = mValidationModel;
+    public void setValidationModel(ValidationModel validationModel) {
+        mValidationModel = validationModel;
     }
 
-    public void setCoverModel(TaskCoverModel mCoverModel) {
-        this.mCoverModel = mCoverModel;
+    public void setCoverModel(TaskCoverModel coverModel) {
+        mCoverModel = coverModel;
     }
 
-    public void setRecordsModel(TaskRecordsModel mRecordsModel) {
-        this.mRecordsModel = mRecordsModel;
+    public void setRecordsModel(TaskRecordsModel recordsModel) {
+        mRecordsModel = recordsModel;
     }
 
-    public void setScheduleModel(TaskRemindersModel mScheduleModel) {
-        this.mScheduleModel = mScheduleModel;
+    public void setScheduleModel(TaskRemindersModel scheduleModel) {
+        mScheduleModel = scheduleModel;
     }
 
 

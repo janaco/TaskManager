@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Represents duration of each tasks for each month.
+ *
  * Created by yana on 22.01.18.
  */
 
@@ -25,8 +27,8 @@ public class StatisticsAdapter extends BaseExpandableListAdapter {
     private final List<Pair<String, ArrayList<StatisticsResult>>> mData = new ArrayList<>();
 
 
-    public void setDateFormatModel(DateFormatModel mDateFormatModel) {
-        this.mDateFormatModel = mDateFormatModel;
+    public void setDateFormatModel(DateFormatModel dateFormatModel) {
+        mDateFormatModel = dateFormatModel;
     }
 
     public void setData(List<Pair<String, ArrayList<StatisticsResult>>> data) {
@@ -78,7 +80,7 @@ public class StatisticsAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_statistics_group_view, null);
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_statistics_group_view, parent, false);
         }
 
         TextView textGroup = convertView.findViewById(R.id.text_title_group);
@@ -92,7 +94,7 @@ public class StatisticsAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_statistics_child_view, null);
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_statistics_child_view, parent, false);
         }
 
         TextView titleTextView = convertView.findViewById(R.id.txt_title);

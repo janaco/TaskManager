@@ -31,7 +31,7 @@ public class TaskCoverModel {
 
     private final Context mContext;
 
-    public TaskCoverModel(Context context){
+    public TaskCoverModel(Context context) {
         mContext = context;
     }
 
@@ -67,6 +67,7 @@ public class TaskCoverModel {
     }
 
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void removeCameraOutputFile() {
         File file = new File(mContext.getFilesDir(), DEFAULT_CAMERA_OUTPUT_NAME);
         if (file.exists()) {
@@ -86,7 +87,6 @@ public class TaskCoverModel {
 
         return null;
     }
-
 
 
     public String saveImage(long taskId, String pathToImage) throws IOException {

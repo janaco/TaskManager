@@ -10,8 +10,11 @@ import android.support.v7.widget.Toolbar;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.ui.fragment.MainPreferencesFragment;
 
+/**
+ * Preferences Screen.
+ * There you can create backup or restore app state.
+ */
 public class SettingsActivity extends AppCompatActivity  {
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

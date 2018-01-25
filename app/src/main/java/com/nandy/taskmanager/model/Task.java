@@ -3,13 +3,14 @@ package com.nandy.taskmanager.model;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.nandy.taskmanager.enums.RepeatPeriod;
+import com.nandy.taskmanager.enums.TaskStatus;
 
 import java.util.Date;
 
@@ -102,20 +103,20 @@ public class Task implements Parcelable {
         return mScheduledDuration;
     }
 
-    public void setScheduledDuration(long mMaxDuration) {
-        this.mScheduledDuration = mMaxDuration;
+    public void setScheduledDuration(long scheduledDuration) {
+        mScheduledDuration = scheduledDuration;
     }
 
     public RepeatPeriod getRepeatPeriod() {
         return mRepeatPeriod;
     }
 
-    public void setRepeatPeriod(RepeatPeriod mPeriod) {
-        this.mRepeatPeriod = mPeriod;
+    public void setRepeatPeriod(RepeatPeriod period) {
+        mRepeatPeriod = period;
     }
 
-    public void setLocation(LatLng mLocation) {
-        this.mLocation = mLocation;
+    public void setLocation(LatLng location) {
+        mLocation = location;
     }
 
     public LatLng getLocation() {
@@ -138,8 +139,8 @@ public class Task implements Parcelable {
         return mDescription;
     }
 
-    public void setDescription(String mDescription) {
-        this.mDescription = mDescription;
+    public void setDescription(String description) {
+        mDescription = description;
     }
 
     public long getId() {
@@ -150,12 +151,12 @@ public class Task implements Parcelable {
         return mStatus;
     }
 
-    public void setStatus(TaskStatus mStatus) {
-        this.mStatus = mStatus;
+    public void setStatus(TaskStatus status) {
+        mStatus = status;
     }
 
-    public void setId(@NonNull long mId) {
-        this.mId = mId;
+    public void setId(@NonNull long id) {
+        mId = id;
     }
 
     public String getImage() {
@@ -166,16 +167,16 @@ public class Task implements Parcelable {
         return mImage != null;
     }
 
-    public void setImage(String mImage) {
-        this.mImage = mImage;
+    public void setImage(String image) {
+        mImage = image;
     }
 
     public Date getPlannedStartDate() {
         return mPlannedStartDate;
     }
 
-    public void setPlannedStartDate(Date mStartDate) {
-        this.mPlannedStartDate = mStartDate;
+    public void setPlannedStartDate(Date plannedStartDate) {
+        mPlannedStartDate = plannedStartDate;
     }
 
     public Metadata getMetadata() {
@@ -183,8 +184,8 @@ public class Task implements Parcelable {
     }
 
 
-    public void setMetadata(Metadata mMetadata) {
-        this.mMetadata = mMetadata;
+    public void setMetadata(Metadata metadata) {
+        mMetadata = metadata;
     }
 
 

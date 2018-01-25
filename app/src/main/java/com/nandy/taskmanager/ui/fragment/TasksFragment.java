@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -14,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
-import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.contract.TasksContract;
@@ -33,6 +31,9 @@ import butterknife.ButterKnife;
  */
 
 public class TasksFragment extends PresenterFragment<TasksPresenter, TasksContract.View> implements TasksContract.View {
+
+    public static final int REQUEST_CREATE_TASK = 101;
+    public static final String PARAM_TASK = "task";
 
     @BindView(R.id.list_tasks)
     ListView mTaskLisView;
@@ -53,7 +54,6 @@ public class TasksFragment extends PresenterFragment<TasksPresenter, TasksContra
         mTaskLisView.setOnItemClickListener((adapterView, itemView, position, l) ->
                 getPresenter().openDetails(position));
 
-        Log.d("SCREEN_ROTATION_", "onCreate: " + savedInstanceState + "\npresenter: " + getPresenter());
         if (savedInstanceState != null &&
                 getPresenter() != null) {
             getPresenter().setSavedViewState(savedInstanceState);
@@ -124,8 +124,8 @@ public class TasksFragment extends PresenterFragment<TasksPresenter, TasksContra
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == Activity.RESULT_OK && requestCode == Constants.REQUEST_CREATE_TASK) {
-            Task task = data.getParcelableExtra(Constants.TASK);
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CREATE_TASK) {
+            Task task = data.getParcelableExtra(PARAM_TASK);
             getPresenter().openDetails(task);
 
         }

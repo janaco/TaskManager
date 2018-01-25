@@ -1,4 +1,4 @@
-package com.nandy.taskmanager.model;
+package com.nandy.taskmanager.enums;
 
 import android.support.annotation.StringRes;
 

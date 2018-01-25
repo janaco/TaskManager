@@ -20,7 +20,6 @@ import java.util.Collection;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-
 public class TasksAdapter extends BaseSwipeAdapter {
 
     public interface OnItemOptionSelectedListener {
@@ -108,8 +107,8 @@ public class TasksAdapter extends BaseSwipeAdapter {
     }
 
 
-    public void setOnItemOptionSelectedListener(OnItemOptionSelectedListener mOnItemOptionSelectedListener) {
-        this.mOnItemOptionSelectedListener = mOnItemOptionSelectedListener;
+    public void setOnItemOptionSelectedListener(OnItemOptionSelectedListener onItemOptionSelectedListener) {
+        mOnItemOptionSelectedListener = onItemOptionSelectedListener;
     }
 
     public void clearAll() {

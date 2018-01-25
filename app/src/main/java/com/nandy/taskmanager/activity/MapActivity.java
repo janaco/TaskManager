@@ -27,14 +27,7 @@ import org.kaerdan.presenterretainer.PresenterActivity;
 public class MapActivity extends PresenterActivity<MapContract.Presenter, MapContract.View>
         implements MapContract.View, OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
-    public static final int REQUEST_LOCATION_PERMISSIONS_CODE = 4;
-    public static final int REQUEST_LOCATION_RESOLUTION = 5;
-    public static final int DEFAULT_ZOOM = 12;
-
-    public static final String KEY_MAP_CENTER = "center";
-    public static final String KEY_LOCATION = "location";
-    public static final String KEY_ZOOM = "zoom";
-
+    public static final  int DEFAULT_ZOOM = 12;
 
     private GoogleMap mMap;
     private Marker mMarker;

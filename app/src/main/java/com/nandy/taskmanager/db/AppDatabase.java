@@ -10,7 +10,7 @@ import com.nandy.taskmanager.db.converters.ActionConverter;
 import com.nandy.taskmanager.db.converters.DateTypeConverter;
 import com.nandy.taskmanager.db.converters.LocationTypeConverter;
 import com.nandy.taskmanager.db.converters.RepeatPeriodConverter;
-import com.nandy.taskmanager.db.converters.TaskStatusConventer;
+import com.nandy.taskmanager.db.converters.TaskStatusConverter;
 import com.nandy.taskmanager.db.dao.EventsDao;
 import com.nandy.taskmanager.db.dao.StatisticsDao;
 import com.nandy.taskmanager.db.dao.TasksDao;
@@ -26,7 +26,7 @@ import com.nandy.taskmanager.model.Task;
 @TypeConverters({
         LocationTypeConverter.class,
         DateTypeConverter.class,
-        TaskStatusConventer.class,
+        TaskStatusConverter.class,
         RepeatPeriodConverter.class,
         ActionConverter.class})
 public abstract class AppDatabase extends RoomDatabase {

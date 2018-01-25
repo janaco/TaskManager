@@ -1,13 +1,11 @@
 package com.nandy.taskmanager.mvp.model;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.Pair;
 
-import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.StatisticsDao;
-import com.nandy.taskmanager.model.Month;
+import com.nandy.taskmanager.enums.Month;
 import com.nandy.taskmanager.model.StatisticsResult;
 
 import java.util.ArrayList;
@@ -34,8 +32,6 @@ public class StatisticsModel {
         for (Month month : Month.values()) {
             String groupName = mContext.getString(month.getNameResId());
             ArrayList<StatisticsResult> results = getStatistics(month.getMonthOfYear());
-
-            Log.d("STATISTICS_", "add: " + groupName + ", " + results);
             data.add(new Pair<>(groupName, results));
         }
 

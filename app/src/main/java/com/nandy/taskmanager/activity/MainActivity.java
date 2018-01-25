@@ -29,6 +29,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+/**
+ * MainActivity screen contains viewPager or two fragments: TasksListFragment and StatisticsFragment.
+ */
 public class MainActivity extends PresenterActivity<MainPresenter, MainActivityContract.View>
         implements MainActivityContract.View {
 
@@ -61,40 +64,6 @@ public class MainActivity extends PresenterActivity<MainPresenter, MainActivityC
                 }
             }
         });
-    }
-
-
-    @Override
-    protected MainPresenter onCreatePresenter() {
-        MainPresenter presenter = new MainPresenter();
-        presenter.setDummyDataMode(new DummyDataModel(getApplicationContext()));
-        presenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
-
-        return presenter;
-    }
-
-    @Override
-    protected MainActivityContract.View getPresenterView() {
-        return this;
-    }
-
-    @Override
-    public void launchActivity(Bundle args, Class<?> cls) {
-        Intent intent = new Intent(getApplicationContext(), cls);
-        intent.putExtras(args);
-        startActivity(intent);
-    }
-
-    @Override
-    public void launchActivityForResult(Bundle args, Class<?> cls, int requestCode) {
-        Intent intent = new Intent(getApplicationContext(), cls);
-        intent.putExtras(args);
-        startActivityForResult(intent, requestCode);
-    }
-
-    @OnClick(R.id.btn_create_task)
-    void onCreateTaskClick() {
-        getPresenter().onCreateTaskClick();
     }
 
     @Override
@@ -134,14 +103,6 @@ public class MainActivity extends PresenterActivity<MainPresenter, MainActivityC
         }
     }
 
-    private void onClearAllOptionSelected() {
-        new AlertDialog.Builder(this)
-                .setMessage(R.string.clear_all_data)
-                .setPositiveButton(R.string.clear_all, (dialogInterface, i) -> getPresenter().onClearAllOptionSelected())
-                .setNegativeButton(R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
-                .show();
-    }
-
     @Override
     public void onBackPressed() {
 
@@ -153,6 +114,47 @@ public class MainActivity extends PresenterActivity<MainPresenter, MainActivityC
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected MainPresenter onCreatePresenter() {
+        MainPresenter presenter = new MainPresenter();
+        presenter.setDummyDataMode(new DummyDataModel(getApplicationContext()));
+        presenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
+
+        return presenter;
+    }
+
+    @Override
+    protected MainActivityContract.View getPresenterView() {
+        return this;
+    }
+
+    @OnClick(R.id.btn_create_task)
+    void onCreateTaskClick() {
+        getPresenter().onCreateTaskClick();
+    }
+
+    @Override
+    public void launchActivity(Bundle args, Class<?> cls) {
+        Intent intent = new Intent(getApplicationContext(), cls);
+        intent.putExtras(args);
+        startActivity(intent);
+    }
+
+    @Override
+    public void launchActivityForResult(Bundle args, Class<?> cls, int requestCode) {
+        Intent intent = new Intent(getApplicationContext(), cls);
+        intent.putExtras(args);
+        startActivityForResult(intent, requestCode);
+    }
+
+    private void onClearAllOptionSelected() {
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.clear_all_data)
+                .setPositiveButton(R.string.clear_all, (dialogInterface, i) -> getPresenter().onClearAllOptionSelected())
+                .setNegativeButton(R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
+                .show();
     }
 
     private Snackbar createExitSnackBar() {

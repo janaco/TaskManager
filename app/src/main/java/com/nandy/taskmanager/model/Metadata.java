@@ -8,7 +8,7 @@ import android.os.Parcelable;
 import java.util.Date;
 
 /**
- * Created by razomer on 22.01.18.
+ * Created by yana on 22.01.18.
  */
 
 public class Metadata implements Parcelable{
@@ -54,12 +54,12 @@ public class Metadata implements Parcelable{
         }
     };
 
-    public void setActualStartDate(Date mActualStartDate) {
-        this.mActualStartDate = mActualStartDate;
+    public void setActualStartDate(Date actualStartDate) {
+        mActualStartDate = actualStartDate;
     }
 
-    public void setTimeSpent(long mTimeSpent) {
-        this.mTimeSpent = mTimeSpent;
+    public void setTimeSpent(long timeSpent) {
+        mTimeSpent = timeSpent;
     }
 
     public Date getActualStartDate() {
@@ -75,7 +75,7 @@ public class Metadata implements Parcelable{
         return mDownTime;
     }
 
-    public void setDownTime(long mDownTime) {
-        this.mDownTime = mDownTime;
+    public void setDownTime(long downTime) {
+        mDownTime = downTime;
     }
 }

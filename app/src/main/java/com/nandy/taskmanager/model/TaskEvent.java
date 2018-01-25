@@ -6,6 +6,8 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.nandy.taskmanager.enums.Action;
+
 /**
  * Created by yana on 21.01.18.
  */
@@ -65,31 +67,31 @@ public class TaskEvent implements Parcelable {
         return mId;
     }
 
-    public void setId(long mId) {
-        this.mId = mId;
+    public void setId(long id) {
+        mId = id;
     }
 
     public long getTaskId() {
         return mTaskId;
     }
 
-    public void setTaskId(long mTaskId) {
-        this.mTaskId = mTaskId;
+    public void setTaskId(long taskId) {
+        mTaskId = taskId;
     }
 
     public long getTime() {
         return mTime;
     }
 
-    public void setTime(long mTime) {
-        this.mTime = mTime;
+    public void setTime(long time) {
+        mTime = time;
     }
 
     public Action getAction() {
         return mAction;
     }
 
-    public void setAction(Action mAction) {
-        this.mAction = mAction;
+    public void setAction(Action action) {
+        mAction = action;
     }
 }

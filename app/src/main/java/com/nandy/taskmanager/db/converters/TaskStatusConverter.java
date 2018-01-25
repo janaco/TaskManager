@@ -2,13 +2,13 @@ package com.nandy.taskmanager.db.converters;
 
 import android.arch.persistence.room.TypeConverter;
 
-import com.nandy.taskmanager.model.TaskStatus;
+import com.nandy.taskmanager.enums.TaskStatus;
 
 /**
- * Created by razomer on 18.01.18.
+ * Created by yana on 18.01.18.
  */
 
-public class TaskStatusConventer {
+public class TaskStatusConverter {
 
     @TypeConverter
     public static String fromTaskStatus(TaskStatus status) {

@@ -71,11 +71,11 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         mSavedInstanceState = savedInstanceState;
     }
 
-    public void setStatisticsModel(StatisticsModel mStatisticsModel) {
-        this.mStatisticsModel = mStatisticsModel;
+    public void setStatisticsModel(StatisticsModel statisticsModel) {
+        mStatisticsModel = statisticsModel;
     }
 
-    public void setDateFormatModel(DateFormatModel mDateFormatModel) {
-        this.mDateFormatModel = mDateFormatModel;
+    public void setDateFormatModel(DateFormatModel dateFormatModel) {
+        mDateFormatModel = dateFormatModel;
     }
 }

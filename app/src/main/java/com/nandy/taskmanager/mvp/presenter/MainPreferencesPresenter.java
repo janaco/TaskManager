@@ -141,19 +141,19 @@ public class MainPreferencesPresenter  {
         });
     }
 
-    public void setCreateBackupModel(CreateBackupModel mCreateBackupModel) {
-        this.mCreateBackupModel = mCreateBackupModel;
+    public void setCreateBackupModel(CreateBackupModel createBackupModel) {
+        mCreateBackupModel = createBackupModel;
     }
 
-    public void setRestoreDataModel(RestoreFromBackupModel mRestoreDataModel) {
-        this.mRestoreDataModel = mRestoreDataModel;
+    public void setRestoreDataModel(RestoreFromBackupModel restoreDataModel) {
+        mRestoreDataModel = restoreDataModel;
     }
 
-    public void setGoogleDriveConnectionModel(GoogleDriveConnectionModel mGoogleDriveConnectionModel) {
-        this.mGoogleDriveConnectionModel = mGoogleDriveConnectionModel;
+    public void setGoogleDriveConnectionModel(GoogleDriveConnectionModel googleDriveConnectionModel) {
+        mGoogleDriveConnectionModel = googleDriveConnectionModel;
     }
 
-    public void setDataImportModel(DataImportModel mDataImportModel) {
-        this.mDataImportModel = mDataImportModel;
+    public void setDataImportModel(DataImportModel dataImportModel) {
+        mDataImportModel = dataImportModel;
     }
 }

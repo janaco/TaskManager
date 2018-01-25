@@ -8,9 +8,9 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.image.ImageLoader;
 import com.nandy.taskmanager.model.Task;
@@ -47,16 +48,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class CreateTaskActivity extends PresenterActivity<CreateTaskContract.Presenter, CreateTaskContract.View>
+/**
+ * Create/edit task screen
+ */
+public class CreateTaskActivity
+        extends PresenterActivity<CreateTaskContract.Presenter, CreateTaskContract.View>
         implements CreateTaskContract.View {
-
-    public final static int REQUEST_CODE_LOCATION = 52;
-    public final static int REQUEST_PERMISSIONS_CODE = 53;
-    public static final int REQUEST_CODE_CHOOSE_IMAGE = 54;
-    public static final int REQUEST_CODE_VOICE_INPUT = 55;
-
-    public static final int MODE_CREATE = 1;
-    public static final int MODE_EDIT = 2;
 
     @BindView(R.id.input_title)
     EditText mInputTitle;
@@ -94,47 +91,6 @@ public class CreateTaskActivity extends PresenterActivity<CreateTaskContract.Pre
         registerForContextMenu(mDurationTextView);
         registerForContextMenu(mRepeatPeriodTextView);
 
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        getPresenter().saveInstanceState(outState,
-                mInputTitle.getText().toString(),
-                mInputDescription.getText().toString());
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        getPresenter().restoreInstanceState(savedInstanceState);
-    }
-
-    @Override
-    protected CreateTaskContract.Presenter onCreatePresenter() {
-
-        Bundle args = getIntent().getExtras();
-        Task task = null;
-        int mode = MODE_CREATE;
-        if (args != null) {
-            task = args.getParcelable("task");
-            mode = args.getInt("mode", MODE_CREATE);
-        }
-        CreateTaskPresenter presenter = new CreateTaskPresenter();
-        presenter.setCreateTaskMode(new CreateTaskModel(task, mode));
-        presenter.setValidationModel(new ValidationModel());
-        presenter.setDateFormatModel(new DateFormatModel(getApplicationContext()));
-        presenter.setCoverModel(new TaskCoverModel(getApplicationContext()));
-        presenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
-        presenter.setScheduleModel(new TaskRemindersModel(getApplicationContext()));
-
-
-        return presenter;
-    }
-
-    @Override
-    protected CreateTaskContract.View getPresenterView() {
-        return this;
     }
 
     @Override
@@ -177,7 +133,6 @@ public class CreateTaskActivity extends PresenterActivity<CreateTaskContract.Pre
         super.onCreateContextMenu(menu, v, menuInfo);
     }
 
-
     @Override
     public boolean onContextItemSelected(MenuItem item) {
 
@@ -200,10 +155,60 @@ public class CreateTaskActivity extends PresenterActivity<CreateTaskContract.Pre
         getPresenter().onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        getPresenter().saveInstanceState(outState,
+                mInputTitle.getText().toString(),
+                mInputDescription.getText().toString());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        getPresenter().restoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == Constants.REQUEST_CODE_PERMISSIONS && isPermissionsGranted()) {
+            showPickImagePopup();
+        }
+    }
+
+    @Override
+    protected CreateTaskContract.Presenter onCreatePresenter() {
+
+        Bundle args = getIntent().getExtras();
+        Task task = null;
+        int mode = Constants.MODE_CREATE;
+        if (args != null) {
+            task = args.getParcelable(Constants.PARAM_TASK);
+            mode = args.getInt(Constants.PARAM_MODE, Constants.MODE_CREATE);
+        }
+        CreateTaskPresenter presenter = new CreateTaskPresenter();
+        presenter.setCreateTaskMode(new CreateTaskModel(task, mode));
+        presenter.setValidationModel(new ValidationModel());
+        presenter.setDateFormatModel(new DateFormatModel(getApplicationContext()));
+        presenter.setCoverModel(new TaskCoverModel(getApplicationContext()));
+        presenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
+        presenter.setScheduleModel(new TaskRemindersModel(getApplicationContext()));
+
+
+        return presenter;
+    }
+
+    @Override
+    protected CreateTaskContract.View getPresenterView() {
+        return this;
+    }
 
     @OnClick(R.id.txt_location)
     void onSetLocationButtonClick() {
-        startActivityForResult(new Intent(getApplicationContext(), MapActivity.class), REQUEST_CODE_LOCATION);
+        startActivityForResult(new Intent(getApplicationContext(), MapActivity.class), Constants.REQUEST_CODE_LOCATION);
     }
 
     @OnClick(R.id.txt_start_date)
@@ -231,9 +236,8 @@ public class CreateTaskActivity extends PresenterActivity<CreateTaskContract.Pre
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.description));
-        startActivityForResult(intent, REQUEST_CODE_VOICE_INPUT);
+        startActivityForResult(intent, Constants.REQUEST_CODE_VOICE_INPUT);
     }
-
 
     @OnClick(R.id.btn_clear_location)
     void onClearLocationButtonClick() {
@@ -246,24 +250,13 @@ public class CreateTaskActivity extends PresenterActivity<CreateTaskContract.Pre
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1 && !isPermissionsGranted()) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
-                    REQUEST_PERMISSIONS_CODE);
+                    Constants.REQUEST_CODE_PERMISSIONS);
 
             return;
         }
 
         showPickImagePopup();
     }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @android.support.annotation.NonNull String[] permissions, @android.support.annotation.NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == REQUEST_PERMISSIONS_CODE && isPermissionsGranted()) {
-            showPickImagePopup();
-        }
-    }
-
 
     @Override
     public void setTitleError(int textResId) {
@@ -373,7 +366,7 @@ public class CreateTaskActivity extends PresenterActivity<CreateTaskContract.Pre
 
         Intent chooserIntent = Intent.createChooser(pickIntent, getString(R.string.take_or_select_photo));
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
-        startActivityForResult(chooserIntent, REQUEST_CODE_CHOOSE_IMAGE);
+        startActivityForResult(chooserIntent, Constants.REQUEST_CODE_CHOOSE_IMAGE);
     }
 
     private void onSaveBtnClick() {

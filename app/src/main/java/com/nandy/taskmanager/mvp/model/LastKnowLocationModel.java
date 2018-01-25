@@ -13,6 +13,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
+import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.activity.MapActivity;
 
 /**
@@ -65,7 +66,7 @@ public class LastKnowLocationModel {
     private void requestLocationResolution(ResolvableApiException exception) {
         try {
             exception
-                    .startResolutionForResult(mActivity, MapActivity.REQUEST_LOCATION_RESOLUTION);
+                    .startResolutionForResult(mActivity, Constants.REQUEST_LOCATION_RESOLUTION);
         } catch (IntentSender.SendIntentException se) {
             se.printStackTrace();
         }

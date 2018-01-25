@@ -1,7 +1,7 @@
-package com.nandy.taskmanager.model;
+package com.nandy.taskmanager.enums;
 
 /**
- * Created by razomer on 18.01.18.
+ * Created by yana on 18.01.18.
  */
 
 public enum  TaskStatus {

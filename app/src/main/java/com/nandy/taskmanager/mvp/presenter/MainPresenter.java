@@ -9,7 +9,6 @@ import com.nandy.taskmanager.eventbus.TaskListChangedEvent;
 import com.nandy.taskmanager.eventbus.TasksCleanedEvent;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.contract.MainActivityContract;
-import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.DummyDataModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 
@@ -47,7 +46,7 @@ public class MainPresenter implements Presenter<MainActivityContract.View>, Main
     @Override
     public void onCreateTaskClick() {
         Bundle args = new Bundle();
-        args.putInt("mode", CreateTaskActivity.MODE_CREATE);
+        args.putInt(Constants.PARAM_MODE, Constants.MODE_CREATE);
         mView.launchActivityForResult(args, CreateTaskActivity.class, Constants.REQUEST_CREATE_TASK);
     }
 
@@ -73,12 +72,12 @@ public class MainPresenter implements Presenter<MainActivityContract.View>, Main
         mView.finish();
     }
 
-    public void setDummyDataMode(DummyDataModel mDummyDataMode) {
-        this.mDummyDataMode = mDummyDataMode;
+    public void setDummyDataMode(DummyDataModel dummyDataMode) {
+        mDummyDataMode = dummyDataMode;
     }
 
-    public void setRecordsModel(TaskRecordsModel mRecordsModel) {
-        this.mRecordsModel = mRecordsModel;
+    public void setRecordsModel(TaskRecordsModel recordsModel) {
+        mRecordsModel = recordsModel;
     }
 
 }

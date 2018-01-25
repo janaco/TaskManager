@@ -10,7 +10,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.tasks.Task;
+import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.GoogleDriveClientCallback;
+import com.nandy.taskmanager.activity.SettingsActivity;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,20 +25,17 @@ import static android.app.Activity.RESULT_OK;
 
 public class GoogleDriveConnectionModel {
 
-
-    protected static final int REQUEST_CODE_SIGN_IN = 0;
-
     private Activity mActivity;
     private GoogleDriveClientCallback mGoogleDriveClientCallback;
 
     public GoogleDriveConnectionModel(Activity activity){
-        this.mActivity = activity;
+        mActivity = activity;
     }
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case REQUEST_CODE_SIGN_IN:
+            case Constants.REQUEST_CODE_SIGN_IN:
                 if (resultCode != RESULT_OK) {
                     //TODO: failed to sign in
                     return;
@@ -70,7 +69,7 @@ public class GoogleDriveConnectionModel {
                             .requestScopes(Drive.SCOPE_APPFOLDER)
                             .build();
             GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(mActivity, signInOptions);
-            mActivity.startActivityForResult(googleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+            mActivity.startActivityForResult(googleSignInClient.getSignInIntent(), Constants.REQUEST_CODE_SIGN_IN);
         }
     }
 

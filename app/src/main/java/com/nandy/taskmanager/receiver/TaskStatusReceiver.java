@@ -7,19 +7,14 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
-import com.nandy.taskmanager.db.AppDatabase;
-import com.nandy.taskmanager.db.dao.TasksDao;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.model.TaskStatus;
+import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.mvp.model.TaskModel;
-import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
-
-import java.util.List;
 
 /**
  * Created by yana on 20.01.18.
@@ -36,11 +31,10 @@ public class TaskStatusReceiver extends BroadcastReceiver {
     private static final int NOTIFICATION_TASK_STARTED = 425;
     private static final int NOTIFICATION_TASK_COMPLETED = 426;
 
-
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        long taskId = intent.getLongExtra("id", -1);
+        long taskId = intent.getLongExtra(Constants.PARAM_ID, -1);
 
         TaskModel taskModel = new TaskModel(context);
 

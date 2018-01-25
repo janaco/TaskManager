@@ -9,7 +9,7 @@ import android.os.Parcelable;
 import java.util.Date;
 
 /**
- * Created by razomer on 22.01.18.
+ * Created by yana on 22.01.18.
  */
 
 @Entity(tableName = "statistics")
@@ -25,10 +25,10 @@ public class Statistics implements Parcelable{
     @ColumnInfo(name = "start_date")
     private Date mStartDate;
 
-    public Statistics(long mTaskId, Date mStartDate, long mSpentTime) {
-        this.mTaskId = mTaskId;
-        this.mSpentTime = mSpentTime;
-        this.mStartDate = mStartDate;
+    public Statistics(long taskId, Date startDate, long spentTime) {
+        mTaskId = taskId;
+        mSpentTime = spentTime;
+        mStartDate = startDate;
     }
 
     protected Statistics(Parcel in) {
@@ -68,30 +68,30 @@ public class Statistics implements Parcelable{
     }
 
     public void setId(long id) {
-        this.mId = id;
+        mId = id;
     }
 
     public long getTaskId() {
         return mTaskId;
     }
 
-    public void setTaskId(long mTaskId) {
-        this.mTaskId = mTaskId;
+    public void setTaskId(long taskId) {
+        mTaskId = taskId;
     }
 
     public long getSpentTime() {
         return mSpentTime;
     }
 
-    public void setSpentTime(long mSpentTime) {
-        this.mSpentTime = mSpentTime;
+    public void setSpentTime(long spentTime) {
+        mSpentTime = spentTime;
     }
 
     public Date getStartDate() {
         return mStartDate;
     }
 
-    public void setmStartDate(Date mStartDate) {
-        this.mStartDate = mStartDate;
+    public void setmStartDate(Date startDate) {
+        mStartDate = startDate;
     }
 }

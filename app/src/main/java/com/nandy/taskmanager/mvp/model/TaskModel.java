@@ -7,12 +7,12 @@ import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.EventsDao;
 import com.nandy.taskmanager.db.dao.StatisticsDao;
 import com.nandy.taskmanager.db.dao.TasksDao;
-import com.nandy.taskmanager.model.Action;
+import com.nandy.taskmanager.enums.Action;
 import com.nandy.taskmanager.model.Metadata;
 import com.nandy.taskmanager.model.Statistics;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskEvent;
-import com.nandy.taskmanager.model.TaskStatus;
+import com.nandy.taskmanager.enums.TaskStatus;
 
 import java.util.Date;
 import java.util.List;
@@ -190,8 +190,8 @@ public class TaskModel {
         return mTask;
     }
 
-    public void setTask(Task mTask) {
-        this.mTask = mTask;
+    public void setTask(Task task) {
+        mTask = task;
     }
 
     @Nullable

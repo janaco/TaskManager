@@ -11,7 +11,7 @@ import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.TasksDao;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.model.TaskStatus;
+import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.mvp.model.LocationModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 

@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.RequestBuilder;
+import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.image.ImageLoader;
 import com.nandy.taskmanager.model.Task;
@@ -37,10 +38,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+/**
+ * Task information is displayed there.
+ */
 public class TaskDetailsActivity extends PresenterActivity<TaskDetailsContract.Presenter, TaskDetailsContract.View>
         implements TaskDetailsContract.View {
-
-    public static final int REQUEST_CODE_EDIT = 61;
 
     @BindView(R.id.image_task)
     ImageView mTaskImageView;
@@ -91,25 +93,6 @@ public class TaskDetailsActivity extends PresenterActivity<TaskDetailsContract.P
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
-
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    protected TaskDetailsContract.Presenter onCreatePresenter() {
-        Task task = getIntent().getExtras().getParcelable("task");
-
-        TaskItemPresenter presenter = new TaskItemPresenter();
-        presenter.setDateFormatModel(new DateFormatModel(getApplicationContext()));
-        presenter.setTaskModel(new TaskModel(getApplicationContext(), task));
-
-        return presenter;
-    }
-
-    @Override
-    protected TaskDetailsContract.View getPresenterView() {
-        return this;
     }
 
     @Override
@@ -154,21 +137,38 @@ public class TaskDetailsActivity extends PresenterActivity<TaskDetailsContract.P
     }
 
     @Override
-    public void launchActivityForResult(Bundle args, Class<?> cls, int requestCode) {
-        Intent intent = new Intent( getApplicationContext(), cls);
-        intent.putExtras(args);
-        startActivityForResult(intent, requestCode);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         getPresenter().onActivityResult(requestCode, resultCode, data);
     }
 
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    protected TaskDetailsContract.Presenter onCreatePresenter() {
+        Task task = getIntent().getExtras().getParcelable(Constants.PARAM_TASK);
+
+        TaskItemPresenter presenter = new TaskItemPresenter();
+        presenter.setDateFormatModel(new DateFormatModel(getApplicationContext()));
+        presenter.setTaskModel(new TaskModel(getApplicationContext(), task));
+
+        return presenter;
+    }
+
+    @Override
+    protected TaskDetailsContract.View getPresenterView() {
+        return this;
+    }
+
     @OnClick(R.id.btn_control)
     void onControlButtonClick() {
         getPresenter().toggleStatus();
+    }
+
+    @Override
+    public void launchActivityForResult(Bundle args, Class<?> cls, int requestCode) {
+        Intent intent = new Intent( getApplicationContext(), cls);
+        intent.putExtras(args);
+        startActivityForResult(intent, requestCode);
     }
 
     @Override
@@ -178,7 +178,6 @@ public class TaskDetailsActivity extends PresenterActivity<TaskDetailsContract.P
             getSupportActionBar().setTitle(title);
         }
     }
-
 
     @Override
     public void setDescription(String description) {

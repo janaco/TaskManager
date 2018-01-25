@@ -1,9 +1,9 @@
 package com.nandy.taskmanager.mvp.model;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.nandy.taskmanager.model.RepeatPeriod;
+import com.nandy.taskmanager.enums.RepeatPeriod;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.model.TaskStatus;
+import com.nandy.taskmanager.enums.TaskStatus;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -14,18 +14,18 @@ import java.util.Date;
 
 public class CreateTaskModel {
 
-
     private final int mMode;
 
-    private Task mTask;
+    private final Task mTask;
 
     public CreateTaskModel(Task task, int mode) {
         mMode = mode;
-        mTask = task;
 
         if (task == null) {
             mTask = new Task(System.currentTimeMillis());
             mTask.setStatus(TaskStatus.NEW);
+        } else {
+            mTask = task;
         }
     }
 

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.maps.model.LatLng;
+import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.activity.MapActivity;
 import com.nandy.taskmanager.mvp.contract.MapContract;
 import com.nandy.taskmanager.mvp.model.LastKnowLocationModel;
@@ -46,7 +47,7 @@ public class MapPresenter implements MapContract.Presenter {
         if (mSavedInstanceState == null) {
 
             if (!mLocationModel.canRequestLocation()) {
-                mView.requestPermissions(MapActivity.REQUEST_LOCATION_PERMISSIONS_CODE, new String[]{Manifest.permission.ACCESS_FINE_LOCATION});
+                mView.requestPermissions(Constants.REQUEST_LOCATION_PERMISSIONS_CODE, new String[]{Manifest.permission.ACCESS_FINE_LOCATION});
             } else {
                 mView.setMyLocationEnabled(true);
                 requestLastKnownLocation();
@@ -75,7 +76,7 @@ public class MapPresenter implements MapContract.Presenter {
 
     @Override
     public void onRequestPermissionsResult(int requestCode) {
-        if (requestCode == MapActivity.REQUEST_LOCATION_PERMISSIONS_CODE) {
+        if (requestCode == Constants.REQUEST_LOCATION_PERMISSIONS_CODE) {
             if (mLocationModel.canRequestLocation()) {
                 mView.setMyLocationEnabled(true);
                 requestLastKnownLocation();
@@ -86,15 +87,15 @@ public class MapPresenter implements MapContract.Presenter {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == MapActivity.REQUEST_LOCATION_RESOLUTION && resultCode == Activity.RESULT_OK) {
+        if (requestCode == Constants.REQUEST_LOCATION_RESOLUTION && resultCode == Activity.RESULT_OK) {
             requestLastKnownLocation();
         }
     }
 
     private void restoreViewState() {
-        LatLng mapCenterPosition = mSavedInstanceState.getParcelable(MapActivity.KEY_MAP_CENTER);
-        LatLng markerPosition = mSavedInstanceState.getParcelable(MapActivity.KEY_LOCATION);
-        float zoom = mSavedInstanceState.getFloat(MapActivity.KEY_ZOOM);
+        LatLng mapCenterPosition = mSavedInstanceState.getParcelable(Constants.PARAM_MAP_CENTER);
+        LatLng markerPosition = mSavedInstanceState.getParcelable(Constants.PARAM_LOCATION);
+        float zoom = mSavedInstanceState.getFloat(Constants.PARAM_ZOOM);
 
         mView.moveMapTo(mapCenterPosition, zoom);
         mView.setMarkerPosition(markerPosition);
@@ -103,9 +104,9 @@ public class MapPresenter implements MapContract.Presenter {
 
     @Override
     public void saveInstanceState(Bundle outState, LatLng mapCenterPosition, LatLng markerPosition, float zoom) {
-        outState.putParcelable(MapActivity.KEY_MAP_CENTER, mapCenterPosition);
-        outState.putParcelable(MapActivity.KEY_LOCATION, markerPosition);
-        outState.putFloat(MapActivity.KEY_ZOOM, zoom);
+        outState.putParcelable(Constants.PARAM_MAP_CENTER, mapCenterPosition);
+        outState.putParcelable(Constants.PARAM_LOCATION, markerPosition);
+        outState.putFloat(Constants.PARAM_ZOOM, zoom);
     }
 
     @Override
@@ -117,7 +118,7 @@ public class MapPresenter implements MapContract.Presenter {
     public void onSaveClick(LatLng markerPosition) {
 
         Bundle args = new Bundle();
-        args.putParcelable(MapActivity.KEY_LOCATION, markerPosition);
+        args.putParcelable(Constants.PARAM_LOCATION, markerPosition);
 
         Intent data = new Intent();
         data.putExtras(args);
@@ -125,7 +126,7 @@ public class MapPresenter implements MapContract.Presenter {
         mView.finishWithResult(Activity.RESULT_OK, data);
     }
 
-    public void setLastKnownLocationModel(LastKnowLocationModel mLocationModel) {
-        this.mLocationModel = mLocationModel;
+    public void setLastKnownLocationModel(LastKnowLocationModel locationModel) {
+        mLocationModel = locationModel;
     }
 }

@@ -9,7 +9,7 @@ import com.nandy.taskmanager.db.converters.ActionConverter;
 import com.nandy.taskmanager.db.converters.DateTypeConverter;
 import com.nandy.taskmanager.db.converters.LocationTypeConverter;
 import com.nandy.taskmanager.db.converters.RepeatPeriodConverter;
-import com.nandy.taskmanager.db.converters.TaskStatusConventer;
+import com.nandy.taskmanager.db.converters.TaskStatusConverter;
 import com.nandy.taskmanager.db.dao.EventsDao;
 import com.nandy.taskmanager.db.dao.StatisticsDao;
 import com.nandy.taskmanager.db.dao.TasksDao;
@@ -106,7 +106,7 @@ public class DataImportModel {
                 task.setTitle(title);
                 task.setDescription(description);
                 task.setImage(image);
-                task.setStatus(TaskStatusConventer.toTaskStatus(status));
+                task.setStatus(TaskStatusConverter.toTaskStatus(status));
                 task.setLocation(LocationTypeConverter.toLatLng(location));
                 task.setPlannedStartDate(DateTypeConverter.fromTimestamp(plannedStartDate));
                 task.setScheduledDuration(scheduledDuration);

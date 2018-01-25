@@ -2,7 +2,7 @@ package com.nandy.taskmanager.db.converters;
 
 import android.arch.persistence.room.TypeConverter;
 
-import com.nandy.taskmanager.model.RepeatPeriod;
+import com.nandy.taskmanager.enums.RepeatPeriod;
 
 /**
  * Created by yana on 20.01.18.

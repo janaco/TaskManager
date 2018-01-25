@@ -14,7 +14,7 @@ import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.image.transformartion.RoundedCornersTransformation;
 
 /**
- * Created by razomer on 19.01.18.
+ * Created by yana on 19.01.18.
  */
 
 public class ImageLoader {

@@ -2,7 +2,7 @@ package com.nandy.taskmanager.db.converters;
 
 import android.arch.persistence.room.TypeConverter;
 
-import com.nandy.taskmanager.model.Action;
+import com.nandy.taskmanager.enums.Action;
 
 /**
  * Created by yana on 21.01.18.

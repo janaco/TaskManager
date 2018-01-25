@@ -3,12 +3,13 @@ package com.nandy.taskmanager.mvp.presenter;
 import android.os.Bundle;
 
 import com.daimajia.swipe.util.Attributes;
+import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.adapter.TasksAdapter;
+import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.eventbus.TaskListChangedEvent;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.model.TaskStatus;
 import com.nandy.taskmanager.mvp.contract.TasksContract;
 import com.nandy.taskmanager.mvp.model.TaskModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
@@ -20,16 +21,12 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
-import static com.nandy.taskmanager.activity.TaskDetailsActivity.REQUEST_CODE_EDIT;
-
 /**
  * Created by yana on 16.01.18.
  */
 
 public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnItemOptionSelectedListener {
 
-    private static final String PARAM_FIRST_VISIBLE_POSITION = "first_visible_position";
-    private static final String PARAM_TASKS = "tasks";
 
     private TasksContract.View mView;
     private TaskRecordsModel mRecordsModel;
@@ -58,9 +55,9 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
     }
 
     private void restoreViewState() {
-        List<Task> tasks = mSavedInstanceState.getParcelableArrayList(PARAM_TASKS);
+        List<Task> tasks = mSavedInstanceState.getParcelableArrayList(Constants.PARAM_TASKS);
         mAdapter.setItems(tasks);
-        mView.scrollToPosition(mSavedInstanceState.getInt(PARAM_FIRST_VISIBLE_POSITION));
+        mView.scrollToPosition(mSavedInstanceState.getInt(Constants.PARAM_FIRST_VISIBLE_POSITION));
         mSavedInstanceState = null;
     }
 
@@ -138,9 +135,9 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
     @Override
     public void onEditOptionSelected(Task task, int position) {
         Bundle args = new Bundle();
-        args.putParcelable("task", getTask(position));
-        args.putInt("mode", CreateTaskActivity.MODE_EDIT);
-        mView.launchActivityForResult(args, CreateTaskActivity.class, REQUEST_CODE_EDIT);
+        args.putParcelable(Constants.PARAM_TASK, getTask(position));
+        args.putInt(Constants.PARAM_MODE, Constants.MODE_EDIT);
+        mView.launchActivityForResult(args, CreateTaskActivity.class, Constants.REQUEST_CODE_EDIT);
     }
 
     @Override
@@ -188,8 +185,8 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
 
     @Override
     public void saveInstanceState(Bundle outState, int firstVisiblePosition) {
-        outState.putInt(PARAM_FIRST_VISIBLE_POSITION, firstVisiblePosition);
-        outState.putParcelableArrayList(PARAM_TASKS, mAdapter.getItems());
+        outState.putInt(Constants.PARAM_FIRST_VISIBLE_POSITION, firstVisiblePosition);
+        outState.putParcelableArrayList(Constants.PARAM_TASKS, mAdapter.getItems());
     }
 
     @Override
@@ -201,16 +198,16 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
         return mAdapter.getItem(position);
     }
 
-    public void setTaskReminderMode(TaskRemindersModel mTaskReminderMode) {
-        this.mTaskReminderMode = mTaskReminderMode;
+    public void setTaskReminderMode(TaskRemindersModel taskReminderMode) {
+        mTaskReminderMode = taskReminderMode;
     }
 
-    public void setTaskStatusModel(TaskModel mTaskModel) {
-        this.mTaskModel = mTaskModel;
+    public void setTaskStatusModel(TaskModel taskModel) {
+        mTaskModel = taskModel;
     }
 
-    public void setRecordsModel(TaskRecordsModel mRecordsModel) {
-        this.mRecordsModel = mRecordsModel;
+    public void setRecordsModel(TaskRecordsModel recordsModel) {
+        mRecordsModel = recordsModel;
     }
 
 
