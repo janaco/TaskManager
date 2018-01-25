@@ -17,6 +17,11 @@ import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.mvp.model.TaskModel;
 
 import io.reactivex.Completable;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -37,41 +42,46 @@ public class TaskStatusReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Completable.create(e -> {
+        TaskModel taskModel = new TaskModel(context);
+
+        Single.create((SingleOnSubscribe<Task>) e -> {
             long taskId = intent.getLongExtra(Constants.PARAM_ID, -1);
-
-            TaskModel taskModel = new TaskModel(context);
-
             Task task = taskModel.getTask(taskId);
 
             if (task == null || intent.getAction() == null) {
-                return;
+                e.onError(new Throwable("Task or action not found"));
+            } else {
+                e.onSuccess(task);
             }
-
-
-            switch (intent.getAction()) {
-
-                case ACTION_START:
-                    if (task.getStatus() == TaskStatus.NEW
-                            || (task.isPeriodical() && task.getStatus() == TaskStatus.COMPLETED)) {
-                        Log.d("TASK_", "start:" + task.getTitle());
-                        taskModel.start(task);
-                        showTaskStartedNotification(context, task.getTitle());
-                    }
-                    break;
-
-                case ACTION_COMPLETE:
-                    if (task.getStatus() == TaskStatus.ACTIVE) {
-                        Log.d("TASK_", "complete:" + task.getTitle());
-                        taskModel.complete(task);
-                        showTaskCompletedNotification(context, task.getTitle());
-                    }
-                    break;
-            }
-            e.onComplete();
         }).subscribeOn(Schedulers.io())
-        .subscribe(()->{},Throwable::printStackTrace);
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        task -> toggleTaskStatus(context, taskModel, task, intent.getAction()),
+                        Throwable::printStackTrace);
+    }
 
+    private void toggleTaskStatus(Context context, TaskModel taskModel, Task task, String action) {
+        switch (action) {
+
+            case ACTION_START:
+                if (task.getStatus() == TaskStatus.NEW
+                        || (task.isPeriodical() && task.getStatus() == TaskStatus.COMPLETED)) {
+                    Log.d("TASK_", "start:" + task.getTitle());
+                    taskModel.start(task).subscribe(
+                            updatedTask -> showTaskStartedNotification(context, updatedTask.getTitle())
+                    );
+                }
+                break;
+
+            case ACTION_COMPLETE:
+                if (task.getStatus() == TaskStatus.ACTIVE) {
+                    Log.d("TASK_", "complete:" + task.getTitle());
+                    taskModel.complete(task).subscribe(
+                            updatedTask -> showTaskCompletedNotification(context, updatedTask.getTitle())
+                    );
+                }
+                break;
+        }
     }
 
     private void showTaskCompletedNotification(Context context, String title) {

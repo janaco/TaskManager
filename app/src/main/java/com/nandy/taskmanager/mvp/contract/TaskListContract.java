@@ -35,6 +35,8 @@ public interface TaskListContract {
 
         void setSavedViewState(Bundle savedInstanceState);
 
+        void refresh();
+
     }
 
     interface View extends org.kaerdan.presenterretainer.Presenter.View {
@@ -52,6 +54,8 @@ public interface TaskListContract {
         void setProgressViewVisible(boolean visible);
 
         void setListViewVisible(boolean visible);
+
+        void setRefreshing(boolean refreshing);
 
     }
 }

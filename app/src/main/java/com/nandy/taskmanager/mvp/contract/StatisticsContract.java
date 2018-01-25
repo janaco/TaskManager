@@ -15,6 +15,8 @@ public interface StatisticsContract {
         void saveInstanceState(Bundle outState, Parcelable listViewState);
 
         void restoreInstanceState(Bundle savedInstanceState);
+
+        void refresh();
     }
 
     interface View extends org.kaerdan.presenterretainer.Presenter.View {
@@ -22,6 +24,8 @@ public interface StatisticsContract {
         <T extends ExpandableListAdapter> void setAdapter(T adapter);
 
         void restoreListState(Parcelable state);
+
+        void setRefreshing(boolean refreshing);
 
     }
 }

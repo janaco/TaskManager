@@ -62,6 +62,8 @@ public class TaskListPresenter implements TaskListContract.Presenter, TasksAdapt
 
         if (mSavedInstanceState != null) {
             restoreViewState();
+        }else {
+            loadTasks(false);
         }
 
     }
@@ -87,9 +89,13 @@ public class TaskListPresenter implements TaskListContract.Presenter, TasksAdapt
     }
 
     @Override
+    public void refresh() {
+        loadTasks(true);
+    }
+
+    @Override
     public void resume() {
         EventBus.getDefault().register(this);
-        loadTasks();
     }
 
     @Override
@@ -124,18 +130,28 @@ public class TaskListPresenter implements TaskListContract.Presenter, TasksAdapt
 
     }
 
-    private void loadTasks() {
+    private void loadTasks(boolean byUser) {
 
         mLoadTasksSubscription =
                 mTaskModel.getAll()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnSubscribe(disposable -> {
-                            mView.setListViewVisible(false);
-                            mView.setProgressViewVisible(true);
+                            if (byUser) {
+                                mView.setRefreshing(true);
+                            } else {
+                                mView.setListViewVisible(false);
+                                mView.setProgressViewVisible(true);
+                            }
+
                         })
-                        .doFinally(() -> mView.setProgressViewVisible(false))
-                        .subscribe(tasks -> {
+                        .doFinally(() -> {
+                            mView.setProgressViewVisible(false);
+                            mView.setRefreshing(false);
+                        })
+                        .subscribe(tasks ->
+
+                        {
                             mAdapter.setItems(tasks);
                             mView.setListViewVisible(true);
                             mView.setNoTasksMessageVisible(tasks.size() == 0);
@@ -159,7 +175,7 @@ public class TaskListPresenter implements TaskListContract.Presenter, TasksAdapt
                 .subscribe(() -> {
                     mAdapter.remove(position);
 
-                    if (mAdapter.getCount() == 0){
+                    if (mAdapter.getCount() == 0) {
                         mView.setNoTasksMessageVisible(true);
                     }
                 }, Throwable::printStackTrace);

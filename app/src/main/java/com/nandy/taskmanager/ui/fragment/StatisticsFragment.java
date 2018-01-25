@@ -4,6 +4,7 @@ package com.nandy.taskmanager.ui.fragment;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,8 @@ public class StatisticsFragment
 
     @BindView(R.id.list_view)
     ExpandableListView mListView;
+    @BindView(R.id.swipe_refresh_layout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,6 +42,7 @@ public class StatisticsFragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+        mSwipeRefreshLayout.setOnRefreshListener(() -> getPresenter().refresh());
 
         if (savedInstanceState != null && getPresenter() != null) {
             getPresenter().restoreInstanceState(savedInstanceState);
@@ -74,5 +78,10 @@ public class StatisticsFragment
     @Override
     public void restoreListState(Parcelable state) {
         mListView.onRestoreInstanceState(state);
+    }
+
+    @Override
+    public void setRefreshing(boolean refreshing) {
+        mSwipeRefreshLayout.setRefreshing(refreshing);
     }
 }

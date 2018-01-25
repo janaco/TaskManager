@@ -18,6 +18,7 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -49,18 +50,29 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         mView.setAdapter(mAdapter);
 
         if (mSavedInstanceState == null) {
-            loadStatistics();
+            loadStatistics(false);
         } else {
             restoreViewState();
             mSavedInstanceState = null;
         }
     }
 
-    private void loadStatistics() {
+    @Override
+    public void refresh() {
+loadStatistics(true);
+    }
+
+    private void loadStatistics(boolean byUser) {
 
         mStatisticsSubscription = mStatisticsModel.getStatistics()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> {
+                    if (byUser){
+                        mView.setRefreshing(true);
+                    }
+                })
+                .doFinally(() -> mView.setRefreshing(false))
                 .subscribe(pairs -> mAdapter.setData(pairs), Throwable::printStackTrace);
     }
 

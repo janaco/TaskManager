@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -44,6 +45,8 @@ public class TaskListFragment
     View mProgressView;
     @BindView(R.id.txt_message)
     TextView mNoTasksTextView;
+    @BindView(R.id.swipe_refresh_layout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Nullable
     @Override
@@ -58,6 +61,7 @@ public class TaskListFragment
 
         registerForContextMenu(mTaskLisView);
 
+        mSwipeRefreshLayout.setOnRefreshListener(() -> getPresenter().refresh());
         mTaskLisView.setOnItemClickListener((adapterView, itemView, position, l) ->
                 getPresenter().openDetails(position));
 
@@ -187,5 +191,10 @@ public class TaskListFragment
     @Override
     public void scrollToPosition(int position) {
         mTaskLisView.setSelection(position);
+    }
+
+    @Override
+    public void setRefreshing(boolean refreshing) {
+        mSwipeRefreshLayout.setRefreshing(refreshing);
     }
 }
