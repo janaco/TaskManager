@@ -8,7 +8,6 @@ import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.events.OpenFileCallback;
 import com.nandy.taskmanager.R;
-import com.nandy.taskmanager.mvp.BasePresenter;
 import com.nandy.taskmanager.mvp.model.CreateBackupModel;
 import com.nandy.taskmanager.mvp.model.DataImportModel;
 import com.nandy.taskmanager.mvp.model.GoogleDriveConnectionModel;
@@ -22,7 +21,7 @@ import java.io.IOException;
  * Created by yana on 24.01.18.
  */
 
-public class MainPreferencesPresenter extends BasePresenter {
+public class MainPreferencesPresenter  {
 
     private final MainPreferencesView mView;
     private CreateBackupModel mCreateBackupModel;
@@ -34,7 +33,6 @@ public class MainPreferencesPresenter extends BasePresenter {
         mView = view;
     }
 
-    @Override
     public void start() {
         if (mCreateBackupModel.isGoogleClient()) {
             mCreateBackupModel.requestExistingBackupFiles()
@@ -42,10 +40,6 @@ public class MainPreferencesPresenter extends BasePresenter {
         }
     }
 
-    @Override
-    public void stop() {
-
-    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mGoogleDriveConnectionModel.onActivityResult(requestCode, resultCode, data);

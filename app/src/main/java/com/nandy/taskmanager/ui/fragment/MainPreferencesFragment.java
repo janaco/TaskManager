@@ -52,12 +52,6 @@ public class MainPreferencesFragment extends PreferenceFragment
         mPresenter.start();
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        mPresenter.stop();
-    }
-
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
