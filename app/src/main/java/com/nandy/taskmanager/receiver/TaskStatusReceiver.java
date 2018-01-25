@@ -17,8 +17,6 @@ import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.mvp.model.TaskModel;
 
 import io.reactivex.Completable;
-import io.reactivex.CompletableEmitter;
-import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -131,7 +129,7 @@ public class TaskStatusReceiver extends BroadcastReceiver {
 
 
         return new NotificationCompat.Builder(context, GROUP_ACTIVE)
-                .setSmallIcon(R.drawable.ic_check_outline)
+                .setSmallIcon(R.drawable.ic_check_outline_24)
                 .setContentTitle(context.getString(R.string.active_task))
                 .setContentText(String.format("%s '%s' %s",
                         context.getString(R.string.task),

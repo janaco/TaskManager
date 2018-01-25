@@ -6,6 +6,6 @@
 
     <item
             android:gravity="center"
-            android:drawable="@drawable/ic_check_outline"/>
+            android:drawable="@drawable/ic_check_outline_48"/>
 
 </layer-list>
