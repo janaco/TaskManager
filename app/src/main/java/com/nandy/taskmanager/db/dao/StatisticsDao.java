@@ -8,6 +8,7 @@ import android.arch.persistence.room.Query;
 import com.nandy.taskmanager.model.Statistics;
 import com.nandy.taskmanager.model.StatisticsResult;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**

@@ -1,11 +1,13 @@
 package com.nandy.taskmanager.mvp.model;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.Pair;
 
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.StatisticsDao;
+import com.nandy.taskmanager.model.Month;
 import com.nandy.taskmanager.model.StatisticsResult;
 
 import java.util.ArrayList;
@@ -21,31 +23,27 @@ public class StatisticsModel {
     private final Context mContext;
     private final StatisticsDao mStatisticsDao;
 
-    public StatisticsModel(Context context){
+    public StatisticsModel(Context context) {
         mContext = context;
         mStatisticsDao = AppDatabase.getInstance(context).statisticsDao();
     }
 
-    public List<Pair<String, List<StatisticsResult>>> getStatistics(){
-        List<Pair<String, List<StatisticsResult>>> data = new ArrayList<>();
+    public List<Pair<String, ArrayList<StatisticsResult>>> getStatistics() {
+        List<Pair<String, ArrayList<StatisticsResult>>> data = new ArrayList<>();
 
-        data.add(new Pair<>(mContext.getString(R.string.january), getStatistics(Calendar.JANUARY)));
-        data.add(new Pair<>(mContext.getString(R.string.february), getStatistics(Calendar.FEBRUARY)));
-        data.add(new Pair<>(mContext.getString(R.string.march), getStatistics(Calendar.MARCH)));
-        data.add(new Pair<>(mContext.getString(R.string.april), getStatistics(Calendar.APRIL)));
-        data.add(new Pair<>(mContext.getString(R.string.may), getStatistics(Calendar.MAY)));
-        data.add(new Pair<>(mContext.getString(R.string.june), getStatistics(Calendar.JUNE)));
-        data.add(new Pair<>(mContext.getString(R.string.july), getStatistics(Calendar.JULY)));
-        data.add(new Pair<>(mContext.getString(R.string.august), getStatistics(Calendar.AUGUST)));
-        data.add(new Pair<>(mContext.getString(R.string.september), getStatistics(Calendar.SEPTEMBER)));
-        data.add(new Pair<>(mContext.getString(R.string.october), getStatistics(Calendar.OCTOBER)));
-        data.add(new Pair<>(mContext.getString(R.string.november), getStatistics(Calendar.NOVEMBER)));
-        data.add(new Pair<>(mContext.getString(R.string.december), getStatistics(Calendar.DECEMBER)));
-        
+        for (Month month : Month.values()) {
+            String groupName = mContext.getString(month.getNameResId());
+            ArrayList<StatisticsResult> results = getStatistics(month.getMonthOfYear());
+
+            Log.d("STATISTICS_", "add: " + groupName + ", " + results);
+            data.add(new Pair<>(groupName, results));
+        }
+
         return data;
 
     }
-    public List<StatisticsResult> getStatistics(int month) {
+
+    private ArrayList<StatisticsResult> getStatistics(int month) {
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MONTH, month);
@@ -63,7 +61,7 @@ public class StatisticsModel {
 
     }
 
-    private List<StatisticsResult> getStatistics(long dateStart, long dateEnd) {
-        return mStatisticsDao.select(dateStart, dateEnd);
+    private ArrayList<StatisticsResult> getStatistics(long dateStart, long dateEnd) {
+        return (ArrayList<StatisticsResult>)mStatisticsDao.select(dateStart, dateEnd);
     }
 }

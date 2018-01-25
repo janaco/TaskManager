@@ -9,20 +9,34 @@ import android.widget.TextView;
 
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.StatisticsResult;
+import com.nandy.taskmanager.mvp.model.DateFormatModel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by razomer on 22.01.18.
+ * Created by yana on 22.01.18.
  */
 
 public class StatisticsAdapter extends BaseExpandableListAdapter {
 
-    private List<Pair<String, List<StatisticsResult>>> mData;
+    private DateFormatModel mDateFormatModel;
+    private final List<Pair<String, ArrayList<StatisticsResult>>> mData = new ArrayList<>();
 
-    public StatisticsAdapter(List<Pair<String, List<StatisticsResult>>> data) {
-        mData = data;
+
+    public void setDateFormatModel(DateFormatModel mDateFormatModel) {
+        this.mDateFormatModel = mDateFormatModel;
+    }
+
+    public void setData(List<Pair<String, ArrayList<StatisticsResult>>> data) {
+        mData.clear();
+        mData.addAll(data);
+        notifyDataSetChanged();
+    }
+
+    public List<Pair<String, ArrayList<StatisticsResult>>> getData() {
+        return mData;
     }
 
     @Override
@@ -86,8 +100,7 @@ public class StatisticsAdapter extends BaseExpandableListAdapter {
 
         StatisticsResult result = getChild(groupPosition, childPosition);
         titleTextView.setText(result.getTaskTitle());
-        spentTimeTextView.setText(TimeUnit.MILLISECONDS.toMinutes(
-                result.getSpentTime()) + " mins");
+        spentTimeTextView.setText(mDateFormatModel.formatDuration(result.getSpentTime()));
 
 
         return convertView;

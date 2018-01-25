@@ -1,5 +1,7 @@
 package com.nandy.taskmanager.mvp.contract;
 
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.widget.ExpandableListAdapter;
 
 /**
@@ -10,15 +12,16 @@ public interface StatisticsContract {
 
     interface Presenter extends org.kaerdan.presenterretainer.Presenter<View> {
 
-        void resume();
+        void saveInstanceState(Bundle outState, Parcelable listViewState);
 
-        void pause();
-
+        void restoreInstanceState(Bundle savedInstanceState);
     }
 
     interface View extends org.kaerdan.presenterretainer.Presenter.View {
 
         <T extends ExpandableListAdapter> void setAdapter(T adapter);
+
+        void restoreListState(Parcelable state);
 
     }
 }

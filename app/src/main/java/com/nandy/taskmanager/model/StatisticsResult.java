@@ -73,4 +73,13 @@ public class StatisticsResult implements Parcelable{
     public void setSpentTime(long mSpentTime) {
         this.mSpentTime = mSpentTime;
     }
+
+    @Override
+    public String toString() {
+        return "StatisticsResult{" +
+                "mTaskId='" + mTaskId + '\'' +
+                ", mTaskTitle='" + mTaskTitle + '\'' +
+                ", mSpentTime=" + mSpentTime +
+                '}';
+    }
 }

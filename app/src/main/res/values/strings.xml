@@ -98,5 +98,9 @@
     <string name="backup_created_successfully">Backup created successfully</string>
     <string name="data_restored">Data restored</string>
     <string name="no_backups_found">No backups found</string>
+    <string name="s">s</string>
+    <string name="min">min</string>
+    <string name="h">h</string>
+    <string name="days">day(s)</string>
 
 </resources>

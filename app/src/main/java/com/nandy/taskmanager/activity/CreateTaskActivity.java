@@ -123,7 +123,7 @@ public class CreateTaskActivity extends PresenterActivity<CreateTaskContract.Pre
         CreateTaskPresenter presenter = new CreateTaskPresenter();
         presenter.setCreateTaskMode(new CreateTaskModel(task, mode));
         presenter.setValidationModel(new ValidationModel());
-        presenter.setDateFormatModel(new DateFormatModel());
+        presenter.setDateFormatModel(new DateFormatModel(getApplicationContext()));
         presenter.setCoverModel(new TaskCoverModel(getApplicationContext()));
         presenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
         presenter.setScheduleModel(new TaskRemindersModel(getApplicationContext()));
