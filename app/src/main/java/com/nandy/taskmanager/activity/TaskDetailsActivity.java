@@ -102,7 +102,6 @@ public class TaskDetailsActivity extends PresenterActivity<TaskDetailsContract.P
 
         TaskItemPresenter presenter = new TaskItemPresenter();
         presenter.setDateFormatModel(new DateFormatModel(getApplicationContext()));
-        presenter.setTaskReminderModel(new TaskRemindersModel(getApplicationContext()));
         presenter.setTaskModel(new TaskModel(getApplicationContext(), task));
 
         return presenter;

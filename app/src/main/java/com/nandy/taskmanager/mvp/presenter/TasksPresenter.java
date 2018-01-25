@@ -10,7 +10,6 @@ import com.nandy.taskmanager.eventbus.TaskListChangedEvent;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskStatus;
 import com.nandy.taskmanager.mvp.contract.TasksContract;
-import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.TaskModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
@@ -127,7 +126,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
     @Override
     public void onDeleteOptionSelected(Task task, int position) {
         mTaskModel.delete(task);
-        mTaskReminderMode.cancelReminder(task.getId());
+        mTaskReminderMode.cancelReminders(task.getId());
         mAdapter.remove(position);
     }
 
@@ -158,7 +157,7 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
             case ACTIVE:
                 task.setStatus(TaskStatus.COMPLETED);
                 mTaskModel.complete(task);
-                mTaskReminderMode.cancelReminder(task.getId());
+                mTaskReminderMode.cancelReminders(task.getId());
                 break;
 
             default:
@@ -175,14 +174,14 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
     public void resetStart(int position) {
         Task task = getTask(position);
         mTaskModel.resetStart(task);
-        mTaskReminderMode.cancelReminder(task.getId());
+        mTaskReminderMode.cancelReminders(task.getId());
     }
 
     @Override
     public void resetEnd(int position) {
         Task task = getTask(position);
         mTaskModel.resetStart(task);
-        mTaskReminderMode.cancelReminder(task.getId());
+        mTaskReminderMode.cancelReminders(task.getId());
         mTaskReminderMode.scheduleEndReminder(task.getId(), task.getScheduledDuration());
     }
 

@@ -12,7 +12,6 @@ import com.nandy.taskmanager.model.TaskStatus;
 import com.nandy.taskmanager.mvp.contract.TaskDetailsContract;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskModel;
-import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 
 /**
  * Created by razomer on 18.01.18.
@@ -23,7 +22,6 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
     private TaskDetailsContract.View mView;
 
     private TaskModel mTaskModel;
-    private TaskRemindersModel mTaskReminderModel;
     private DateFormatModel mDateFormatModel;
 
     @Override
@@ -146,12 +144,10 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
 
             case NEW:
                 mTaskModel.start();
-                mTaskReminderModel.scheduleStartReminder(mTaskModel.getTask());
                 break;
 
             case ACTIVE:
                 mTaskModel.complete();
-                mTaskReminderModel.cancelReminder(mTaskModel.getTask().getId());
                 break;
         }
 
@@ -160,7 +156,6 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
     }
 
     public void delete() {
-        mTaskReminderModel.cancelReminder(mTaskModel.getTask().getId());
         mTaskModel.delete();
         mView.finish();
 
@@ -172,42 +167,30 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
 
     public void resetStart() {
         mTaskModel.resetStart();
-        mTaskReminderModel.cancelReminder(mTaskModel.getTask().getId());
         displayData(mTaskModel.getTask());
         setupMenu();
     }
 
     public void resetEnd() {
-        Task task = mTaskModel.getTask();
         mTaskModel.resetEnd();
-        mTaskReminderModel.cancelReminder(task.getId());
-        mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration());
         displayData(mTaskModel.getTask());
         setupMenu();
     }
 
     public void pause() {
         mTaskModel.pause();
-        mTaskReminderModel.cancelReminder(mTaskModel.getTask().getId());
         displayData(mTaskModel.getTask());
         setupMenu();
     }
 
     public void resume() {
         mTaskModel.resume();
-        Task task = mTaskModel.getTask();
-        long duration = task.getScheduledDuration() - task.getMetadata().getTimeSpent();
-        mTaskReminderModel.scheduleEndReminder(task.getId(), duration);
         displayData(mTaskModel.getTask());
         setupMenu();
     }
 
     public void setTaskModel(TaskModel mTaskModel) {
         this.mTaskModel = mTaskModel;
-    }
-
-    public void setTaskReminderModel(TaskRemindersModel mTaskReminderModel) {
-        this.mTaskReminderModel = mTaskReminderModel;
     }
 
     public void setDateFormatModel(DateFormatModel mDateFormatModel) {

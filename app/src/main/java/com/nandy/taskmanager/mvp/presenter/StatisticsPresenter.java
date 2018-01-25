@@ -48,15 +48,6 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
     }
 
     private void restoreViewState() {
-//        ArrayList<String> keys = mSavedInstanceState.getStringArrayList(StatisticsFragment.PARAM_KEYS);
-//        List<Pair<String, ArrayList<StatisticsResult>>> data = new ArrayList<>();
-//
-//        for (String key : keys) {
-//            ArrayList<StatisticsResult> values = mSavedInstanceState.getParcelableArrayList(key);
-//            data.add(new Pair<>(key, values));
-//        }
-//
-//        mAdapter.setData(data);
         mView.restoreListState(mSavedInstanceState.getParcelable(StatisticsFragment.PARAM_LIST_STATE));
     }
 
@@ -72,16 +63,6 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
 
     @Override
     public void saveInstanceState(Bundle outState, Parcelable listViewState) {
-//        List<Pair<String, ArrayList<StatisticsResult>>> data = mAdapter.getData();
-//
-//        ArrayList<String> keys = new ArrayList<>(data.size());
-//
-//        for (Pair<String, ArrayList<StatisticsResult>> pair : data) {
-//            keys.add(pair.first);
-//            outState.putParcelableArrayList(pair.first, pair.second);
-//        }
-//
-//        outState.putStringArrayList(StatisticsFragment.PARAM_KEYS, keys);
         outState.putParcelable(StatisticsFragment.PARAM_LIST_STATE, listViewState);
     }
 

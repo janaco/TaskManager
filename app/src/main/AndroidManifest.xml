@@ -48,7 +48,8 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".receiver.TaskStatusReceiver" />
+        <receiver android:name=".receiver.TaskStatusReceiver"
+            android:enabled="true"/>
 
         <service
             android:name=".service.LocationService"

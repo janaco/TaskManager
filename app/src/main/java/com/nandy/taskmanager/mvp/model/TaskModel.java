@@ -23,6 +23,8 @@ import java.util.List;
 
 public class TaskModel {
 
+    private TaskRemindersModel mTaskReminderModel;
+
     private final EventsDao mEventsDao;
     private final TasksDao mTasksDao;
     private final StatisticsDao mStatisticsDao;
@@ -37,6 +39,7 @@ public class TaskModel {
         mEventsDao = AppDatabase.getInstance(context).taskEventsDao();
         mTasksDao = AppDatabase.getInstance(context).tasksDao();
         mStatisticsDao = AppDatabase.getInstance(context).statisticsDao();
+        mTaskReminderModel = new TaskRemindersModel(context);
     }
 
 
@@ -48,6 +51,12 @@ public class TaskModel {
 
         task.setStatus(TaskStatus.NEW);
         mTasksDao.update(task);
+        mTaskReminderModel.cancelReminders(task.getId());
+
+        if (task.getPlannedStartDate().after(new Date())){
+            mTaskReminderModel.scheduleStartReminder(task);
+        }
+
     }
 
     public void resetEnd(Task task) {
@@ -57,6 +66,7 @@ public class TaskModel {
 
         task.setStatus(TaskStatus.ACTIVE);
         mTasksDao.update(task);
+        mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration());
     }
 
     public void resetStart() {
@@ -84,6 +94,8 @@ public class TaskModel {
 
         mTasksDao.update(task);
         mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.START));
+        mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration());
+
     }
 
     public void complete() {
@@ -135,6 +147,7 @@ public class TaskModel {
 
         mTasksDao.update(task);
         mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.PAUSE));
+        mTaskReminderModel.cancelReminders(task.getId());
     }
 
     public void pause(){
@@ -158,6 +171,9 @@ public class TaskModel {
 
         mTasksDao.update(task);
         mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.RESUME));
+
+        long timeToComplete = task.getScheduledDuration() - timeSpent;
+        mTaskReminderModel.scheduleEndReminder(task.getId(), timeToComplete);
     }
 
     public void delete() {
@@ -165,6 +181,7 @@ public class TaskModel {
     }
 
     public void delete(Task task) {
+        mTaskReminderModel.cancelReminders(task.getId());
         mTasksDao.delete(task);
         mStatisticsDao.deleteAll(task.getId());
     }

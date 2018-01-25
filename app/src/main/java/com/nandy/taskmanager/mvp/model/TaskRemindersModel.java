@@ -13,6 +13,7 @@ import com.nandy.taskmanager.receiver.TaskStatusReceiver;
 import com.nandy.taskmanager.service.LocationService;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.ALARM_SERVICE;
 
@@ -29,10 +30,12 @@ public class TaskRemindersModel {
     }
 
     public void scheduleStartReminder(Task task) {
-        Log.d("TASK_", "scheduleStartReminder: " + task.getId() + ", " + task.getPlannedStartDate());
+        Log.d("TASK_", "scheduleStartReminder: " + task.getId());
 
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(task.getPlannedStartDate());
+//        calendar.setTime(task.getPlannedStartDate());
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.SECOND, 15);
 
         Intent data = new Intent(mContext, TaskStatusReceiver.class);
         data.setAction(TaskStatusReceiver.ACTION_START);
@@ -43,12 +46,12 @@ public class TaskRemindersModel {
                 PendingIntent.getBroadcast(mContext, requestCode, data, PendingIntent.FLAG_UPDATE_CURRENT);
 
         if (task.isPeriodical()) {
-            getAlarmManager()
-                    .setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                            task.getRepeatPeriod().getValue(), pendingIntent);
 //            getAlarmManager()
 //                    .setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-//                            TimeUnit.MINUTES.toMillis(2), pendingIntent);
+//                            task.getRepeatPeriod().getValue(), pendingIntent);
+            getAlarmManager()
+                    .setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                            TimeUnit.SECONDS.toMillis(45), pendingIntent);
         } else {
             getAlarmManager()
                     .set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
@@ -57,15 +60,14 @@ public class TaskRemindersModel {
 
     public void scheduleEndReminder(long taskId, long duration) {
 
-        Log.d("TASK_", "scheduleEndReminder: " + taskId + ", " + duration);
+//        taskId = taskId + 1;
+
+        Log.d("TASK_", "scheduleEndReminder: " + taskId);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.MILLISECOND, (int) duration);
-//        calendar.add(Calendar.SECOND, 30);
-
-        cancelReminder((int) taskId);
-        enableTasksReceiver();
+//        calendar.add(Calendar.MILLISECOND, (int) duration);
+        calendar.add(Calendar.SECOND, 20);
 
         Intent data = new Intent(mContext, TaskStatusReceiver.class);
         data.setAction(TaskStatusReceiver.ACTION_COMPLETE);
@@ -79,7 +81,9 @@ public class TaskRemindersModel {
                 .set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
 
-    public void cancelReminder(long requestCode) {
+    public void cancelReminders(long requestCode) {
+
+        Log.d("TASK_", "cancelReminders: " + requestCode);
 
         Intent intent = new Intent(mContext, TaskStatusReceiver.class);
         PendingIntent pendingIntent = PendingIntent
@@ -90,14 +94,6 @@ public class TaskRemindersModel {
 
     private AlarmManager getAlarmManager() {
         return (AlarmManager) mContext.getSystemService(ALARM_SERVICE);
-    }
-
-    private void enableTasksReceiver() {
-        mContext.getPackageManager()
-                .setComponentEnabledSetting(
-                        new ComponentName(mContext, TaskStatusReceiver.class),
-                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                        PackageManager.DONT_KILL_APP);
     }
 
 

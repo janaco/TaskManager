@@ -30,7 +30,8 @@ public class TaskStatusReceiver extends BroadcastReceiver {
     public static final String ACTION_START = "action_start";
     public static final String ACTION_COMPLETE = "action_compete";
 
-    public static final String TASK_CHANNEL_ID = "Task";
+    public static final String GROUP_ACTIVE = "group_active";
+    public static final String GROUP_COMPLETED = "group_completed";
 
     private static final int NOTIFICATION_TASK_STARTED = 425;
     private static final int NOTIFICATION_TASK_COMPLETED = 426;
@@ -42,7 +43,6 @@ public class TaskStatusReceiver extends BroadcastReceiver {
         long taskId = intent.getLongExtra("id", -1);
 
         TaskModel taskModel = new TaskModel(context);
-        TaskRemindersModel remindersModel = new TaskRemindersModel(context);
 
         Task task = taskModel.getTask(taskId);
 
@@ -50,19 +50,21 @@ public class TaskStatusReceiver extends BroadcastReceiver {
             return;
         }
 
+
         switch (intent.getAction()) {
 
             case ACTION_START:
                 if (task.getStatus() == TaskStatus.NEW
                         || (task.isPeriodical() && task.getStatus() == TaskStatus.COMPLETED)) {
+                    Log.d("TASK_", "start:" + task.getTitle());
                     taskModel.start(task);
                     showTaskStartedNotification(context, task.getTitle());
-                    remindersModel.scheduleEndReminder(taskId, task.getScheduledDuration());
                 }
                 break;
 
             case ACTION_COMPLETE:
                 if (task.getStatus() == TaskStatus.ACTIVE) {
+                    Log.d("TASK_", "complete:" + task.getTitle());
                     taskModel.complete(task);
                     showTaskCompletedNotification(context, task.getTitle());
                 }
@@ -108,7 +110,9 @@ public class TaskStatusReceiver extends BroadcastReceiver {
 
 
     private Notification buildTaskCompetedNotification(Context context, String title, PendingIntent contentIntent) {
-        return new NotificationCompat.Builder(context, TASK_CHANNEL_ID)
+
+
+        return new NotificationCompat.Builder(context, GROUP_COMPLETED)
                 .setSmallIcon(R.drawable.ic_clock_alert)
                 .setContentTitle(context.getString(R.string.task_completed))
                 .setContentText(String.format("%s '%s' %s",
@@ -120,8 +124,10 @@ public class TaskStatusReceiver extends BroadcastReceiver {
     }
 
 
-    private Notification buildTaskStartedNotification(Context context, String title, PendingIntent contentIntent) {
-        return new NotificationCompat.Builder(context, TASK_CHANNEL_ID)
+    private static Notification buildTaskStartedNotification(Context context, String title, PendingIntent contentIntent) {
+
+
+        return new NotificationCompat.Builder(context, GROUP_ACTIVE)
                 .setSmallIcon(R.drawable.ic_check_outline)
                 .setContentTitle(context.getString(R.string.active_task))
                 .setContentText(String.format("%s '%s' %s",
