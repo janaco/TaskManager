@@ -21,7 +21,7 @@ import com.nandy.taskmanager.mvp.model.DummyDataModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.presenter.MainPresenter;
 import com.nandy.taskmanager.ui.fragment.StatisticsFragment;
-import com.nandy.taskmanager.ui.fragment.TasksFragment;
+import com.nandy.taskmanager.ui.fragment.TaskListFragment;
 
 import org.kaerdan.presenterretainer.PresenterActivity;
 
@@ -169,7 +169,7 @@ public class MainActivity extends PresenterActivity<MainActivityContract.Present
     private TabsPagerAdapter createPagerAdapter() {
         return new TabsPagerAdapter(
                 getSupportFragmentManager(),
-                new Fragment[]{new TasksFragment(), new StatisticsFragment()});
+                new Fragment[]{new TaskListFragment(), new StatisticsFragment()});
     }
 
 }

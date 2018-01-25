@@ -16,6 +16,11 @@ import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.mvp.model.TaskModel;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableEmitter;
+import io.reactivex.CompletableOnSubscribe;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by yana on 20.01.18.
  */
@@ -34,36 +39,40 @@ public class TaskStatusReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        long taskId = intent.getLongExtra(Constants.PARAM_ID, -1);
+        Completable.create(e -> {
+            long taskId = intent.getLongExtra(Constants.PARAM_ID, -1);
 
-        TaskModel taskModel = new TaskModel(context);
+            TaskModel taskModel = new TaskModel(context);
 
-        Task task = taskModel.getTask(taskId);
+            Task task = taskModel.getTask(taskId);
 
-        if (task == null || intent.getAction() == null) {
-            return;
-        }
+            if (task == null || intent.getAction() == null) {
+                return;
+            }
 
 
-        switch (intent.getAction()) {
+            switch (intent.getAction()) {
 
-            case ACTION_START:
-                if (task.getStatus() == TaskStatus.NEW
-                        || (task.isPeriodical() && task.getStatus() == TaskStatus.COMPLETED)) {
-                    Log.d("TASK_", "start:" + task.getTitle());
-                    taskModel.start(task);
-                    showTaskStartedNotification(context, task.getTitle());
-                }
-                break;
+                case ACTION_START:
+                    if (task.getStatus() == TaskStatus.NEW
+                            || (task.isPeriodical() && task.getStatus() == TaskStatus.COMPLETED)) {
+                        Log.d("TASK_", "start:" + task.getTitle());
+                        taskModel.start(task);
+                        showTaskStartedNotification(context, task.getTitle());
+                    }
+                    break;
 
-            case ACTION_COMPLETE:
-                if (task.getStatus() == TaskStatus.ACTIVE) {
-                    Log.d("TASK_", "complete:" + task.getTitle());
-                    taskModel.complete(task);
-                    showTaskCompletedNotification(context, task.getTitle());
-                }
-                break;
-        }
+                case ACTION_COMPLETE:
+                    if (task.getStatus() == TaskStatus.ACTIVE) {
+                        Log.d("TASK_", "complete:" + task.getTitle());
+                        taskModel.complete(task);
+                        showTaskCompletedNotification(context, task.getTitle());
+                    }
+                    break;
+            }
+            e.onComplete();
+        }).subscribeOn(Schedulers.io())
+        .subscribe(()->{},Throwable::printStackTrace);
 
     }
 

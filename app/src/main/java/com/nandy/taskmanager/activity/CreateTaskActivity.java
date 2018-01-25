@@ -16,6 +16,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,11 +29,13 @@ import android.widget.Toast;
 
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.SimpleTextChangedListener;
 import com.nandy.taskmanager.image.ImageLoader;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.contract.CreateTaskContract;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
+import com.nandy.taskmanager.mvp.model.GeocoderModel;
 import com.nandy.taskmanager.mvp.model.TaskCoverModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
@@ -73,6 +77,8 @@ public class CreateTaskActivity
     TextView mRepeatPeriodTextView;
     @BindView(R.id.txt_location)
     TextView mLocationTextView;
+    @BindView(R.id.layout_progress)
+    View mProgressView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +96,8 @@ public class CreateTaskActivity
 
         registerForContextMenu(mDurationTextView);
         registerForContextMenu(mRepeatPeriodTextView);
+
+       setupTextWatchers();
 
     }
 
@@ -109,7 +117,7 @@ public class CreateTaskActivity
                 return true;
 
             case R.id.action_save:
-                onSaveBtnClick();
+                getPresenter().saveChanges();
                 return true;
 
             default:
@@ -156,20 +164,6 @@ public class CreateTaskActivity
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        getPresenter().saveInstanceState(outState,
-                mInputTitle.getText().toString(),
-                mInputDescription.getText().toString());
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        getPresenter().restoreInstanceState(savedInstanceState);
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -196,7 +190,7 @@ public class CreateTaskActivity
         presenter.setCoverModel(new TaskCoverModel(getApplicationContext()));
         presenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));
         presenter.setScheduleModel(new TaskRemindersModel(getApplicationContext()));
-
+        presenter.setGeocoderModel(new GeocoderModel(getApplicationContext()));
 
         return presenter;
     }
@@ -299,13 +293,18 @@ public class CreateTaskActivity
     }
 
     @Override
-    public void displayLocation(String location) {
+    public void displayAddress(String location) {
         mLocationTextView.setText(location);
     }
 
     @Override
     public void setTitle(String title) {
         mInputTitle.setText(title);
+        Log.d("CREATE_TASK_", "set title: " + title);
+
+        if (!TextUtils.isEmpty(title)) {
+            mInputTitle.setSelection(title.length());
+        }
     }
 
     @Override
@@ -322,6 +321,9 @@ public class CreateTaskActivity
     @Override
     public void setDescription(String description) {
         mInputDescription.setText(description);
+        if (!TextUtils.isEmpty(description)) {
+            mInputDescription.setSelection(description.length());
+        }
     }
 
     @Override
@@ -351,6 +353,11 @@ public class CreateTaskActivity
         finish();
     }
 
+    @Override
+    public void setProgressViewVisible(boolean visible) {
+        mProgressView.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
     private boolean isPermissionsGranted() {
         return Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 || ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 
@@ -369,13 +376,21 @@ public class CreateTaskActivity
         startActivityForResult(chooserIntent, Constants.REQUEST_CODE_CHOOSE_IMAGE);
     }
 
-    private void onSaveBtnClick() {
 
-        String title = mInputTitle.getText().toString().trim();
-        String comment = mInputDescription.getText().toString().trim();
+    private void setupTextWatchers(){
+        mInputTitle.addTextChangedListener(new SimpleTextChangedListener() {
+            @Override
+            public void onTextChanged(String text) {
+                getPresenter().onTitleChanged(text);
+            }
+        });
 
-        getPresenter().saveChanges(title, comment);
-
+        mInputDescription.addTextChangedListener(new SimpleTextChangedListener() {
+            @Override
+            public void onTextChanged(String text) {
+                getPresenter().onDescriptionChanged(text);
+            }
+        });
     }
 
 

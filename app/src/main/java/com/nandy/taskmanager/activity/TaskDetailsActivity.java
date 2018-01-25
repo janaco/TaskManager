@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -110,8 +111,7 @@ public class TaskDetailsActivity extends PresenterActivity<TaskDetailsContract.P
                 break;
 
             case R.id.action_delete:
-                getPresenter().delete();
-                finish();
+                onDeleteOptionSelected();
                 break;
 
             case R.id.action_reset_start:
@@ -133,6 +133,13 @@ public class TaskDetailsActivity extends PresenterActivity<TaskDetailsContract.P
         return super.onOptionsItemSelected(item);
     }
 
+    private void onDeleteOptionSelected(){
+            new AlertDialog.Builder(this)
+                    .setMessage(R.string.delete_item_alert)
+                    .setPositiveButton(R.string.delete, (dialogInterface, i) -> getPresenter().delete())
+                    .setNegativeButton(R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
+                    .show();
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -192,8 +199,8 @@ public class TaskDetailsActivity extends PresenterActivity<TaskDetailsContract.P
     }
 
     @Override
-    public void setScheduledDuration(int value, int textResId) {
-        mScheduledDurationTextView.setText(String.format(Locale.getDefault(), "%d %s", value, getString(textResId)));
+    public void setScheduledDuration(String duration) {
+        mScheduledDurationTextView.setText(duration);
     }
 
     @Override

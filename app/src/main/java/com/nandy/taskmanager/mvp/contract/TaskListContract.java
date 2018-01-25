@@ -9,7 +9,7 @@ import com.nandy.taskmanager.model.Task;
  * Created by yana on 24.01.18.
  */
 
-public interface TasksContract {
+public interface TaskListContract {
 
     interface Presenter extends org.kaerdan.presenterretainer.Presenter<View> {
 
@@ -46,6 +46,12 @@ public interface TasksContract {
         void launchActivityForResult(Bundle args, Class<?> cls, int requestCode);
 
         void scrollToPosition(int position);
+
+        void setNoTasksMessageVisible(boolean visible);
+
+        void setProgressViewVisible(boolean visible);
+
+        void setListViewVisible(boolean visible);
 
     }
 }

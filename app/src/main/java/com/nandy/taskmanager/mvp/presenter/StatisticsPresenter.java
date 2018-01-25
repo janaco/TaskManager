@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Pair;
 
+import com.nandy.taskmanager.Constants;
+import com.nandy.taskmanager.SubscriptionUtils;
 import com.nandy.taskmanager.adapter.StatisticsAdapter;
 import com.nandy.taskmanager.model.StatisticsResult;
 import com.nandy.taskmanager.mvp.contract.StatisticsContract;
@@ -13,6 +15,11 @@ import com.nandy.taskmanager.ui.fragment.StatisticsFragment;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by yana on 24.01.18.
@@ -28,6 +35,8 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
 
     private Bundle mSavedInstanceState;
 
+    private Disposable mStatisticsSubscription;
+
     @Override
     public void onAttachView(StatisticsContract.View view) {
         mView = view;
@@ -40,20 +49,29 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         mView.setAdapter(mAdapter);
 
         if (mSavedInstanceState == null) {
-            mAdapter.setData(mStatisticsModel.getStatistics());
+            loadStatistics();
         } else {
             restoreViewState();
             mSavedInstanceState = null;
         }
     }
 
+    private void loadStatistics() {
+
+        mStatisticsSubscription = mStatisticsModel.getStatistics()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(pairs -> mAdapter.setData(pairs), Throwable::printStackTrace);
+    }
+
     private void restoreViewState() {
-        mView.restoreListState(mSavedInstanceState.getParcelable(StatisticsFragment.PARAM_LIST_STATE));
+        mView.restoreListState(mSavedInstanceState.getParcelable(Constants.PARAM_LIST_STATE));
     }
 
     @Override
     public void onDetachView() {
         mView = null;
+        SubscriptionUtils.dispose(mStatisticsSubscription);
     }
 
     @Override
@@ -63,7 +81,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
 
     @Override
     public void saveInstanceState(Bundle outState, Parcelable listViewState) {
-        outState.putParcelable(StatisticsFragment.PARAM_LIST_STATE, listViewState);
+        outState.putParcelable(Constants.PARAM_LIST_STATE, listViewState);
     }
 
     @Override

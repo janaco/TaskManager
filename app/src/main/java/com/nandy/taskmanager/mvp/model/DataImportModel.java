@@ -13,6 +13,7 @@ import com.nandy.taskmanager.db.converters.TaskStatusConverter;
 import com.nandy.taskmanager.db.dao.EventsDao;
 import com.nandy.taskmanager.db.dao.StatisticsDao;
 import com.nandy.taskmanager.db.dao.TasksDao;
+import com.nandy.taskmanager.model.Location;
 import com.nandy.taskmanager.model.Metadata;
 import com.nandy.taskmanager.model.Statistics;
 import com.nandy.taskmanager.model.Task;
@@ -93,7 +94,8 @@ public class DataImportModel {
                 String title = cursor.getString(cursor.getColumnIndex("title"));
                 String description = cursor.getString(cursor.getColumnIndex("description"));
                 String image = cursor.getString(cursor.getColumnIndex("image"));
-                String location = cursor.getString(cursor.getColumnIndex("location"));
+                String location = cursor.getString(cursor.getColumnIndex("geo_position"));
+                String address = cursor.getString(cursor.getColumnIndex("address"));
                 long plannedStartDate = cursor.getLong(cursor.getColumnIndex("planned_start_date"));
                 String status = cursor.getString(cursor.getColumnIndex("status"));
                 long scheduledDuration = cursor.getLong(cursor.getColumnIndex("scheduled_duration"));
@@ -107,7 +109,6 @@ public class DataImportModel {
                 task.setDescription(description);
                 task.setImage(image);
                 task.setStatus(TaskStatusConverter.toTaskStatus(status));
-                task.setLocation(LocationTypeConverter.toLatLng(location));
                 task.setPlannedStartDate(DateTypeConverter.fromTimestamp(plannedStartDate));
                 task.setScheduledDuration(scheduledDuration);
                 task.setRepeatPeriod(RepeatPeriodConverter.toRepeatPeriod(repeatPeriod));
@@ -116,6 +117,10 @@ public class DataImportModel {
                 metadata.setActualStartDate(DateTypeConverter.fromTimestamp(actualStartDate));
                 metadata.setTimeSpent(timeSpent);
                 metadata.setDownTime(downtime);
+                if (location != null && !location.isEmpty()){
+                    metadata.setLocation(new Location(
+                            LocationTypeConverter.toLatLng(location), address));
+                }
 
                 task.setMetadata(metadata);
 

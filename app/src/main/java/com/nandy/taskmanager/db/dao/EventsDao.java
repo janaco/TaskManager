@@ -7,6 +7,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskEvent;
 
 import java.util.List;
@@ -23,5 +24,11 @@ public interface EventsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(TaskEvent taskEvent);
+
+    @Query("DELETE FROM events")
+    void deleteAll();
+
+    @Query("DELETE FROM events WHERE id_task=:taskId")
+    void delete(long taskId);
 
 }

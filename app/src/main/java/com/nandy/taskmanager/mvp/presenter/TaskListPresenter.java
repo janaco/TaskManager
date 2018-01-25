@@ -1,16 +1,19 @@
 package com.nandy.taskmanager.mvp.presenter;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.daimajia.swipe.util.Attributes;
 import com.nandy.taskmanager.Constants;
+import com.nandy.taskmanager.SubscriptionUtils;
 import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.adapter.TasksAdapter;
 import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.eventbus.TaskListChangedEvent;
+import com.nandy.taskmanager.eventbus.TasksCleanedEvent;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.mvp.contract.TasksContract;
+import com.nandy.taskmanager.mvp.contract.TaskListContract;
 import com.nandy.taskmanager.mvp.model.TaskModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
@@ -21,24 +24,33 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by yana on 16.01.18.
  */
 
-public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnItemOptionSelectedListener {
+public class TaskListPresenter implements TaskListContract.Presenter, TasksAdapter.OnItemOptionSelectedListener {
 
-
-    private TasksContract.View mView;
-    private TaskRecordsModel mRecordsModel;
-    private TaskRemindersModel mTaskReminderMode;
+    private TaskListContract.View mView;
     private TaskModel mTaskModel;
 
     private TasksAdapter mAdapter;
 
     private Bundle mSavedInstanceState;
 
+    private Disposable mLoadTasksSubscription;
+    private Disposable mRemoveTaskSubscription;
+    private Disposable mTaskStatusSubscription;
+
     @Override
-    public void onAttachView(TasksContract.View view) {
+    public void onAttachView(TaskListContract.View view) {
         mView = view;
 
         if (mAdapter == null) {
@@ -64,6 +76,9 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
     @Override
     public void onDetachView() {
         mView = null;
+        SubscriptionUtils.dispose(mLoadTasksSubscription);
+        SubscriptionUtils.dispose(mRemoveTaskSubscription);
+        SubscriptionUtils.dispose(mTaskStatusSubscription);
     }
 
     @Override
@@ -86,11 +101,14 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onTaskListChangedEvent(TaskListChangedEvent event) {
         mAdapter.addAll(event.getTasks());
+        mView.setListViewVisible(mAdapter.getCount() > 0);
+        mView.setNoTasksMessageVisible(mAdapter.getCount() == 0);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onTasksCleanedEvent() {
+    public void onTasksCleanedEvent(TasksCleanedEvent event) {
         mAdapter.clearAll();
+        mView.setNoTasksMessageVisible(mAdapter.getCount() == 0);
     }
 
     @Override
@@ -107,7 +125,22 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
     }
 
     private void loadTasks() {
-        mAdapter.setItems(mRecordsModel.selectAll());
+
+        mLoadTasksSubscription =
+                mTaskModel.getAll()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe(disposable -> {
+                            mView.setListViewVisible(false);
+                            mView.setProgressViewVisible(true);
+                        })
+                        .doFinally(() -> mView.setProgressViewVisible(false))
+                        .subscribe(tasks -> {
+                            mAdapter.setItems(tasks);
+                            mView.setListViewVisible(true);
+                            mView.setNoTasksMessageVisible(tasks.size() == 0);
+
+                        }, Throwable::printStackTrace);
     }
 
     @Override
@@ -122,9 +155,15 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
 
     @Override
     public void onDeleteOptionSelected(Task task, int position) {
-        mTaskModel.delete(task);
-        mTaskReminderMode.cancelReminders(task.getId());
-        mAdapter.remove(position);
+        mRemoveTaskSubscription = mTaskModel.delete(task)
+                .subscribe(() -> {
+                    mAdapter.remove(position);
+
+                    if (mAdapter.getCount() == 0){
+                        mView.setNoTasksMessageVisible(true);
+                    }
+                }, Throwable::printStackTrace);
+
     }
 
     @Override
@@ -146,42 +185,35 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
         switch (task.getStatus()) {
 
             case NEW:
-                task.setStatus(TaskStatus.ACTIVE);
-                mTaskModel.start(task);
-                mTaskReminderMode.scheduleStartReminder(task);
+                mTaskStatusSubscription = mTaskModel.start(task)
+                        .subscribe(result -> updateListItem(result, position), Throwable::printStackTrace);
                 break;
 
             case ACTIVE:
-                task.setStatus(TaskStatus.COMPLETED);
-                mTaskModel.complete(task);
-                mTaskReminderMode.cancelReminders(task.getId());
-                break;
-
-            default:
-                task.setStatus(TaskStatus.NEW);
+                mTaskStatusSubscription = mTaskModel.complete(task)
+                        .subscribe(result -> updateListItem(result, position), Throwable::printStackTrace);
                 break;
         }
 
-        mRecordsModel.update(task);
+    }
+
+
+    @Override
+    public void resetStart(int position) {
+        mTaskStatusSubscription = mTaskModel.resetStart(getTask(position))
+                .subscribe(task -> updateListItem(task, position), Throwable::printStackTrace);
+    }
+
+    private void updateListItem(Task task, int position) {
         mAdapter.set(task, position);
     }
 
     @Override
-
-    public void resetStart(int position) {
-        Task task = getTask(position);
-        mTaskModel.resetStart(task);
-        mTaskReminderMode.cancelReminders(task.getId());
-    }
-
-    @Override
     public void resetEnd(int position) {
-        Task task = getTask(position);
-        mTaskModel.resetStart(task);
-        mTaskReminderMode.cancelReminders(task.getId());
-        mTaskReminderMode.scheduleEndReminder(task.getId(), task.getScheduledDuration());
-    }
+        mTaskStatusSubscription = mTaskModel.resetEnd(getTask(position))
+                .subscribe(task -> updateListItem(task, position));
 
+    }
 
     @Override
     public void saveInstanceState(Bundle outState, int firstVisiblePosition) {
@@ -198,16 +230,8 @@ public class TasksPresenter implements TasksContract.Presenter, TasksAdapter.OnI
         return mAdapter.getItem(position);
     }
 
-    public void setTaskReminderMode(TaskRemindersModel taskReminderMode) {
-        mTaskReminderMode = taskReminderMode;
-    }
-
     public void setTaskStatusModel(TaskModel taskModel) {
         mTaskModel = taskModel;
-    }
-
-    public void setRecordsModel(TaskRecordsModel recordsModel) {
-        mRecordsModel = recordsModel;
     }
 
 

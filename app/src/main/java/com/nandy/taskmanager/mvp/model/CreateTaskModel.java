@@ -1,7 +1,8 @@
 package com.nandy.taskmanager.mvp.model;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.enums.RepeatPeriod;
+import com.nandy.taskmanager.model.Location;
+import com.nandy.taskmanager.model.Metadata;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.enums.TaskStatus;
 
@@ -36,6 +37,14 @@ public class CreateTaskModel {
 
     public Task getTask() {
         return mTask;
+    }
+
+    public void setTitle(String title){
+        mTask.setTitle(title);
+    }
+
+    public void setDescription(String description){
+        mTask.setDescription(description);
     }
 
 
@@ -77,12 +86,21 @@ public class CreateTaskModel {
         mTask.setRepeatPeriod(repeatPeriod);
     }
 
-    public void setLocation(LatLng location) {
-        mTask.setLocation(location);
+    public void setLocation(Location address) {
+        Metadata metadata = mTask.getMetadata();
+        if (metadata == null){
+            metadata = new Metadata();
+        }
+        metadata.setLocation(address);
+        mTask.setMetadata(metadata);
     }
 
     public void clearLocation() {
-        mTask.setLocation(null);
+        if (mTask.hasMetadata()){
+            Metadata metadata = mTask.getMetadata();
+            metadata.setLocation(null);
+            mTask.setMetadata(metadata);
+        }
     }
 
     public void setImage(String image) {

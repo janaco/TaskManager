@@ -103,5 +103,8 @@
     <string name="h">h</string>
     <string name="days">day(s)</string>
     <string name="no_planned_start_date">Planned start date is not specified</string>
+    <string name="unknown_address">Unknown address</string>
+    <string name="you_have_no_tasks">You have no tasks</string>
+    <string name="delete_item_alert">Are you really want to delete this task?</string>
 
 </resources>

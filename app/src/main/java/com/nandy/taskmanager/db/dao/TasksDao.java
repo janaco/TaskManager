@@ -24,7 +24,7 @@ public interface TasksDao {
     @Query("SELECT * FROM tasks WHERE id LIKE :id")
     List<Task> getById(long id);
 
-    @Query("SELECT * FROM tasks WHERE location IS NOT NULL AND status LIKE('NEW') ")
+    @Query("SELECT * FROM tasks WHERE geo_position IS NOT NULL AND status LIKE('NEW') ")
     List<Task> selectAllWithLocation();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

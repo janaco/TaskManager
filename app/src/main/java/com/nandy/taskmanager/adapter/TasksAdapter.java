@@ -83,9 +83,11 @@ public class TasksAdapter extends BaseSwipeAdapter {
 
                 case ACTIVE:
                     holder.setControlButtonText(R.string.finish);
+                    break;
 
                 case NEW:
                     holder.setControlButtonText(R.string.start);
+                    break;
             }
 
             holder.setOnDeleteButtonClickListener(view -> {

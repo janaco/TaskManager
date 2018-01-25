@@ -11,15 +11,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.mvp.contract.TasksContract;
+import com.nandy.taskmanager.mvp.contract.TaskListContract;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 import com.nandy.taskmanager.mvp.model.TaskModel;
-import com.nandy.taskmanager.mvp.presenter.TasksPresenter;
+import com.nandy.taskmanager.mvp.presenter.TaskListPresenter;
 
 import org.kaerdan.presenterretainer.PresenterFragment;
 
@@ -30,20 +31,24 @@ import butterknife.ButterKnife;
  * Created by yana on 21.01.18.
  */
 
-public class TasksFragment
-        extends PresenterFragment<TasksContract.Presenter, TasksContract.View>
-        implements TasksContract.View {
+public class TaskListFragment
+        extends PresenterFragment<TaskListContract.Presenter, TaskListContract.View>
+        implements TaskListContract.View {
 
     public static final int REQUEST_CREATE_TASK = 101;
     public static final String PARAM_TASK = "task";
 
     @BindView(R.id.list_tasks)
     ListView mTaskLisView;
+    @BindView(R.id.layout_progress)
+    View mProgressView;
+    @BindView(R.id.txt_message)
+    TextView mNoTasksTextView;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        return inflater.inflate(R.layout.fragment_tasks_list, container, false);
     }
 
     @Override
@@ -146,25 +151,36 @@ public class TasksFragment
     }
 
     @Override
-    protected TasksContract.Presenter onCreatePresenter() {
-        TasksPresenter presenter = new TasksPresenter();
-        presenter.setRecordsModel(new TaskRecordsModel(getContext()));
+    public void setListViewVisible(boolean visible) {
+        mTaskLisView.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void setNoTasksMessageVisible(boolean visible) {
+        mNoTasksTextView.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void setProgressViewVisible(boolean visible) {
+        mProgressView.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    protected TaskListContract.Presenter onCreatePresenter() {
+        TaskListPresenter presenter = new TaskListPresenter();
         presenter.setTaskStatusModel(new TaskModel(getContext()));
-        presenter.setTaskReminderMode(new TaskRemindersModel(getContext()));
 
         return presenter;
     }
 
     @Override
-    protected TasksFragment getPresenterView() {
+    protected TaskListFragment getPresenterView() {
         return this;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (getPresenter() != null) {
-            getPresenter().saveInstanceState(outState, mTaskLisView.getFirstVisiblePosition());
-        }
+        getPresenter().saveInstanceState(outState, mTaskLisView.getFirstVisiblePosition());
         super.onSaveInstanceState(outState);
     }
 

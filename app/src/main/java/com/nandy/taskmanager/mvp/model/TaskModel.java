@@ -17,6 +17,15 @@ import com.nandy.taskmanager.enums.TaskStatus;
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableEmitter;
+import io.reactivex.CompletableOnSubscribe;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by razomer on 22.01.18.
  */
@@ -24,10 +33,7 @@ import java.util.List;
 public class TaskModel {
 
     private TaskRemindersModel mTaskReminderModel;
-
-    private final EventsDao mEventsDao;
-    private final TasksDao mTasksDao;
-    private final StatisticsDao mStatisticsDao;
+    private TaskRecordsModel mRecordsModel;
     private Task mTask;
 
     public TaskModel(Context context, Task task) {
@@ -36,167 +42,217 @@ public class TaskModel {
     }
 
     public TaskModel(Context context) {
-        mEventsDao = AppDatabase.getInstance(context).taskEventsDao();
-        mTasksDao = AppDatabase.getInstance(context).tasksDao();
-        mStatisticsDao = AppDatabase.getInstance(context).statisticsDao();
         mTaskReminderModel = new TaskRemindersModel(context);
+        mRecordsModel = new TaskRecordsModel(context);
     }
 
+    public Single<List<Task>> getAll() {
 
-    public void resetStart(Task task) {
-        Metadata metadata = task.getMetadata();
-        metadata.setTimeSpent(0);
-        metadata.setActualStartDate(null);
-        task.setMetadata(metadata);
-
-        task.setStatus(TaskStatus.NEW);
-        mTasksDao.update(task);
-        mTaskReminderModel.cancelReminders(task.getId());
-
-        if (task.getPlannedStartDate().after(new Date())){
-            mTaskReminderModel.scheduleStartReminder(task);
-        }
-
+        return Single.create(e -> e.onSuccess(mRecordsModel.selectAll()));
     }
 
-    public void resetEnd(Task task) {
-        Metadata metadata = task.getMetadata();
-        metadata.setTimeSpent(0);
-        task.setMetadata(metadata);
+    public Single<Task> resetStart(Task task) {
 
-        task.setStatus(TaskStatus.ACTIVE);
-        mTasksDao.update(task);
-        mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration());
-    }
+        return Single.create((SingleOnSubscribe<Task>) e -> {
 
-    public void resetStart() {
-        resetStart(mTask);
-    }
+            Metadata metadata = task.getMetadata();
+            metadata.setTimeSpent(0);
+            metadata.setActualStartDate(null);
+            task.setMetadata(metadata);
 
-    public void resetEnd() {
-        resetEnd(mTask);
-    }
+            task.setStatus(TaskStatus.NEW);
+            mRecordsModel.update(task);
+            mTaskReminderModel.cancelReminders(task.getId());
 
-    public void start() {
-        start(mTask);
-    }
+            if (task.getPlannedStartDate().after(new Date())) {
+                mTaskReminderModel.scheduleStartReminder(task);
+            }
 
-
-    public void start(Task task) {
-
-        task.setStatus(TaskStatus.ACTIVE);
-        Metadata metadata = task.getMetadata();
-        if (metadata == null) {
-            metadata = new Metadata();
-        }
-        metadata.setActualStartDate(new Date());
-        task.setMetadata(metadata);
-
-        mTasksDao.update(task);
-        mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.START));
-        mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration());
+            e.onSuccess(task);
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
 
     }
 
-    public void complete() {
-        complete(mTask);
+    public Single<Task> resetEnd(Task task) {
+
+        return Single.create((SingleOnSubscribe<Task>) e -> {
+
+            Metadata metadata = task.getMetadata();
+            metadata.setTimeSpent(0);
+            task.setMetadata(metadata);
+
+            task.setStatus(TaskStatus.ACTIVE);
+            mRecordsModel.update(task);
+            mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration());
+
+            e.onSuccess(task);
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void complete(Task task) {
-
-        Metadata metadata = task.getMetadata();
-        Date actualStartDate = metadata.getActualStartDate();
-        long duration = System.currentTimeMillis() - actualStartDate.getTime();
-        long downtime = 0;
-
-        switch (task.getStatus()) {
-
-            case ACTIVE:
-                downtime = metadata.getDownTime();
-                break;
-
-            case PAUSED:
-                downtime = duration - metadata.getTimeSpent();
-                break;
-        }
-
-        long timeSpent = duration - downtime;
-
-        metadata.setTimeSpent(timeSpent);
-        metadata.setDownTime(downtime);
-        task.setMetadata(metadata);
-
-        task.setStatus(TaskStatus.COMPLETED);
-        mTasksDao.update(task);
-        mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.END));
-        mStatisticsDao.insert(new Statistics(task.getId(), actualStartDate, timeSpent));
+    public Single<Task> resetStart() {
+        return resetStart(mTask);
     }
 
-    public void pause(Task task) {
-        task.setStatus(TaskStatus.PAUSED);
-
-        Metadata metadata = task.getMetadata();
-        Date actualStartDate = metadata.getActualStartDate();
-        long downtime = metadata.getDownTime();
-        long duration = System.currentTimeMillis() - actualStartDate.getTime();
-        long timeSpent = duration - downtime;
-
-        metadata.setTimeSpent(timeSpent);
-
-        task.setMetadata(metadata);
-
-        mTasksDao.update(task);
-        mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.PAUSE));
-        mTaskReminderModel.cancelReminders(task.getId());
+    public Single<Task> resetEnd() {
+        return resetEnd(mTask);
     }
 
-    public void pause(){
-        pause(mTask);
+    public Single<Task> start() {
+        return start(mTask);
     }
 
-    public void resume(){
-        resume(mTask);
-    }
-    public void resume(Task task) {
-        task.setStatus(TaskStatus.ACTIVE);
 
-        Metadata metadata = task.getMetadata();
-        Date actualStartDate = metadata.getActualStartDate();
-        long timeSpent = metadata.getTimeSpent();
-        long duration = System.currentTimeMillis() - actualStartDate.getTime();
-        long downtime = duration - timeSpent;
-        metadata.setDownTime(downtime);
+    public Single<Task> start(Task task) {
 
-        task.setMetadata(metadata);
+        return Single.create((SingleOnSubscribe<Task>) e -> {
 
-        mTasksDao.update(task);
-        mEventsDao.insert(new TaskEvent(task.getId(), System.currentTimeMillis(), Action.RESUME));
+            task.setStatus(TaskStatus.ACTIVE);
+            Metadata metadata = task.getMetadata();
+            if (metadata == null) {
+                metadata = new Metadata();
+            }
+            metadata.setActualStartDate(new Date());
+            task.setMetadata(metadata);
 
-        long timeToComplete = task.getScheduledDuration() - timeSpent;
-        mTaskReminderModel.scheduleEndReminder(task.getId(), timeToComplete);
-    }
+            mRecordsModel.update(task, new TaskEvent(task.getId(), System.currentTimeMillis(), Action.START));
+            mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration());
 
-    public void delete() {
-        delete(mTask);
+            e.onSuccess(task);
+        })  .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void delete(Task task) {
-        mTaskReminderModel.cancelReminders(task.getId());
-        mTasksDao.delete(task);
-        mStatisticsDao.deleteAll(task.getId());
+    public Single<Task> complete() {
+        return complete(mTask);
     }
 
-    public Task getTask() {
-        return mTask;
+    public Single<Task> complete(Task task) {
+
+        return Single.create((SingleOnSubscribe<Task>)e -> {
+
+            Metadata metadata = task.getMetadata();
+            Date actualStartDate = metadata.getActualStartDate();
+            long duration = System.currentTimeMillis() - actualStartDate.getTime();
+            long downtime = 0;
+
+            switch (task.getStatus()) {
+
+                case ACTIVE:
+                    downtime = metadata.getDownTime();
+                    break;
+
+                case PAUSED:
+                    downtime = duration - metadata.getTimeSpent();
+                    break;
+            }
+
+            long timeSpent = duration - downtime;
+
+            metadata.setTimeSpent(timeSpent);
+            metadata.setDownTime(downtime);
+            task.setMetadata(metadata);
+
+            task.setStatus(TaskStatus.COMPLETED);
+            mRecordsModel.update(task, new TaskEvent(task.getId(), System.currentTimeMillis(), Action.END));
+            mRecordsModel.addStatistics(new Statistics(task.getId(), actualStartDate, timeSpent));
+
+            e.onSuccess(task);
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
+
+    public Single<Task> pause(Task task) {
+
+        return Single.create((SingleOnSubscribe<Task>)e -> {
+
+            task.setStatus(TaskStatus.PAUSED);
+
+            Metadata metadata = task.getMetadata();
+            Date actualStartDate = metadata.getActualStartDate();
+            long downtime = metadata.getDownTime();
+            long duration = System.currentTimeMillis() - actualStartDate.getTime();
+            long timeSpent = duration - downtime;
+
+            metadata.setTimeSpent(timeSpent);
+
+            task.setMetadata(metadata);
+
+            mRecordsModel.update(task, new TaskEvent(task.getId(), System.currentTimeMillis(), Action.PAUSE));
+            mTaskReminderModel.cancelReminders(task.getId());
+
+            e.onSuccess(task);
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Single<Task> pause() {
+        return pause(mTask);
+    }
+
+    public Single<Task> resume() {
+        return resume(mTask);
+    }
+
+    public Single<Task> resume(Task task) {
+
+        return Single.create((SingleOnSubscribe<Task>)e -> {
+
+            task.setStatus(TaskStatus.ACTIVE);
+
+            Metadata metadata = task.getMetadata();
+            Date actualStartDate = metadata.getActualStartDate();
+            long timeSpent = metadata.getTimeSpent();
+            long duration = System.currentTimeMillis() - actualStartDate.getTime();
+            long downtime = duration - timeSpent;
+            metadata.setDownTime(downtime);
+
+            task.setMetadata(metadata);
+
+            mRecordsModel.update(task, new TaskEvent(task.getId(), System.currentTimeMillis(), Action.RESUME));
+
+            long timeToComplete = task.getScheduledDuration() - timeSpent;
+            mTaskReminderModel.scheduleEndReminder(task.getId(), timeToComplete);
+            e.onSuccess(task);
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Completable delete() {
+        return delete(mTask);
+    }
+
+    public Completable delete(Task task) {
+
+        return Completable.create(e -> {
+
+            mTaskReminderModel.cancelReminders(task.getId());
+            mRecordsModel.delete(task);
+
+            e.onComplete();
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
 
     public void setTask(Task task) {
         mTask = task;
     }
 
+    public Task getTask(){
+        return mTask;
+    }
+
     @Nullable
     public Task getTask(long taskId) {
-        List<Task> tasks = mTasksDao.getById(taskId);
+        List<Task> tasks = mRecordsModel.getById(taskId);
 
         if (tasks.size() > 0) {
             return tasks.get(0);

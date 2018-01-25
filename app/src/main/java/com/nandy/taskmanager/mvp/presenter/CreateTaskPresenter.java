@@ -8,11 +8,14 @@ import android.speech.RecognizerIntent;
 import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.SubscriptionUtils;
 import com.nandy.taskmanager.enums.RepeatPeriod;
+import com.nandy.taskmanager.model.Location;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.contract.CreateTaskContract;
 import com.nandy.taskmanager.mvp.model.CreateTaskModel;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
+import com.nandy.taskmanager.mvp.model.GeocoderModel;
 import com.nandy.taskmanager.mvp.model.TaskCoverModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
@@ -27,6 +30,13 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Completable;
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 import static android.app.Activity.RESULT_OK;
 
 /**
@@ -37,32 +47,23 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
 
     private CreateTaskContract.View mView;
 
-    private CreateTaskModel mCreateTaskMode;
+    private CreateTaskModel mCreateTaskModel;
     private DateFormatModel mDateFormatModel;
     private TaskCoverModel mCoverModel;
     private TaskRecordsModel mRecordsModel;
     private TaskRemindersModel mScheduleModel;
     private ValidationModel mValidationModel;
+    private GeocoderModel mGeocoderModel;
 
-    private Bundle mSavedInstanceState;
+    private Disposable mAddressSubscription;
+    private Disposable mCreateTaskSubscription;
 
     @Override
     public void onAttachView(CreateTaskContract.View view) {
         mView = view;
+        setDuration(15, TimeUnit.MINUTES);
+        setRepeatPeriod(RepeatPeriod.NO_REPEAT);
         displayData();
-
-        if (mSavedInstanceState != null) {
-            restoreViewState();
-        }else {
-            setDuration(15, TimeUnit.MINUTES);
-            setRepeatPeriod(RepeatPeriod.NO_REPEAT);
-        }
-    }
-
-    private void restoreViewState() {
-
-        mView.setTitle(mSavedInstanceState.getString(Constants.PARAM_TITLE));
-        mView.setDescription(mSavedInstanceState.getString(Constants.PARAM_DESCRIPTION));
     }
 
     @Override
@@ -72,11 +73,13 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
     @Override
     public void onDestroy() {
         mView = null;
+        SubscriptionUtils.dispose(mAddressSubscription);
+        SubscriptionUtils.dispose(mCreateTaskSubscription);
     }
 
     private void displayData() {
 
-        Task task = mCreateTaskMode.getTask();
+        Task task = mCreateTaskModel.getTask();
         mView.setTitle(task.getTitle());
         mView.setDescription(task.getDescription());
 
@@ -92,10 +95,8 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
             mView.setRepeatPeriod(task.getRepeatPeriod().getTextResId());
         }
 
-        if (task.hasLocation()) {
-            mView.displayLocation(String.format(Locale.getDefault(), "%f, %f",
-                    task.getLocation().latitude,
-                    task.getLocation().longitude));
+        if (task.hasMetadata() && task.getMetadata().hasLocation()) {
+            mView.displayAddress(task.getMetadata().getLocation().getAddress());
         }
 
         if (task.hasImage()) {
@@ -119,49 +120,74 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
         mView.setStartTimeVisible(true);
     }
 
-    public void saveChanges(String title, String description) {
+    public void saveChanges() {
 
-        if (!isInputValid(title, description)) {
+        Task task = mCreateTaskModel.getTask();
+
+        if (!isInputValid(task.getTitle(), task.getDescription())) {
             return;
         }
 
-        Task task = mCreateTaskMode.getTask();
-
-        if (task.getPlannedStartDate() == null){
+        if (task.getPlannedStartDate() == null) {
             mView.showMessage(R.string.no_planned_start_date);
             return;
         }
-        task.setTitle(title);
-        task.setDescription(description);
 
-        if (task.getImage() != null) {
-            try {
-                String reducedImagePath = mCoverModel.saveImage(task.getId(), task.getImage());
-                task.setImage(reducedImagePath);
-            } catch (IOException e) {
-                e.printStackTrace();
-                mView.showMessage(R.string.image_saving_error);
-            }
-        }
-
-        if (mCreateTaskMode.getMode() == Constants.MODE_CREATE) {
-            mRecordsModel.insert(task);
-        } else {
-            mRecordsModel.update(task);
-
-        }
-
-        mScheduleModel.scheduleStartReminder(task);
-        if (task.hasLocation()) {
-            mScheduleModel.scheduleLocationUpdates();
-        }
-
-        Intent intent = new Intent();
-        Bundle args = new Bundle();
-        args.putParcelable("task", task);
-        intent.putExtras(args);
-        mView.finishWithResult(RESULT_OK, intent);
+        createOrUpdate(task, mCreateTaskModel.getMode() == Constants.MODE_CREATE);
     }
+
+    @Override
+    public void onTitleChanged(String title) {
+        mCreateTaskModel.setTitle(title);
+    }
+
+    @Override
+    public void onDescriptionChanged(String description) {
+        mCreateTaskModel.setDescription(description);
+    }
+
+    private String reduceImageSize(long taskId, String imagePath) {
+        try {
+            return mCoverModel.saveImage(taskId, imagePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void createOrUpdate(Task task, boolean shouldCreateNew) {
+
+        mCreateTaskSubscription = Completable.create(e -> {
+            if (task.getImage() != null) {
+                String reducedImagePath = reduceImageSize(task.getId(), task.getImage());
+                task.setImage(reducedImagePath);
+            }
+
+            if (shouldCreateNew) {
+                mRecordsModel.insert(task);
+            } else {
+                mRecordsModel.update(task);
+            }
+
+            e.onComplete();
+        })
+                .doOnComplete(() -> {
+                    mScheduleModel.cancelReminders(task.getId());
+                    mScheduleModel.scheduleStartReminder(task);
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> mView.setProgressViewVisible(true))
+                .doFinally(() -> mView.setProgressViewVisible(false))
+                .subscribe(() -> {
+                    Intent intent = new Intent();
+                    Bundle args = new Bundle();
+                    args.putParcelable(Constants.PARAM_TASK, task);
+                    intent.putExtras(args);
+                    mView.finishWithResult(RESULT_OK, intent);
+                }, Throwable::printStackTrace);
+    }
+
 
     private boolean isInputValid(String title, String description) {
 
@@ -185,6 +211,20 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
         return isInputValid;
     }
 
+    private void onLocationSpecified(LatLng latLng) {
+
+        mAddressSubscription = Single.create((SingleOnSubscribe<Location>) e -> {
+            String addressText = mGeocoderModel.getAddressFromLocation(latLng);
+            e.onSuccess(new Location(latLng, addressText));
+        })
+                .doOnSuccess(location -> mCreateTaskModel.setLocation(location))
+                .doOnError(throwable -> mCreateTaskModel.setLocation(new Location(latLng, null)))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(location -> mView.displayAddress(location.getAddress()), throwable -> mView.displayAddress(String.format(Locale.getDefault(), "%f, %f", latLng.latitude, latLng.longitude)));
+
+    }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         switch (requestCode) {
@@ -192,8 +232,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
             case Constants.REQUEST_CODE_LOCATION:
                 if (resultCode == RESULT_OK) {
                     LatLng latLng = data.getParcelableExtra("location");
-                    mCreateTaskMode.setLocation(latLng);
-                    mView.displayLocation(String.format(Locale.getDefault(), "%f, %f", latLng.latitude, latLng.longitude));
+                    onLocationSpecified(latLng);
 
                 }
                 break;
@@ -236,7 +275,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
             case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
                 try {
                     File imageFile = mCoverModel.getCroppedImage(data, resultCode);
-                    mCreateTaskMode.setImage(imageFile.getPath());
+                    mCreateTaskModel.setImage(imageFile.getPath());
                     mView.displayImage(imageFile.getPath());
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -249,7 +288,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
     }
 
     public void clearLocation() {
-        mCreateTaskMode.clearLocation();
+        mCreateTaskModel.clearLocation();
         mView.clearLocation();
     }
 
@@ -260,10 +299,10 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
         mView.showDatePickerDialog(
                 (datePicker, year, month, day) ->
                 {
-                    mCreateTaskMode.setStartDate(year, month, day);
+                    mCreateTaskModel.setStartDate(year, month, day);
                     mView.setStartTimeVisible(true);
                     mView.displayStartDate(
-                            mDateFormatModel.formatDate(mCreateTaskMode.getTask().getPlannedStartDate()));
+                            mDateFormatModel.formatDate(mCreateTaskModel.getTask().getPlannedStartDate()));
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -276,9 +315,9 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
         mView.showTimePickerDialog(
                 (timePicker, hour, minute) ->
                 {
-                    mCreateTaskMode.setStartTime(hour, minute);
+                    mCreateTaskModel.setStartTime(hour, minute);
                     mView.displayStartTime(
-                            mDateFormatModel.formatTime(mCreateTaskMode.getTask().getPlannedStartDate()));
+                            mDateFormatModel.formatTime(mCreateTaskModel.getTask().getPlannedStartDate()));
                 },
                 calendar.get(Calendar.HOUR_OF_DAY),
                 calendar.get(Calendar.MINUTE));
@@ -325,20 +364,9 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
     }
 
     private void setDuration(int value, TimeUnit timeUnit) {
-        mCreateTaskMode.setDuration(timeUnit.toMillis(value));
+        mCreateTaskModel.setDuration(timeUnit.toMillis(value));
         mView.setDuration(value, timeUnit == TimeUnit.MINUTES ? R.string.minutes : R.string.hour);
 
-    }
-
-    @Override
-    public void saveInstanceState(Bundle outState, String title, String description) {
-        outState.putString(Constants.PARAM_TITLE, title);
-        outState.putString(Constants.PARAM_DESCRIPTION, description);
-    }
-
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        mSavedInstanceState = savedInstanceState;
     }
 
     public boolean onRepeatPeriodSelected(int optionId) {
@@ -374,7 +402,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
     }
 
     private void setRepeatPeriod(RepeatPeriod repeatPeriod) {
-        mCreateTaskMode.setRepeatPeriod(repeatPeriod);
+        mCreateTaskModel.setRepeatPeriod(repeatPeriod);
         mView.setRepeatPeriod(repeatPeriod.getTextResId());
     }
 
@@ -383,11 +411,15 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
     }
 
     public void setCreateTaskMode(CreateTaskModel createTaskMode) {
-        mCreateTaskMode = createTaskMode;
+        mCreateTaskModel = createTaskMode;
     }
 
     public void setValidationModel(ValidationModel validationModel) {
         mValidationModel = validationModel;
+    }
+
+    public void setGeocoderModel(GeocoderModel geocoderModel) {
+        mGeocoderModel = geocoderModel;
     }
 
     public void setCoverModel(TaskCoverModel coverModel) {

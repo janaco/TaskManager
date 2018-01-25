@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 
+import com.nandy.taskmanager.model.Task;
+
 /**
  * Created by yana on 25.01.18.
  */
@@ -40,7 +42,7 @@ public interface TaskDetailsContract {
 
         void setActualStartTime(String time);
 
-        void setScheduledDuration(int value, @StringRes int textResId);
+        void setScheduledDuration(String duration);
 
         void setTimeSpent(String timeSpent);
 

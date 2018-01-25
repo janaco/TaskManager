@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.TasksDao;
@@ -80,9 +81,11 @@ public class LocationService extends Service implements LocationModel.LocationLi
     public void onLocationChanged(Location location) {
 
         for (Task task : mTasks) {
+           LatLng taskLocation
+                    = task.getMetadata().getLocation().getPosition();
             float distance =
                     getDistanceBetween(location.getLatitude(), location.getLongitude(),
-                            task.getLocation().latitude, task.getLocation().longitude);
+                           taskLocation.latitude, taskLocation.longitude);
 
             if (distance < RADIUS) {
                 toggleStatus(task);

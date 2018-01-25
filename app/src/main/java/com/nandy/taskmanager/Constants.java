@@ -19,15 +19,14 @@ public interface Constants {
     int MODE_CREATE = 1;
     int MODE_EDIT = 2;
 
-    String PARAM_DESCRIPTION = "description";
     String PARAM_FIRST_VISIBLE_POSITION = "first_visible_position";
     String PARAM_ID = "id";
+    String PARAM_LIST_STATE = "list_state";
     String PARAM_LOCATION = "location";
     String PARAM_MODE = "mode";
     String PARAM_MAP_CENTER = "center";
     String PARAM_TASK = "task";
     String PARAM_TASKS = "tasks";
-    String PARAM_TITLE = "title";
     String PARAM_ZOOM = "zoom";
 
 

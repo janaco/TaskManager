@@ -18,6 +18,8 @@
             android:layout_height="wrap_content"
             android:padding="10dp">
 
+            <include layout="@layout/layout_progress"/>
+
             <ImageView
                 android:id="@+id/image_task"
                 android:layout_width="60dp"

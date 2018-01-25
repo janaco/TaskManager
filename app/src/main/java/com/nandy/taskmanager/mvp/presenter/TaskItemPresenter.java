@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.SubscriptionUtils;
 import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.model.Task;
@@ -13,6 +14,13 @@ import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.mvp.contract.TaskDetailsContract;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskModel;
+
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by razomer on 18.01.18.
@@ -25,6 +33,9 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
     private TaskModel mTaskModel;
     private DateFormatModel mDateFormatModel;
 
+    private Disposable mTaskStatusSubscriprion;
+    private Disposable mDeleteTaskSubscription;
+
     @Override
     public void onAttachView(TaskDetailsContract.View view) {
         mView = view;
@@ -33,12 +44,13 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
 
     @Override
     public void onDetachView() {
-        mView = null;
     }
 
     @Override
     public void onDestroy() {
-
+        mView = null;
+        SubscriptionUtils.dispose(mTaskStatusSubscriprion);
+        SubscriptionUtils.dispose(mDeleteTaskSubscription);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -56,7 +68,7 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
         mView.setTitle(task.getTitle());
         mView.setDescription(task.getDescription());
         mView.setPlannedStartTime(mDateFormatModel.formatAsFullDate(task.getPlannedStartDate()));
-        mView.setScheduledDuration(mDateFormatModel.convertToMinutes(task.getScheduledDuration()), R.string.minutes);
+        mView.setScheduledDuration(mDateFormatModel.formatDuration(task.getScheduledDuration()));
         mView.setRepeatPeriod(task.getRepeatPeriod().getTextResId());
 
         displayLocation(task);
@@ -114,8 +126,12 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
         }
     }
 
+    @Override
     public void setupMenu() {
-        Task task = mTaskModel.getTask();
+        setupMenu(mTaskModel.getTask());
+    }
+
+    private void setupMenu(Task task) {
         mView.setResetStartMenuOptionEnabled(task.getStatus() != TaskStatus.NEW);
         mView.setResetEndMenuOptionEnabled(task.getStatus() == TaskStatus.COMPLETED);
         mView.setPauseOptionVisible(task.getStatus() == TaskStatus.ACTIVE);
@@ -125,7 +141,7 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
     private void displayLocation(Task task) {
         if (task.hasLocation()) {
             mView.setLocationVisible(true);
-            mView.setLocation(task.getLocation().toString());
+            mView.setLocation(task.getMetadata().getLocation().getAddress());
         } else {
             mView.setLocationVisible(false);
         }
@@ -144,46 +160,40 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
         switch (mTaskModel.getTask().getStatus()) {
 
             case NEW:
-                mTaskModel.start();
+                mTaskStatusSubscriprion = mTaskModel.start().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
                 break;
 
             case ACTIVE:
-                mTaskModel.complete();
+                mTaskStatusSubscriprion = mTaskModel.complete().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
                 break;
         }
 
-        displayStatusInformation(mTaskModel.getTask());
-        setupMenu();
     }
 
     public void delete() {
-        mTaskModel.delete();
-        mView.finish();
+        mDeleteTaskSubscription = mTaskModel.delete().subscribe(() -> mView.finish(), Throwable::printStackTrace);
     }
 
 
     public void resetStart() {
-        mTaskModel.resetStart();
-        displayData(mTaskModel.getTask());
-        setupMenu();
+        mTaskStatusSubscriprion = mTaskModel.resetStart().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
     }
 
     public void resetEnd() {
-        mTaskModel.resetEnd();
-        displayData(mTaskModel.getTask());
-        setupMenu();
+        mTaskStatusSubscriprion = mTaskModel.resetEnd().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
     }
 
     public void pause() {
-        mTaskModel.pause();
-        displayData(mTaskModel.getTask());
-        setupMenu();
+        mTaskStatusSubscriprion = mTaskModel.pause().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
     }
 
     public void resume() {
-        mTaskModel.resume();
-        displayData(mTaskModel.getTask());
-        setupMenu();
+        mTaskStatusSubscriprion = mTaskModel.resume().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
+    }
+
+    private void onTaskStatusChanged(Task task) {
+        displayData(task);
+        setupMenu(task);
     }
 
     public void setTaskModel(TaskModel taskModel) {

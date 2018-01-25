@@ -16,7 +16,7 @@ public interface CreateTaskContract {
 
     interface Presenter extends org.kaerdan.presenterretainer.Presenter<View> {
 
-        void saveChanges(String title, String description);
+        void saveChanges();
 
         void onActivityResult(int requestCode, int resultCode, Intent data);
 
@@ -30,9 +30,10 @@ public interface CreateTaskContract {
 
         boolean onRepeatPeriodSelected(int optionId);
 
-        void saveInstanceState(Bundle outState, String title, String description);
 
-        void restoreInstanceState(Bundle savedInstanceState);
+        void onTitleChanged(String title);
+
+        void onDescriptionChanged(String description);
     }
 
     interface View extends org.kaerdan.presenterretainer.Presenter.View {
@@ -53,7 +54,7 @@ public interface CreateTaskContract {
 
         void setRepeatPeriod(@StringRes int textResId);
 
-        void displayLocation(String location);
+        void displayAddress(String location);
 
         void displayImage(String imagePath);
 
@@ -72,5 +73,7 @@ public interface CreateTaskContract {
         void showMessage(String message);
 
         void finishWithResult(int resultCode, Intent data);
+
+        void setProgressViewVisible(boolean visible);
     }
 }

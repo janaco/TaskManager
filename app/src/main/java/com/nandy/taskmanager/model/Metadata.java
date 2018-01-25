@@ -1,6 +1,7 @@
 package com.nandy.taskmanager.model;
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -11,7 +12,7 @@ import java.util.Date;
  * Created by yana on 22.01.18.
  */
 
-public class Metadata implements Parcelable{
+public class Metadata implements Parcelable {
 
     @ColumnInfo(name = "actual_start_date")
     private Date mActualStartDate;
@@ -21,13 +22,18 @@ public class Metadata implements Parcelable{
     @ColumnInfo(name = "downtime")
     private long mDownTime;
 
-    public Metadata(){}
+    @Embedded
+    private Location mLocation;
+
+    public Metadata() {
+    }
 
     @Ignore
     protected Metadata(Parcel in) {
         mTimeSpent = in.readLong();
         mActualStartDate = (Date) in.readSerializable();
         mDownTime = in.readLong();
+        mLocation = in.readParcelable(Location.class.getClassLoader());
     }
 
     @Override
@@ -35,6 +41,7 @@ public class Metadata implements Parcelable{
         dest.writeLong(mTimeSpent);
         dest.writeSerializable(mActualStartDate);
         dest.writeLong(mDownTime);
+        dest.writeParcelable(mLocation, flags);
     }
 
     @Override
@@ -77,5 +84,17 @@ public class Metadata implements Parcelable{
 
     public void setDownTime(long downTime) {
         mDownTime = downTime;
+    }
+
+    public Location getLocation(){
+        return mLocation;
+    }
+
+    public void setLocation(Location location){
+        mLocation = location;
+    }
+
+    public boolean hasLocation(){
+        return mLocation != null;
     }
 }

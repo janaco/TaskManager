@@ -25,13 +25,8 @@ public class ImageLoader {
 
         return Glide.with(context)
                 .load(pathToImage)
-                .apply(new RequestOptions()
-                        .placeholder(R.mipmap.ic_task)
-                        .error(R.mipmap.ic_task)
-                        .centerCrop()
-                        .transform(new OverlayTransformation(overlay, context.getResources().getDisplayMetrics()))
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .skipMemoryCache(true));
+                .apply(getDefaultRequestOptions()
+                        .transform(new OverlayTransformation(overlay, context.getResources().getDisplayMetrics())));
     }
 
     public static RequestBuilder<Drawable> load(Context context, String pathToImage) {
@@ -65,7 +60,6 @@ public class ImageLoader {
                 .placeholder(R.mipmap.ic_task)
                 .error(R.mipmap.ic_task)
                 .centerCrop()
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true);
+                .diskCacheStrategy(DiskCacheStrategy.ALL);
     }
 }

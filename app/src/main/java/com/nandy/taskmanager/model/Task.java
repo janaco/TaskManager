@@ -28,9 +28,6 @@ public class Task implements Parcelable {
     @ColumnInfo(name = "image")
     private String mImage;
 
-    @ColumnInfo(name = "location")
-    private LatLng mLocation;
-
     @ColumnInfo(name = "planned_start_date")
     private Date mPlannedStartDate;
 
@@ -56,7 +53,6 @@ public class Task implements Parcelable {
         mTitle = in.readString();
         mDescription = in.readString();
         mImage = in.readString();
-        mLocation = in.readParcelable(LatLng.class.getClassLoader());
         mScheduledDuration = in.readLong();
         mPlannedStartDate = (Date) in.readSerializable();
         mStatus = TaskStatus.valueOf(in.readString());
@@ -70,7 +66,6 @@ public class Task implements Parcelable {
         dest.writeString(mTitle);
         dest.writeString(mDescription);
         dest.writeString(mImage);
-        dest.writeParcelable(mLocation, flags);
         dest.writeLong(mScheduledDuration);
         dest.writeSerializable(mPlannedStartDate);
         dest.writeString(mStatus.name());
@@ -113,18 +108,6 @@ public class Task implements Parcelable {
 
     public void setRepeatPeriod(RepeatPeriod period) {
         mRepeatPeriod = period;
-    }
-
-    public void setLocation(LatLng location) {
-        mLocation = location;
-    }
-
-    public LatLng getLocation() {
-        return mLocation;
-    }
-
-    public boolean hasLocation() {
-        return mLocation != null;
     }
 
     public String getTitle() {
@@ -188,6 +171,13 @@ public class Task implements Parcelable {
         mMetadata = metadata;
     }
 
+    public boolean hasMetadata(){
+        return mMetadata != null;
+    }
+
+    public boolean hasLocation(){
+        return hasMetadata() && mMetadata.hasLocation();
+    }
 
     @Override
     public String toString() {
@@ -195,7 +185,6 @@ public class Task implements Parcelable {
                 "mId='" + mId + '\'' +
                 ", mTitle='" + mTitle + '\'' +
                 ", mImage='" + mImage + '\'' +
-                ", mLocation=" + mLocation +
                 ", mPlannedStartDate=" + mPlannedStartDate +
                 ", mStatus=" + mStatus +
                 '}';

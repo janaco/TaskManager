@@ -1,8 +1,10 @@
 package com.nandy.taskmanager.mvp.presenter;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.nandy.taskmanager.Constants;
+import com.nandy.taskmanager.SubscriptionUtils;
 import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.activity.SettingsActivity;
 import com.nandy.taskmanager.eventbus.TaskListChangedEvent;
@@ -17,6 +19,18 @@ import org.kaerdan.presenterretainer.Presenter;
 
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableEmitter;
+import io.reactivex.CompletableOnSubscribe;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by yana on 21.01.18.
  */
@@ -28,6 +42,9 @@ public class MainPresenter implements Presenter<MainActivityContract.View>, Main
     private DummyDataModel mDummyDataMode;
     private TaskRecordsModel mRecordsModel;
 
+    private Disposable mClearListSubscription;
+    private Disposable mDummyDataSubscription;
+
     @Override
     public void onAttachView(MainActivityContract.View view) {
         mView = view;
@@ -36,6 +53,8 @@ public class MainPresenter implements Presenter<MainActivityContract.View>, Main
     @Override
     public void onDetachView() {
         mView = null;
+        SubscriptionUtils.dispose(mClearListSubscription);
+        SubscriptionUtils.dispose(mDummyDataSubscription);
     }
 
     @Override
@@ -52,19 +71,37 @@ public class MainPresenter implements Presenter<MainActivityContract.View>, Main
 
     @Override
     public void onFillListOptionSelected() {
-        List<Task> tasks = mDummyDataMode.generateDummyData();
-        EventBus.getDefault().post(new TaskListChangedEvent(tasks));
+
+        mDummyDataSubscription = Single.create(
+                (SingleOnSubscribe<List<Task>>) e -> e.onSuccess(mDummyDataMode.generateDummyData()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(tasks -> EventBus.getDefault().post(new TaskListChangedEvent(tasks)),
+                        Throwable::printStackTrace);
     }
 
     @Override
     public void onClearAllOptionSelected() {
-        mRecordsModel.clearAll();
-        EventBus.getDefault().post(new TasksCleanedEvent());
+
+        mClearListSubscription = Completable
+                .create(e -> {
+                    mRecordsModel.clearAll();
+                    e.onComplete();
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        () ->
+                        {
+                            Log.d("EVENT_BUS", "post.TasksCleanedEvent");
+                            EventBus.getDefault().post(new TasksCleanedEvent());
+                        }, Throwable::printStackTrace
+                );
     }
 
     @Override
     public void onSettingsOptionSelected() {
-        mView.launchActivity(null,  SettingsActivity.class);
+        mView.launchActivity(null, SettingsActivity.class);
     }
 
     @Override

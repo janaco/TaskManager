@@ -28,7 +28,7 @@ public interface StatisticsDao{
     List<StatisticsResult> select(long dateStart, long dateEnd);
 
     @Query("DELETE FROM statistics WHERE id_task LIKE :taskId")
-    void deleteAll(long taskId);
+    void delete(long taskId);
 
     @Query("DELETE FROM statistics")
     void deleteAll();
