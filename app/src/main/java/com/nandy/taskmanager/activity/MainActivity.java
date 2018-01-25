@@ -32,7 +32,7 @@ import butterknife.OnClick;
 /**
  * MainActivity screen contains viewPager or two fragments: TasksListFragment and StatisticsFragment.
  */
-public class MainActivity extends PresenterActivity<MainPresenter, MainActivityContract.View>
+public class MainActivity extends PresenterActivity<MainActivityContract.Presenter, MainActivityContract.View>
         implements MainActivityContract.View {
 
     @BindView(R.id.container)
@@ -117,7 +117,7 @@ public class MainActivity extends PresenterActivity<MainPresenter, MainActivityC
     }
 
     @Override
-    protected MainPresenter onCreatePresenter() {
+    protected MainActivityContract.Presenter onCreatePresenter() {
         MainPresenter presenter = new MainPresenter();
         presenter.setDummyDataMode(new DummyDataModel(getApplicationContext()));
         presenter.setRecordsModel(new TaskRecordsModel(getApplicationContext()));

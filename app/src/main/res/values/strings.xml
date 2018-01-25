@@ -102,5 +102,6 @@
     <string name="min">min</string>
     <string name="h">h</string>
     <string name="days">day(s)</string>
+    <string name="no_planned_start_date">Planned start date is not specified</string>
 
 </resources>

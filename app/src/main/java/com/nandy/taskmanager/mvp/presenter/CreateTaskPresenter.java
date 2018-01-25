@@ -35,8 +35,6 @@ import static android.app.Activity.RESULT_OK;
 
 public class CreateTaskPresenter implements CreateTaskContract.Presenter {
 
-
-
     private CreateTaskContract.View mView;
 
     private CreateTaskModel mCreateTaskMode;
@@ -55,6 +53,9 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
 
         if (mSavedInstanceState != null) {
             restoreViewState();
+        }else {
+            setDuration(15, TimeUnit.MINUTES);
+            setRepeatPeriod(RepeatPeriod.NO_REPEAT);
         }
     }
 
@@ -125,6 +126,11 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
         }
 
         Task task = mCreateTaskMode.getTask();
+
+        if (task.getPlannedStartDate() == null){
+            mView.showMessage(R.string.no_planned_start_date);
+            return;
+        }
         task.setTitle(title);
         task.setDescription(description);
 

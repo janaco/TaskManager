@@ -30,7 +30,9 @@ import butterknife.ButterKnife;
  * Created by yana on 21.01.18.
  */
 
-public class TasksFragment extends PresenterFragment<TasksPresenter, TasksContract.View> implements TasksContract.View {
+public class TasksFragment
+        extends PresenterFragment<TasksContract.Presenter, TasksContract.View>
+        implements TasksContract.View {
 
     public static final int REQUEST_CREATE_TASK = 101;
     public static final String PARAM_TASK = "task";
@@ -144,7 +146,7 @@ public class TasksFragment extends PresenterFragment<TasksPresenter, TasksContra
     }
 
     @Override
-    protected TasksPresenter onCreatePresenter() {
+    protected TasksContract.Presenter onCreatePresenter() {
         TasksPresenter presenter = new TasksPresenter();
         presenter.setRecordsModel(new TaskRecordsModel(getContext()));
         presenter.setTaskStatusModel(new TaskModel(getContext()));

@@ -24,6 +24,7 @@ public class CreateTaskModel {
         if (task == null) {
             mTask = new Task(System.currentTimeMillis());
             mTask.setStatus(TaskStatus.NEW);
+            mTask.setRepeatPeriod(RepeatPeriod.NO_REPEAT);
         } else {
             mTask = task;
         }

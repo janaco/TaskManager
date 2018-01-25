@@ -21,9 +21,9 @@ public class DateFormatModel {
     private static final int MINUTES_IN_HOUR = 60;
     private static final int HOURS_IN_DAY = 24;
 
-    private static final String DATE_FORMAT = "dd.MM.yyyy";
-    private static final String TIME_FORMAT = "hh:mm";
-    private static final String FULL_DATE_FORMAT = "dd.MM.yyyy hh:mm";
+    private static final String DATE_FORMAT = "d MMM yyyy";
+    private static final String TIME_FORMAT = "h:mm a";
+    private static final String FULL_DATE_FORMAT = "d MMM yyyy h:mm a";
 
     private DateFormat mDateFormat;
     private DateFormat mTimeFormat;

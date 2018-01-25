@@ -22,7 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class StatisticsFragment
-        extends PresenterFragment<StatisticsPresenter, StatisticsContract.View>
+        extends PresenterFragment<StatisticsContract.Presenter, StatisticsContract.View>
         implements StatisticsContract.View {
 
     public static final String PARAM_LIST_STATE = "list_state";
@@ -48,7 +48,7 @@ public class StatisticsFragment
     }
 
     @Override
-    protected StatisticsPresenter onCreatePresenter() {
+    protected StatisticsContract.Presenter onCreatePresenter() {
         StatisticsPresenter presenter = new StatisticsPresenter();
         presenter.setStatisticsModel(new StatisticsModel(getContext()));
         presenter.setDateFormatModel(new DateFormatModel(getContext()));

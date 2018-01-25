@@ -42,7 +42,7 @@ public interface TaskDetailsContract {
 
         void setScheduledDuration(int value, @StringRes int textResId);
 
-        void setTimeSpent(int value, @StringRes int textResId);
+        void setTimeSpent(String timeSpent);
 
         void setRepeatPeriod(@StringRes int textResId);
 

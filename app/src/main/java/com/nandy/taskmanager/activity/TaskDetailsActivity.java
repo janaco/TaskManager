@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -25,9 +24,7 @@ import com.nandy.taskmanager.image.ImageLoader;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.contract.TaskDetailsContract;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
-import com.nandy.taskmanager.mvp.model.TaskCoverModel;
 import com.nandy.taskmanager.mvp.model.TaskModel;
-import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 import com.nandy.taskmanager.mvp.presenter.TaskItemPresenter;
 
 import org.kaerdan.presenterretainer.PresenterActivity;
@@ -200,8 +197,8 @@ public class TaskDetailsActivity extends PresenterActivity<TaskDetailsContract.P
     }
 
     @Override
-    public void setTimeSpent(int value, int textResId) {
-        mTimeSpentTextView.setText(String.format(Locale.getDefault(), "%d %s", value, getString(textResId)));
+    public void setTimeSpent(String timeSpent) {
+        mTimeSpentTextView.setText(timeSpent);
     }
 
     @Override

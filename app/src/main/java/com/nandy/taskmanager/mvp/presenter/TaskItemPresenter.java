@@ -99,7 +99,7 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
                 mView.setActualStartDateVisible(true);
                 mView.setActualStartTime(mDateFormatModel.formatAsFullDate(task.getMetadata().getActualStartDate()));
                 mView.setTimeSpentVisible(true);
-                mView.setTimeSpent(mDateFormatModel.convertToSeconds(task.getMetadata().getTimeSpent()), R.string.hour);
+                mView.setTimeSpent(mDateFormatModel.formatDuration(task.getMetadata().getTimeSpent()));
 
                 break;
 
@@ -108,7 +108,7 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
                 mView.setControlButtonText(R.string.completed);
                 mView.setActualStartDateVisible(true);
                 mView.setTimeSpentVisible(true);
-                mView.setTimeSpent(mDateFormatModel.convertToSeconds(task.getMetadata().getTimeSpent()), R.string.hour);
+                mView.setTimeSpent(mDateFormatModel.formatDuration(task.getMetadata().getTimeSpent()));
                 mView.setActualStartTime(mDateFormatModel.formatAsFullDate(task.getMetadata().getActualStartDate()));
                 break;
         }
