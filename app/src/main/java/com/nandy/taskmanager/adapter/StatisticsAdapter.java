@@ -13,7 +13,6 @@ import com.nandy.taskmanager.mvp.model.DateFormatModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Represents duration of each tasks for each month.

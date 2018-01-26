@@ -1,30 +1,14 @@
 package com.nandy.taskmanager.mvp.model;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.nandy.taskmanager.db.AppDatabase;
-import com.nandy.taskmanager.db.converters.ActionConverter;
-import com.nandy.taskmanager.db.converters.DateTypeConverter;
-import com.nandy.taskmanager.db.converters.LocationTypeConverter;
-import com.nandy.taskmanager.db.converters.RepeatPeriodConverter;
-import com.nandy.taskmanager.db.converters.TaskStatusConverter;
-import com.nandy.taskmanager.db.dao.EventsDao;
-import com.nandy.taskmanager.db.dao.StatisticsDao;
-import com.nandy.taskmanager.db.dao.TasksDao;
-import com.nandy.taskmanager.model.Location;
-import com.nandy.taskmanager.model.Metadata;
-import com.nandy.taskmanager.model.Statistics;
-import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.model.TaskEvent;
 
 import java.io.File;
 import java.io.IOException;
 
 import io.reactivex.Completable;
-import io.reactivex.CompletableEmitter;
-import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 

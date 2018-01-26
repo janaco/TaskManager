@@ -7,8 +7,8 @@ import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.TasksDao;
 import com.nandy.taskmanager.enums.Duration;
 import com.nandy.taskmanager.enums.RepeatPeriod;
-import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.enums.TaskStatus;
+import com.nandy.taskmanager.model.Task;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,7 +16,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by razomer on 18.01.18.

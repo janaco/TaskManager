@@ -30,8 +30,6 @@ import com.nandy.taskmanager.mvp.presenter.TaskItemPresenter;
 
 import org.kaerdan.presenterretainer.PresenterActivity;
 
-import java.util.Locale;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;

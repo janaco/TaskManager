@@ -9,11 +9,11 @@ import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.events.OpenFileCallback;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.eventbus.LocationTrackingEnabledStateChangedEvent;
+import com.nandy.taskmanager.mvp.contract.MainPreferencesContract;
 import com.nandy.taskmanager.mvp.model.CreateBackupModel;
 import com.nandy.taskmanager.mvp.model.DataImportModel;
 import com.nandy.taskmanager.mvp.model.GoogleDriveConnectionModel;
 import com.nandy.taskmanager.mvp.model.RestoreFromBackupModel;
-import com.nandy.taskmanager.mvp.view.MainPreferencesView;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -24,15 +24,15 @@ import java.io.IOException;
  * Created by yana on 24.01.18.
  */
 
-public class MainPreferencesPresenter  {
+public class MainPreferencesPresenter  implements MainPreferencesContract.Presenter{
 
-    private final MainPreferencesView mView;
+    private final MainPreferencesContract.View mView;
     private CreateBackupModel mCreateBackupModel;
     private RestoreFromBackupModel mRestoreDataModel;
     private GoogleDriveConnectionModel mGoogleDriveConnectionModel;
     private DataImportModel mDataImportModel;
 
-    public MainPreferencesPresenter(MainPreferencesView view) {
+    public MainPreferencesPresenter(MainPreferencesContract.View view) {
         mView = view;
     }
 
@@ -43,7 +43,7 @@ public class MainPreferencesPresenter  {
         }
     }
 
-
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         try {
             mGoogleDriveConnectionModel.onActivityResult(requestCode, resultCode, data);
@@ -53,6 +53,7 @@ public class MainPreferencesPresenter  {
         }
     }
 
+    @Override
     public void createBackup() {
 
         mGoogleDriveConnectionModel.signIn(driveResourceClient -> {
@@ -95,6 +96,7 @@ public class MainPreferencesPresenter  {
     }
 
 
+    @Override
     public void restoreFromBackup() {
 
         mGoogleDriveConnectionModel.signIn(driveResourceClient -> {
@@ -151,6 +153,7 @@ public class MainPreferencesPresenter  {
         });
     }
 
+    @Override
     public void onLocationTrackingPreferenceChanged(boolean enabled){
         EventBus.getDefault().post(new LocationTrackingEnabledStateChangedEvent(enabled));
     }

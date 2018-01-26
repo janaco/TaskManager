@@ -3,7 +3,6 @@ package com.nandy.taskmanager.mvp.model;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;

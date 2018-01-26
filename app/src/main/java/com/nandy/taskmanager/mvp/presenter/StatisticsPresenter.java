@@ -2,24 +2,16 @@ package com.nandy.taskmanager.mvp.presenter;
 
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.util.Pair;
 
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.SubscriptionUtils;
 import com.nandy.taskmanager.adapter.StatisticsAdapter;
-import com.nandy.taskmanager.model.StatisticsResult;
 import com.nandy.taskmanager.mvp.contract.StatisticsContract;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.StatisticsModel;
-import com.nandy.taskmanager.ui.fragment.StatisticsFragment;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**

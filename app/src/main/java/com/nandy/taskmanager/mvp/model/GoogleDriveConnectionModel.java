@@ -2,7 +2,6 @@ package com.nandy.taskmanager.mvp.model;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -14,7 +13,6 @@ import com.google.android.gms.tasks.Task;
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.GoogleDriveClientCallback;
 import com.nandy.taskmanager.R;
-import com.nandy.taskmanager.activity.SettingsActivity;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -58,14 +56,12 @@ public class GoogleDriveConnectionModel {
 
     public void signIn(GoogleDriveClientCallback googleDriveClientCallback) {
         mGoogleDriveClientCallback = googleDriveClientCallback;
-        Log.d("GOOGLE_CLIENT_", "signIn");
 
         Set<Scope> requiredScopes = new HashSet<>(2);
         requiredScopes.add(Drive.SCOPE_FILE);
         requiredScopes.add(Drive.SCOPE_APPFOLDER);
         GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(mActivity);
         if (signInAccount != null && signInAccount.getGrantedScopes().containsAll(requiredScopes)) {
-            Log.d("GOOGLE_CLIENT_", "onGoogleDriveClientReady");
             mGoogleDriveClientCallback.onGoogleDriveClientReady(Drive.getDriveResourceClient(mActivity, signInAccount));
         } else {
             GoogleSignInOptions signInOptions =
@@ -74,7 +70,6 @@ public class GoogleDriveConnectionModel {
                             .requestScopes(Drive.SCOPE_APPFOLDER)
                             .build();
             GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(mActivity, signInOptions);
-            Log.d("GOOGLE_CLIENT_", "googleSignInClient: " + googleSignInClient);
             mActivity.startActivityForResult(googleSignInClient.getSignInIntent(), Constants.REQUEST_CODE_SIGN_IN);
         }
     }

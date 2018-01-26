@@ -3,9 +3,7 @@ package com.nandy.taskmanager.mvp.presenter;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.speech.RecognizerIntent;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.Constants;
@@ -30,12 +28,10 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -88,40 +84,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
                 mCoverModel.createAndGetChooseCoverIntent(), Constants.REQUEST_CODE_CHOOSE_IMAGE);
     }
 
-    private void displayData() {
-
-        Task task = mCreateTaskModel.getTask();
-        mView.setTitle(task.getTitle());
-        mView.setDescription(task.getDescription());
-
-        if (task.getPlannedStartDate() != null) {
-            displayPlannedStartTime(task.getPlannedStartDate());
-        }
-
-        if (task.getScheduledDuration()  != null) {
-            mView.setDuration(task.getScheduledDuration().getTextResId());
-        }
-
-        if (task.getRepeatPeriod() != null) {
-            mView.setRepeatPeriod(task.getRepeatPeriod().getTextResId());
-        }
-
-        if (task.hasMetadata() && task.getMetadata().hasLocation()) {
-            mView.displayAddress(task.getMetadata().getLocation().getAddress());
-        }
-
-        if (task.hasImage()) {
-            mView.displayImage(task.getImage());
-        }
-    }
-
-
-    private void displayPlannedStartTime(Date plannedStartTime) {
-        mView.displayStartDate(mDateFormatModel.formatDate(plannedStartTime));
-        mView.displayStartTime(mDateFormatModel.formatTime(plannedStartTime));
-        mView.setStartTimeVisible(true);
-    }
-
+    @Override
     public void saveChanges() {
 
         Task task = mCreateTaskModel.getTask();
@@ -148,90 +111,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
         mCreateTaskModel.setDescription(description);
     }
 
-    private String reduceImageSize(long taskId, String imagePath) {
-        try {
-            return mCoverModel.saveImage(taskId, imagePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private void createOrUpdate(Task task, boolean shouldCreateNew) {
-
-        mCreateTaskSubscription = Completable.create(e -> {
-            if (task.getImage() != null) {
-                String reducedImagePath = reduceImageSize(task.getId(), task.getImage());
-                task.setImage(reducedImagePath);
-            }
-
-            if (shouldCreateNew) {
-                mRecordsModel.insert(task);
-            } else {
-                mRecordsModel.update(task);
-            }
-
-            e.onComplete();
-        })
-                .doOnComplete(() -> {
-                    mScheduleModel.cancelReminders(task.getId());
-                    mScheduleModel.scheduleStartReminder(task);
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mView.setProgressViewVisible(true))
-                .doFinally(() -> mView.setProgressViewVisible(false))
-                .subscribe(() -> {
-
-                    if (task.hasLocation()) {
-                        EventBus.getDefault().post(new TaskChangedEvent(task));
-                    }
-
-                    Intent intent = new Intent();
-                    Bundle args = new Bundle();
-                    args.putParcelable(Constants.PARAM_TASK, task);
-                    intent.putExtras(args);
-                    mView.finishWithResult(RESULT_OK, intent);
-                }, Throwable::printStackTrace);
-    }
-
-
-    private boolean isInputValid(String title, String description) {
-
-        boolean isInputValid = true;
-
-        if (mValidationModel.isEmpty(title)) {
-            mView.setTitleError(R.string.empty_field);
-            isInputValid = false;
-        }
-
-        if (!mValidationModel.isTitleValid(title)) {
-            mView.setTitleError(R.string.title_is_too_short);
-            isInputValid = false;
-        }
-
-        if (mValidationModel.isEmpty(description)) {
-            mView.setCommentError(R.string.empty_field);
-            isInputValid = false;
-        }
-
-        return isInputValid;
-    }
-
-    private void onLocationSpecified(LatLng latLng) {
-
-        mAddressSubscription = Single.create((SingleOnSubscribe<Location>) e -> {
-            String addressText = mGeocoderModel.getAddressFromLocation(latLng);
-            e.onSuccess(new Location(latLng, addressText));
-        })
-                .doOnSuccess(location -> mCreateTaskModel.setLocation(location))
-                .doOnError(throwable -> mCreateTaskModel.setLocation(new Location(latLng, null)))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(location -> mView.displayAddress(location.getAddress()), throwable -> mView.displayAddress(String.format(Locale.getDefault(), "%f, %f", latLng.latitude, latLng.longitude)));
-
-    }
-
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         switch (requestCode) {
@@ -297,11 +177,13 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
 
     }
 
+    @Override
     public void clearLocation() {
         mCreateTaskModel.clearLocation();
         mView.clearLocation();
     }
 
+    @Override
     public void setStartDate() {
 
         Calendar calendar = Calendar.getInstance();
@@ -319,6 +201,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
                 calendar.get(Calendar.DAY_OF_MONTH));
     }
 
+    @Override
     public void setStartTime() {
         Calendar calendar = Calendar.getInstance();
 
@@ -333,6 +216,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
                 calendar.get(Calendar.MINUTE));
     }
 
+    @Override
     public boolean onDurationSelected(int optionId) {
 
         switch (optionId) {
@@ -365,12 +249,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
         }
     }
 
-    private void setDuration(Duration duration) {
-        mCreateTaskModel.setDuration(duration);
-        mView.setDuration(duration.getTextResId());
-
-    }
-
+    @Override
     public boolean onRepeatPeriodSelected(int optionId) {
 
         switch (optionId) {
@@ -397,6 +276,128 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
             default:
                 return false;
         }
+    }
+
+    private void displayData() {
+
+        Task task = mCreateTaskModel.getTask();
+        mView.setTitle(task.getTitle());
+        mView.setDescription(task.getDescription());
+
+        if (task.getPlannedStartDate() != null) {
+            displayPlannedStartTime(task.getPlannedStartDate());
+        }
+
+        if (task.getScheduledDuration()  != null) {
+            mView.setDuration(task.getScheduledDuration().getTextResId());
+        }
+
+        if (task.getRepeatPeriod() != null) {
+            mView.setRepeatPeriod(task.getRepeatPeriod().getTextResId());
+        }
+
+        if (task.hasMetadata() && task.getMetadata().hasLocation()) {
+            mView.displayAddress(task.getMetadata().getLocation().getAddress());
+        }
+
+        if (task.hasImage()) {
+            mView.displayImage(task.getImage());
+        }
+    }
+
+    private void displayPlannedStartTime(Date plannedStartTime) {
+        mView.displayStartDate(mDateFormatModel.formatDate(plannedStartTime));
+        mView.displayStartTime(mDateFormatModel.formatTime(plannedStartTime));
+        mView.setStartTimeVisible(true);
+    }
+
+    private String reduceImageSize(long taskId, String imagePath) {
+        try {
+            return mCoverModel.saveImage(taskId, imagePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void createOrUpdate(Task task, boolean shouldCreateNew) {
+
+        mCreateTaskSubscription = Completable.create(e -> {
+            if (task.getImage() != null) {
+                String reducedImagePath = reduceImageSize(task.getId(), task.getImage());
+                task.setImage(reducedImagePath);
+            }
+
+            if (shouldCreateNew) {
+                mRecordsModel.insert(task);
+            } else {
+                mRecordsModel.update(task);
+            }
+
+            e.onComplete();
+        })
+                .doOnComplete(() -> {
+                    mScheduleModel.cancelReminders(task.getId());
+                    mScheduleModel.scheduleStartReminder(task);
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> mView.setProgressViewVisible(true))
+                .doFinally(() -> mView.setProgressViewVisible(false))
+                .subscribe(() -> {
+
+                    if (task.hasLocation()) {
+                        EventBus.getDefault().post(new TaskChangedEvent(task));
+                    }
+
+                    Intent intent = new Intent();
+                    Bundle args = new Bundle();
+                    args.putParcelable(Constants.PARAM_TASK, task);
+                    intent.putExtras(args);
+                    mView.finishWithResult(RESULT_OK, intent);
+                }, Throwable::printStackTrace);
+    }
+
+    private boolean isInputValid(String title, String description) {
+
+        boolean isInputValid = true;
+
+        if (mValidationModel.isEmpty(title)) {
+            mView.setTitleError(R.string.empty_field);
+            isInputValid = false;
+        }
+
+        if (!mValidationModel.isTitleValid(title)) {
+            mView.setTitleError(R.string.title_is_too_short);
+            isInputValid = false;
+        }
+
+        if (mValidationModel.isEmpty(description)) {
+            mView.setCommentError(R.string.empty_field);
+            isInputValid = false;
+        }
+
+        return isInputValid;
+    }
+
+    private void onLocationSpecified(LatLng latLng) {
+
+        mAddressSubscription = Single.create((SingleOnSubscribe<Location>) e -> {
+            String addressText = mGeocoderModel.getAddressFromLocation(latLng);
+            e.onSuccess(new Location(latLng, addressText));
+        })
+                .doOnSuccess(location -> mCreateTaskModel.setLocation(location))
+                .doOnError(throwable -> mCreateTaskModel.setLocation(new Location(latLng, null)))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(location -> mView.displayAddress(location.getAddress()), throwable -> mView.displayAddress(String.format(Locale.getDefault(), "%f, %f", latLng.latitude, latLng.longitude)));
+
+    }
+
+    private void setDuration(Duration duration) {
+        mCreateTaskModel.setDuration(duration);
+        mView.setDuration(duration.getTextResId());
+
     }
 
     private void setRepeatPeriod(RepeatPeriod repeatPeriod) {

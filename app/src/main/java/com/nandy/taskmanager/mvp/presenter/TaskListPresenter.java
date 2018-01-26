@@ -1,7 +1,6 @@
 package com.nandy.taskmanager.mvp.presenter;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.daimajia.swipe.util.Attributes;
 import com.nandy.taskmanager.Constants;
@@ -9,15 +8,12 @@ import com.nandy.taskmanager.SubscriptionUtils;
 import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.adapter.TasksAdapter;
-import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.eventbus.TaskChangedEvent;
 import com.nandy.taskmanager.eventbus.TaskListChangedEvent;
 import com.nandy.taskmanager.eventbus.TasksCleanedEvent;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.contract.TaskListContract;
 import com.nandy.taskmanager.mvp.model.TaskModel;
-import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
-import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -29,8 +25,6 @@ import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -66,14 +60,6 @@ public class TaskListPresenter implements TaskListContract.Presenter, TasksAdapt
         }
 
     }
-
-    private void restoreViewState() {
-        List<Task> tasks = mSavedInstanceState.getParcelableArrayList(Constants.PARAM_TASKS);
-        mAdapter.setItems(tasks);
-        mView.scrollToPosition(mSavedInstanceState.getInt(Constants.PARAM_FIRST_VISIBLE_POSITION));
-        mSavedInstanceState = null;
-    }
-
     @Override
     public void onDetachView() {
         mView = null;
@@ -128,35 +114,6 @@ public class TaskListPresenter implements TaskListContract.Presenter, TasksAdapt
         args.putParcelable("task", task);
         mView.launchActivity(args, TaskDetailsActivity.class);
 
-    }
-
-    private void loadTasks(boolean byUser) {
-
-        mLoadTasksSubscription =
-                mTaskModel.getAll()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnSubscribe(disposable -> {
-                            if (byUser) {
-                                mView.setRefreshing(true);
-                            } else {
-                                mView.setListViewVisible(mAdapter.getCount() > 0);
-                                mView.setProgressViewVisible(mAdapter.getCount() == 0);
-                            }
-
-                        })
-                        .doFinally(() -> {
-                            mView.setProgressViewVisible(false);
-                            mView.setRefreshing(false);
-                        })
-                        .subscribe(tasks ->
-
-                        {
-                            mAdapter.setItems(tasks);
-                            mView.setListViewVisible(true);
-                            mView.setNoTasksMessageVisible(tasks.size() == 0);
-
-                        }, Throwable::printStackTrace);
     }
 
     @Override
@@ -249,6 +206,42 @@ public class TaskListPresenter implements TaskListContract.Presenter, TasksAdapt
     @Override
     public void setSavedViewState(Bundle savedInstanceState) {
         mSavedInstanceState = savedInstanceState;
+    }
+
+    private void loadTasks(boolean byUser) {
+
+        mLoadTasksSubscription =
+                mTaskModel.getAll()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe(disposable -> {
+                            if (byUser) {
+                                mView.setRefreshing(true);
+                            } else {
+                                mView.setListViewVisible(mAdapter.getCount() > 0);
+                                mView.setProgressViewVisible(mAdapter.getCount() == 0);
+                            }
+
+                        })
+                        .doFinally(() -> {
+                            mView.setProgressViewVisible(false);
+                            mView.setRefreshing(false);
+                        })
+                        .subscribe(tasks ->
+
+                        {
+                            mAdapter.setItems(tasks);
+                            mView.setListViewVisible(true);
+                            mView.setNoTasksMessageVisible(tasks.size() == 0);
+
+                        }, Throwable::printStackTrace);
+    }
+
+    private void restoreViewState() {
+        List<Task> tasks = mSavedInstanceState.getParcelableArrayList(Constants.PARAM_TASKS);
+        mAdapter.setItems(tasks);
+        mView.scrollToPosition(mSavedInstanceState.getInt(Constants.PARAM_FIRST_VISIBLE_POSITION));
+        mSavedInstanceState = null;
     }
 
     private Task getTask(int position) {

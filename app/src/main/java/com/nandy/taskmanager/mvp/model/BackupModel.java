@@ -1,7 +1,6 @@
 package com.nandy.taskmanager.mvp.model;
 
 import android.content.Context;
-import android.webkit.MimeTypeMap;
 
 import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.MetadataBuffer;

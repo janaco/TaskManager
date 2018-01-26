@@ -8,10 +8,9 @@ import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.SubscriptionUtils;
 import com.nandy.taskmanager.activity.CreateTaskActivity;
-import com.nandy.taskmanager.activity.TaskDetailsActivity;
+import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.eventbus.TaskChangedEvent;
 import com.nandy.taskmanager.model.Task;
-import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.mvp.contract.TaskDetailsContract;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskModel;
@@ -19,12 +18,9 @@ import com.nandy.taskmanager.mvp.model.TaskModel;
 import org.greenrobot.eventbus.EventBus;
 
 import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -58,6 +54,7 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
         SubscriptionUtils.dispose(mDeleteTaskSubscription);
     }
 
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (resultCode == Activity.RESULT_OK && requestCode == Constants.REQUEST_CODE_EDIT) {
@@ -67,6 +64,69 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
         }
     }
 
+    @Override
+    public void edit() {
+        Bundle args = new Bundle();
+        args.putParcelable(Constants.PARAM_TASK, mTaskModel.getTask());
+        args.putInt(Constants.PARAM_MODE, Constants.MODE_EDIT);
+
+        mView.launchActivityForResult(args, CreateTaskActivity.class, Constants.REQUEST_CODE_EDIT);
+    }
+
+    @Override
+    public void setupMenu() {
+        setupMenu(mTaskModel.getTask());
+    }
+
+    @Override
+    public void toggleStatus() {
+
+        switch (mTaskModel.getTask().getStatus()) {
+
+            case NEW:
+                mTaskStatusSubscriprion =
+                        Single.create((SingleOnSubscribe<Task>) e -> e.onSuccess(mTaskModel.start()))
+                                .doOnSuccess(updatedTask -> EventBus.getDefault().post(new TaskChangedEvent(updatedTask)))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
+                break;
+
+            case ACTIVE:
+                mTaskStatusSubscriprion =
+                        Single.create((SingleOnSubscribe<Task>) e -> e.onSuccess(mTaskModel.complete()))
+                                .doOnSuccess(updatedTask -> EventBus.getDefault().post(new TaskChangedEvent(updatedTask)))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
+                break;
+        }
+    }
+
+    @Override
+    public void delete() {
+        mDeleteTaskSubscription = mTaskModel.delete().subscribe(() -> mView.finish(), Throwable::printStackTrace);
+    }
+
+    @Override
+    public void resetStart() {
+        mTaskStatusSubscriprion = mTaskModel.resetStart().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
+    }
+
+    @Override
+    public void resetEnd() {
+        mTaskStatusSubscriprion = mTaskModel.resetEnd().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
+    }
+
+    @Override
+    public void pause() {
+        mTaskStatusSubscriprion = mTaskModel.pause().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
+    }
+
+    @Override
+    public void resume() {
+        mTaskStatusSubscriprion = mTaskModel.resume().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
+    }
 
     private void displayData(Task task) {
 
@@ -79,15 +139,6 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
         displayLocation(task);
         loadImage(task);
         displayStatusInformation(task);
-    }
-
-    @Override
-    public void edit() {
-        Bundle args = new Bundle();
-        args.putParcelable(Constants.PARAM_TASK, mTaskModel.getTask());
-        args.putInt(Constants.PARAM_MODE, Constants.MODE_EDIT);
-
-        mView.launchActivityForResult(args, CreateTaskActivity.class, Constants.REQUEST_CODE_EDIT);
     }
 
     private void displayStatusInformation(Task task) {
@@ -131,11 +182,6 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
         }
     }
 
-    @Override
-    public void setupMenu() {
-        setupMenu(mTaskModel.getTask());
-    }
-
     private void setupMenu(Task task) {
         mView.setResetStartMenuOptionEnabled(task.getStatus() != TaskStatus.NEW);
         mView.setResetEndMenuOptionEnabled(task.getStatus() == TaskStatus.COMPLETED);
@@ -158,51 +204,6 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
         } else {
             mView.loadImage(R.mipmap.ic_task, task.hasLocation());
         }
-    }
-
-    public void toggleStatus() {
-
-        switch (mTaskModel.getTask().getStatus()) {
-
-            case NEW:
-                mTaskStatusSubscriprion =
-                        Single.create((SingleOnSubscribe<Task>) e -> e.onSuccess(mTaskModel.start()))
-                                .doOnSuccess(updatedTask -> EventBus.getDefault().post(new TaskChangedEvent(updatedTask)))
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
-                break;
-
-            case ACTIVE:
-                mTaskStatusSubscriprion =
-                        Single.create((SingleOnSubscribe<Task>) e -> e.onSuccess(mTaskModel.complete()))
-                                .doOnSuccess(updatedTask -> EventBus.getDefault().post(new TaskChangedEvent(updatedTask)))
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
-                break;
-        }
-    }
-
-    public void delete() {
-        mDeleteTaskSubscription = mTaskModel.delete().subscribe(() -> mView.finish(), Throwable::printStackTrace);
-    }
-
-
-    public void resetStart() {
-        mTaskStatusSubscriprion = mTaskModel.resetStart().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
-    }
-
-    public void resetEnd() {
-        mTaskStatusSubscriprion = mTaskModel.resetEnd().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
-    }
-
-    public void pause() {
-        mTaskStatusSubscriprion = mTaskModel.pause().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
-    }
-
-    public void resume() {
-        mTaskStatusSubscriprion = mTaskModel.resume().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
     }
 
     private void onTaskStatusChanged(Task task) {

@@ -8,8 +8,8 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -22,7 +22,6 @@ import com.nandy.taskmanager.mvp.model.DummyDataModel;
 import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TasksInRadiusTrackingModel;
 import com.nandy.taskmanager.mvp.presenter.MainPresenter;
-import com.nandy.taskmanager.service.LocationService;
 import com.nandy.taskmanager.ui.fragment.StatisticsFragment;
 import com.nandy.taskmanager.ui.fragment.TaskListFragment;
 
@@ -52,6 +51,11 @@ public class MainActivity extends PresenterActivity<MainActivityContract.Present
         ButterKnife.bind(this);
 
         setSupportActionBar(findViewById(R.id.toolbar));
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null){
+            actionBar.setTitle(R.string.app_name);
+        }
 
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));

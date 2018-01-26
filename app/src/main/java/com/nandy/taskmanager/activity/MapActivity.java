@@ -3,6 +3,7 @@ package com.nandy.taskmanager.activity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -95,7 +96,7 @@ public class MapActivity extends PresenterActivity<MapContract.Presenter, MapCon
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         getPresenter().onRequestPermissionsResult(requestCode);
     }
 

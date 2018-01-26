@@ -3,18 +3,14 @@ package com.nandy.taskmanager.mvp.model;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
-import com.nandy.taskmanager.db.AppDatabase;
-import com.nandy.taskmanager.db.dao.EventsDao;
-import com.nandy.taskmanager.db.dao.StatisticsDao;
-import com.nandy.taskmanager.db.dao.TasksDao;
 import com.nandy.taskmanager.enums.Action;
+import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.eventbus.TaskChangedEvent;
 import com.nandy.taskmanager.eventbus.TaskRemovedEvent;
 import com.nandy.taskmanager.model.Metadata;
 import com.nandy.taskmanager.model.Statistics;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskEvent;
-import com.nandy.taskmanager.enums.TaskStatus;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -22,10 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Completable;
-import io.reactivex.CompletableEmitter;
-import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;

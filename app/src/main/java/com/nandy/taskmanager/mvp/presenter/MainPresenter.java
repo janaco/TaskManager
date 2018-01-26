@@ -1,7 +1,6 @@
 package com.nandy.taskmanager.mvp.presenter;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.OnServiceConnectedListener;

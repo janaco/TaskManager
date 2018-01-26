@@ -13,19 +13,19 @@ import android.widget.Toast;
 
 import com.nandy.taskmanager.AppPreferencesStorage;
 import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.mvp.contract.MainPreferencesContract;
 import com.nandy.taskmanager.mvp.model.CreateBackupModel;
 import com.nandy.taskmanager.mvp.model.DataImportModel;
 import com.nandy.taskmanager.mvp.model.GoogleDriveConnectionModel;
 import com.nandy.taskmanager.mvp.model.RestoreFromBackupModel;
 import com.nandy.taskmanager.mvp.presenter.MainPreferencesPresenter;
-import com.nandy.taskmanager.mvp.view.MainPreferencesView;
 
 /**
  * Created by yana on 24.01.18.
  */
 
 public class MainPreferencesFragment extends PreferenceFragment
-        implements Preference.OnPreferenceClickListener, MainPreferencesView {
+        implements Preference.OnPreferenceClickListener, MainPreferencesContract.View {
 
 
     private MainPreferencesPresenter mPresenter;

@@ -18,8 +18,6 @@ import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.contract.TaskListContract;
-import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
-import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 import com.nandy.taskmanager.mvp.model.TaskModel;
 import com.nandy.taskmanager.mvp.presenter.TaskListPresenter;
 
