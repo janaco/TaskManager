@@ -119,7 +119,11 @@ public class TasksInRadiusTrackingModel {
 
 
     public void unbind() {
-        mContext.unbindService(mServiceConnection);
+        try {
+            mContext.unbindService(mServiceConnection);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
         mLocationService = null;
     }
 
