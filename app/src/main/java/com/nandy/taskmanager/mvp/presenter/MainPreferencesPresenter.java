@@ -17,6 +17,8 @@ import com.nandy.taskmanager.mvp.view.MainPreferencesView;
 import java.io.File;
 import java.io.IOException;
 
+import io.reactivex.functions.Action;
+
 /**
  * Created by yana on 24.01.18.
  */
@@ -42,7 +44,12 @@ public class MainPreferencesPresenter  {
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mGoogleDriveConnectionModel.onActivityResult(requestCode, resultCode, data);
+        try {
+            mGoogleDriveConnectionModel.onActivityResult(requestCode, resultCode, data);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            mView.showMessage(throwable.getMessage());
+        }
     }
 
     public void createBackup() {
@@ -69,10 +76,10 @@ public class MainPreferencesPresenter  {
     }
 
 
-    private void onError(Exception e) {
-        e.printStackTrace();
+    private void onError(Throwable t) {
+        t.printStackTrace();
         mView.cancelProgressDialog();
-        mView.showMessage(e.getMessage());
+        mView.showMessage(t.getMessage());
     }
 
     private void updateOrCreateBackup() {
@@ -124,10 +131,12 @@ public class MainPreferencesPresenter  {
                 try {
                     mRestoreDataModel.restoreBackup(driveContents);
                     File dbBackupFile = mRestoreDataModel.getBackupDbFile();
-                    mDataImportModel.importData(dbBackupFile);
-                    dbBackupFile.delete();
-                    mView.cancelProgressDialog();
-                    mView.showMessage(R.string.data_restored);
+                    mDataImportModel.importData(dbBackupFile)
+                            .subscribe(() -> {
+                                dbBackupFile.delete();
+                                mView.cancelProgressDialog();
+                                mView.showMessage(R.string.data_restored);
+                            }, MainPreferencesPresenter.this::onError);
 
                 } catch (IOException e) {
                     onError(e);

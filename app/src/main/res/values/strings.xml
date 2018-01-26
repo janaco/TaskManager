@@ -106,5 +106,6 @@
     <string name="unknown_address">Unknown address</string>
     <string name="you_have_no_tasks">You have no tasks</string>
     <string name="delete_item_alert">Are you really want to delete this task?</string>
+    <string name="failed_to_sign_in">Failed to sign in</string>
 
 </resources>

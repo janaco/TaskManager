@@ -138,7 +138,9 @@ public class MainActivity extends PresenterActivity<MainActivityContract.Present
     @Override
     public void launchActivity(Bundle args, Class<?> cls) {
         Intent intent = new Intent(getApplicationContext(), cls);
-        intent.putExtras(args);
+        if (args != null){
+            intent.putExtras(args);
+        }
         startActivity(intent);
     }
 

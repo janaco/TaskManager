@@ -1,10 +1,10 @@
 package com.nandy.taskmanager.activity;
 
+import android.app.Fragment;
 import android.content.Intent;
-import android.support.v4.app.Fragment;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
 import com.nandy.taskmanager.R;
@@ -39,7 +39,8 @@ public class SettingsActivity extends AppCompatActivity  {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(
+
+        Fragment fragment = getFragmentManager().findFragmentByTag(
                 MainPreferencesFragment.class.getSimpleName());
 
         if (fragment != null){

@@ -62,8 +62,6 @@ public class TaskListPresenter implements TaskListContract.Presenter, TasksAdapt
 
         if (mSavedInstanceState != null) {
             restoreViewState();
-        }else {
-            loadTasks(false);
         }
 
     }
@@ -85,7 +83,6 @@ public class TaskListPresenter implements TaskListContract.Presenter, TasksAdapt
 
     @Override
     public void onDestroy() {
-
     }
 
     @Override
@@ -96,6 +93,8 @@ public class TaskListPresenter implements TaskListContract.Presenter, TasksAdapt
     @Override
     public void resume() {
         EventBus.getDefault().register(this);
+        loadTasks(false);
+
     }
 
     @Override
@@ -140,8 +139,8 @@ public class TaskListPresenter implements TaskListContract.Presenter, TasksAdapt
                             if (byUser) {
                                 mView.setRefreshing(true);
                             } else {
-                                mView.setListViewVisible(false);
-                                mView.setProgressViewVisible(true);
+                                mView.setListViewVisible(mAdapter.getCount() > 0);
+                                mView.setProgressViewVisible(mAdapter.getCount() == 0);
                             }
 
                         })

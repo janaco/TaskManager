@@ -22,6 +22,12 @@ import com.nandy.taskmanager.model.TaskEvent;
 import java.io.File;
 import java.io.IOException;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableEmitter;
+import io.reactivex.CompletableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by yana on 24.01.18.
  */
@@ -30,17 +36,23 @@ public class DataImportModel {
 
     private AppDatabase mAppDatabase;
 
-    public DataImportModel(Context context){
+    public DataImportModel(Context context) {
         mAppDatabase = AppDatabase.getInstance(context);
     }
 
-    public void importData(File backupDbFile) throws IOException {
+    public Completable importData(File backupDbFile) throws IOException {
 
-        SQLiteDatabase backupDb = SQLiteDatabase.openDatabase(backupDbFile.getPath(), null, 0);
+       return Completable.create(e -> {
+            SQLiteDatabase backupDb = SQLiteDatabase.openDatabase(backupDbFile.getPath(), null, 0);
 
-        importTasks(backupDb);
-        importEvents(backupDb);
-        importStatistics(backupDb);
+            importTasks(backupDb);
+            importEvents(backupDb);
+            importStatistics(backupDb);
+
+            e.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
     }
 
     private void importEvents(SQLiteDatabase backupDb) {
@@ -117,7 +129,7 @@ public class DataImportModel {
                 metadata.setActualStartDate(DateTypeConverter.fromTimestamp(actualStartDate));
                 metadata.setTimeSpent(timeSpent);
                 metadata.setDownTime(downtime);
-                if (location != null && !location.isEmpty()){
+                if (location != null && !location.isEmpty()) {
                     metadata.setLocation(new Location(
                             LocationTypeConverter.toLatLng(location), address));
                 }

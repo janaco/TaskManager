@@ -1,6 +1,7 @@
 package com.nandy.taskmanager.ui.fragment;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -69,6 +70,11 @@ public class MainPreferencesFragment extends PreferenceFragment
         return false;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mPresenter.onActivityResult(requestCode, resultCode, data);
+    }
 
     @Override
     public void setRestoreBackupPreferenceEnabled(boolean enabled) {
