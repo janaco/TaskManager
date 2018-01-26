@@ -11,6 +11,7 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.widget.Toast;
 
+import com.nandy.taskmanager.AppPreferencesStorage;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.mvp.model.CreateBackupModel;
 import com.nandy.taskmanager.mvp.model.DataImportModel;
@@ -27,11 +28,6 @@ public class MainPreferencesFragment extends PreferenceFragment
         implements Preference.OnPreferenceClickListener, MainPreferencesView {
 
 
-    private static final String KEY_CREATE_BACKUP = "KEY_CREATE_BACKUP";
-    private static final String KEY_RESTORE_BACKUP = "KEY_RESTORE_BACKUP";
-
-    private static final String KEY_LOCATION_TRACKING = "pref_location_tracking";
-
     private MainPreferencesPresenter mPresenter;
     private ProgressDialog mProgressDialog;
 
@@ -40,10 +36,11 @@ public class MainPreferencesFragment extends PreferenceFragment
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.main_preferences);
 
-        findPreference(KEY_CREATE_BACKUP).setOnPreferenceClickListener(this);
-        findPreference(KEY_RESTORE_BACKUP).setOnPreferenceClickListener(this);
+        findPreference(AppPreferencesStorage.KEY_CREATE_BACKUP).setOnPreferenceClickListener(this);
+        findPreference(AppPreferencesStorage.KEY_RESTORE_BACKUP).setOnPreferenceClickListener(this);
 
-        CheckBoxPreference prefLocationTracking = (CheckBoxPreference) getPreferenceManager().findPreference(KEY_LOCATION_TRACKING);
+        CheckBoxPreference prefLocationTracking = (CheckBoxPreference) getPreferenceManager()
+                .findPreference(AppPreferencesStorage.KEY_LOCATION_TRACKING);
         if (prefLocationTracking != null) {
             prefLocationTracking.setOnPreferenceChangeListener((preference, newValue) -> {
                 if (newValue instanceof Boolean) {
@@ -73,11 +70,11 @@ public class MainPreferencesFragment extends PreferenceFragment
 
         switch (preference.getKey()) {
 
-            case KEY_CREATE_BACKUP:
+            case AppPreferencesStorage.KEY_CREATE_BACKUP:
                 mPresenter.createBackup();
                 return true;
 
-            case KEY_RESTORE_BACKUP:
+            case AppPreferencesStorage.KEY_RESTORE_BACKUP:
                 mPresenter.restoreFromBackup();
                 return true;
         }
@@ -92,7 +89,7 @@ public class MainPreferencesFragment extends PreferenceFragment
 
     @Override
     public void setRestoreBackupPreferenceEnabled(boolean enabled) {
-        Preference preference = findPreference(KEY_RESTORE_BACKUP);
+        Preference preference = findPreference(AppPreferencesStorage.KEY_RESTORE_BACKUP);
 
         SpannableString spannable = new SpannableString(preference.getTitle());
         int colorResId = enabled ? R.color.primaryTextColor : android.R.color.secondary_text_dark_nodisable;

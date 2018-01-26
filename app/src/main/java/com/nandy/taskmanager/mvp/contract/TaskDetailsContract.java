@@ -42,7 +42,7 @@ public interface TaskDetailsContract {
 
         void setActualStartTime(String time);
 
-        void setScheduledDuration(String duration);
+        void setScheduledDuration(@StringRes int textResId);
 
         void setTimeSpent(String timeSpent);
 

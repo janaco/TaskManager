@@ -20,8 +20,6 @@ import org.greenrobot.eventbus.EventBus;
 import java.io.File;
 import java.io.IOException;
 
-import io.reactivex.functions.Action;
-
 /**
  * Created by yana on 24.01.18.
  */

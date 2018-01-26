@@ -7,20 +7,17 @@
         <item android:id="@+id/option_no_repeat"
             android:title="@string/no_repeat"/>
 
-        <item android:id="@+id/option_once_a_hour"
-            android:title="@string/once_a_hour"/>
+        <item android:id="@+id/option_five_mins"
+            android:title="@string/every_five_mins"/>
 
-        <item android:id="@+id/option_once_a_day"
-            android:title="@string/once_a_day"/>
+        <item android:id="@+id/option_fifteen_mins"
+            android:title="@string/every_fifteen_mins"/>
 
-        <item android:id="@+id/option_once_a_week"
-            android:title="@string/once_a_week"/>
+        <item android:id="@+id/option_every_hour"
+            android:title="@string/every_hour"/>
 
-        <item android:id="@+id/option_once_a_month"
-            android:title="@string/once_a_month"/>
-
-        <item android:id="@+id/option_once_a_year"
-            android:title="@string/once_a_year"/>
+        <item android:id="@+id/option_every_day"
+            android:title="@string/every_day"/>
 
     </group>
 

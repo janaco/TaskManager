@@ -42,19 +42,14 @@
     <string name="repeat">Repeat</string>
     <string name="start_date">Start Date</string>
     <string name="no_repeat">No repeat</string>
-    <string name="once_a_hour">Once a hour</string>
-    <string name="once_a_day">Once a day</string>
-    <string name="once_a_week">Once a week</string>
-    <string name="once_a_month">Once a month</string>
-    <string name="once_a_year">Once a year</string>
+    <string name="every_hour">Every hour</string>
+    <string name="every_day">Every day</string>
+    <string name="every_five_mins">Every 5 minutes</string>
+    <string name="every_fifteen_mins">Every 15 minutes</string>
     <string name="fifteen_minutes">15 minutes</string>
     <string name="half_of_hour">Half of hour</string>
     <string name="one_hour">1 hour</string>
     <string name="two_hours">2 hour</string>
-    <string name="three_hours">3 hour</string>
-    <string name="four_hours">4 hour</string>
-    <string name="five_hours">5 hour</string>
-    <string name="six_hours">6 hour</string>
     <string name="minutes">minutes</string>
     <string name="set_duration">Set duration</string>
     <string name="task_completed">Task completed.</string>
@@ -110,26 +105,26 @@
     <string name="enable_location_tracking">Enable location tracking</string>
     <string name="location_tracking_summary">Set option enabled to start and complete tasks with location automatically. Please, enable locations on your device to make this option work</string>
     <string name="duration_summary">Set default duration for all tasks</string>
+    <string name="one_minute">1 minute</string>
+    <string name="five_minutes">5 minutes</string>
+    <string name="default_duration">Default duration</string>
 
     <string-array name="array_duration">
-        <item>15 mins</item>
+        <item>1 minute</item>
+        <item>5 minutes</item>
+        <item>15 minutes</item>
         <item>Half of hour</item>
         <item>1 hour</item>
         <item>2 hour</item>
-        <item>3 hour</item>
-        <item>4 hour</item>
-        <item>5 hour</item>
-        <item>6 hour</item>
     </string-array>
 
     <string-array name="array_duration_values">
-        <item>0.25</item>
-        <item>0.5</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
+        <item>ONE_MINUTE</item>
+        <item>FIVE_MINUTES</item>
+        <item>FIFTEEN_MINUTES</item>
+        <item>HALF_OF_HOUR</item>
+        <item>ONE_HOUR</item>
+        <item>TWO_HOURS</item>
     </string-array>
+
 </resources>

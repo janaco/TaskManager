@@ -199,8 +199,8 @@ public class TaskDetailsActivity extends PresenterActivity<TaskDetailsContract.P
     }
 
     @Override
-    public void setScheduledDuration(String duration) {
-        mScheduledDurationTextView.setText(duration);
+    public void setScheduledDuration(@StringRes int textResId) {
+        mScheduledDurationTextView.setText(textResId);
     }
 
     @Override

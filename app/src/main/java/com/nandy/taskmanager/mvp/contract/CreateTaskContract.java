@@ -53,7 +53,7 @@ public interface CreateTaskContract {
 
         void setStartTimeVisible(boolean visible);
 
-        void setDuration(int duration, @StringRes int textResId);
+        void setDuration(@StringRes int textResId);
 
         void setRepeatPeriod(@StringRes int textResId);
 

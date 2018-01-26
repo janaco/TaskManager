@@ -73,7 +73,7 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
         mView.setTitle(task.getTitle());
         mView.setDescription(task.getDescription());
         mView.setPlannedStartTime(mDateFormatModel.formatAsFullDate(task.getPlannedStartDate()));
-        mView.setScheduledDuration(mDateFormatModel.formatDuration(task.getScheduledDuration()));
+        mView.setScheduledDuration(task.getScheduledDuration().getTextResId());
         mView.setRepeatPeriod(task.getRepeatPeriod().getTextResId());
 
         displayLocation(task);

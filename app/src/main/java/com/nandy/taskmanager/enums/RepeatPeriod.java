@@ -13,11 +13,10 @@ import java.util.concurrent.TimeUnit;
 public enum RepeatPeriod {
 
     NO_REPEAT(R.string.no_repeat, -1),
-    ONCE_A_HOUR(R.string.once_a_hour, TimeUnit.HOURS.toMillis(1)),
-    ONCE_A_DAY(R.string.once_a_day, TimeUnit.DAYS.toMillis(1)),
-    ONCE_A_WEEK(R.string.once_a_week, TimeUnit.DAYS.toMillis(7)),
-    ONCE_A_MONTH(R.string.once_a_month, TimeUnit.DAYS.toMillis(30)),
-    ONCE_A_YEAR(R.string.once_a_year, TimeUnit.DAYS.toMillis(365));
+    EVERY_FIVE_MINUTES(R.string.every_five_mins, TimeUnit.MINUTES.toMillis(5)),
+    EVERY_FIFTEEN_MINUTES(R.string.every_fifteen_mins, TimeUnit.MINUTES.toMillis(15)),
+    EVERY_HOUR(R.string.every_hour, TimeUnit.HOURS.toMillis(1)),
+    EVERY_DAY(R.string.every_day, TimeUnit.DAYS.toMillis(1));
 
     @StringRes
     private int mTextResId;

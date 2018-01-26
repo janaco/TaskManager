@@ -189,7 +189,7 @@ public class CreateTaskActivity
             mode = args.getInt(Constants.PARAM_MODE, Constants.MODE_CREATE);
         }
         CreateTaskPresenter presenter = new CreateTaskPresenter();
-        presenter.setCreateTaskMode(new CreateTaskModel(task, mode));
+        presenter.setCreateTaskMode(new CreateTaskModel(getApplicationContext(), task, mode));
         presenter.setValidationModel(new ValidationModel());
         presenter.setDateFormatModel(new DateFormatModel(getApplicationContext()));
         presenter.setCoverModel(new TaskCoverModel(getApplicationContext()));
@@ -288,8 +288,8 @@ public class CreateTaskActivity
     }
 
     @Override
-    public void setDuration(int duration, @StringRes int textResId) {
-        mDurationTextView.setText(String.format(Locale.getDefault(), "%d %s", duration, getString(textResId)));
+    public void setDuration(@StringRes int textResId) {
+        mDurationTextView.setText(textResId);
     }
 
     @Override

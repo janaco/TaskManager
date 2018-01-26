@@ -8,6 +8,7 @@ import android.content.Context;
 
 import com.nandy.taskmanager.db.converters.ActionConverter;
 import com.nandy.taskmanager.db.converters.DateTypeConverter;
+import com.nandy.taskmanager.db.converters.DurationConverter;
 import com.nandy.taskmanager.db.converters.LocationTypeConverter;
 import com.nandy.taskmanager.db.converters.RepeatPeriodConverter;
 import com.nandy.taskmanager.db.converters.TaskStatusConverter;
@@ -28,7 +29,8 @@ import com.nandy.taskmanager.model.Task;
         DateTypeConverter.class,
         TaskStatusConverter.class,
         RepeatPeriodConverter.class,
-        ActionConverter.class})
+        ActionConverter.class,
+        DurationConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 
     public static final String DB_NAME = "tasks";

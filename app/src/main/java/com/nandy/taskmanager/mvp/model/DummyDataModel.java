@@ -2,8 +2,10 @@ package com.nandy.taskmanager.mvp.model;
 
 import android.content.Context;
 
+import com.nandy.taskmanager.AppPreferencesStorage;
 import com.nandy.taskmanager.db.AppDatabase;
 import com.nandy.taskmanager.db.dao.TasksDao;
+import com.nandy.taskmanager.enums.Duration;
 import com.nandy.taskmanager.enums.RepeatPeriod;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.enums.TaskStatus;
@@ -43,6 +45,7 @@ public class DummyDataModel {
 
         List<Task> tasks = new ArrayList<>();
         TasksDao tasksDao = AppDatabase.getInstance(mContext).tasksDao();
+        Duration defaultDuration = AppPreferencesStorage.getDefaultDuration(mContext);
         int startIndex = tasksDao.getCount() + 1;
 
         for (int index = startIndex; index < startIndex + capacity; index++) {
@@ -57,13 +60,12 @@ public class DummyDataModel {
             int startHour = getRandomHour();
             int startMinute = getRandomMinute();
 
-            long duration = TimeUnit.HOURS.toMinutes(getRandomDuration());
 
             Date startDate = generateDate(month, day, startHour, startMinute);
 
             task.setPlannedStartDate(startDate);
             task.setStatus(TaskStatus.NEW);
-            task.setScheduledDuration(duration);
+            task.setScheduledDuration(defaultDuration);
             task.setRepeatPeriod(getRandomPeriod(RepeatPeriod.values()));
 
             tasksDao.insert(task);
@@ -77,9 +79,6 @@ public class DummyDataModel {
         return periods[mRandom.nextInt(periods.length - 1)];
     }
 
-    private int getRandomDuration() {
-        return mRandom.nextInt(6);
-    }
 
     private int getRandomDayOfTheMonth() {
         return mRandom.nextInt(28);

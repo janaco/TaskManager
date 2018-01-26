@@ -11,6 +11,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.SubscriptionUtils;
+import com.nandy.taskmanager.enums.Duration;
 import com.nandy.taskmanager.enums.RepeatPeriod;
 import com.nandy.taskmanager.eventbus.TaskChangedEvent;
 import com.nandy.taskmanager.model.Location;
@@ -67,8 +68,6 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
     @Override
     public void onAttachView(CreateTaskContract.View view) {
         mView = view;
-        setDuration(15, TimeUnit.MINUTES);
-        setRepeatPeriod(RepeatPeriod.NO_REPEAT);
         displayData();
     }
 
@@ -99,8 +98,8 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
             displayPlannedStartTime(task.getPlannedStartDate());
         }
 
-        if (task.getScheduledDuration() > 0) {
-            displayScheduledDuration(task.getScheduledDuration());
+        if (task.getScheduledDuration()  != null) {
+            mView.setDuration(task.getScheduledDuration().getTextResId());
         }
 
         if (task.getRepeatPeriod() != null) {
@@ -116,15 +115,6 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
         }
     }
 
-    private void displayScheduledDuration(long scheduledDuration) {
-        int duration = mDateFormatModel.convertToMinutes(scheduledDuration);
-        int textResId = R.string.minutes;
-        if (duration > 30) {
-            duration = mDateFormatModel.convertToSeconds(scheduledDuration);
-            textResId = R.string.hour;
-        }
-        mView.setDuration(duration, textResId);
-    }
 
     private void displayPlannedStartTime(Date plannedStartTime) {
         mView.displayStartDate(mDateFormatModel.formatDate(plannedStartTime));
@@ -346,36 +336,28 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
     public boolean onDurationSelected(int optionId) {
 
         switch (optionId) {
-            case R.id.option_fifteen_minutes:
-                setDuration(15, TimeUnit.MINUTES);
+            case R.id.option_one_minute:
+                setDuration(Duration.ONE_MINUTE);
+                return true;
+
+            case R.id.option_five_mins:
+                setDuration(Duration.FIVE_MINUTES);
+                return true;
+
+            case R.id.option_fifteen_mins:
+                setDuration(Duration.FIFTEEN_MINUTES);
                 return true;
 
             case R.id.option_half_of_hour:
-                setDuration(30, TimeUnit.MINUTES);
+                setDuration(Duration.HALF_OF_HOUR);
                 return true;
 
             case R.id.option_one_hour:
-                setDuration(1, TimeUnit.HOURS);
+                setDuration(Duration.ONE_HOUR);
                 return true;
 
             case R.id.option_two_hours:
-                setDuration(2, TimeUnit.HOURS);
-                return true;
-
-            case R.id.option_three_hours:
-                setDuration(3, TimeUnit.HOURS);
-                return true;
-
-            case R.id.option_four_hours:
-                setDuration(4, TimeUnit.HOURS);
-                return true;
-
-            case R.id.option_five_hours:
-                setDuration(5, TimeUnit.HOURS);
-                return true;
-
-            case R.id.option_six_hours:
-                setDuration(6, TimeUnit.HOURS);
+                setDuration(Duration.TWO_HOURS);
                 return true;
 
             default:
@@ -383,9 +365,9 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
         }
     }
 
-    private void setDuration(int value, TimeUnit timeUnit) {
-        mCreateTaskModel.setDuration(timeUnit.toMillis(value));
-        mView.setDuration(value, timeUnit == TimeUnit.MINUTES ? R.string.minutes : R.string.hour);
+    private void setDuration(Duration duration) {
+        mCreateTaskModel.setDuration(duration);
+        mView.setDuration(duration.getTextResId());
 
     }
 
@@ -396,24 +378,20 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
                 setRepeatPeriod(RepeatPeriod.NO_REPEAT);
                 return true;
 
-            case R.id.option_once_a_hour:
-                setRepeatPeriod(RepeatPeriod.ONCE_A_HOUR);
+            case R.id.option_five_mins:
+                setRepeatPeriod(RepeatPeriod.EVERY_FIVE_MINUTES);
                 return true;
 
-            case R.id.option_once_a_day:
-                setRepeatPeriod(RepeatPeriod.ONCE_A_DAY);
+            case R.id.option_fifteen_mins:
+                setRepeatPeriod(RepeatPeriod.EVERY_FIFTEEN_MINUTES);
                 return true;
 
-            case R.id.option_once_a_week:
-                setRepeatPeriod(RepeatPeriod.ONCE_A_WEEK);
+            case R.id.option_every_hour:
+                setRepeatPeriod(RepeatPeriod.EVERY_HOUR);
                 return true;
 
-            case R.id.option_once_a_month:
-                setRepeatPeriod(RepeatPeriod.ONCE_A_MONTH);
-                return true;
-
-            case R.id.option_once_a_year:
-                setRepeatPeriod(RepeatPeriod.ONCE_A_YEAR);
+            case R.id.option_every_day:
+                setRepeatPeriod(RepeatPeriod.EVERY_DAY);
                 return true;
 
             default:

@@ -9,6 +9,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.nandy.taskmanager.enums.Duration;
 import com.nandy.taskmanager.enums.RepeatPeriod;
 import com.nandy.taskmanager.enums.TaskStatus;
 
@@ -35,7 +36,7 @@ public class Task implements Parcelable {
     private TaskStatus mStatus;
 
     @ColumnInfo(name = "scheduled_duration")
-    private long mScheduledDuration;
+    private Duration mScheduledDuration;
 
     @ColumnInfo(name = "repeat_period")
     private RepeatPeriod mRepeatPeriod;
@@ -53,7 +54,7 @@ public class Task implements Parcelable {
         mTitle = in.readString();
         mDescription = in.readString();
         mImage = in.readString();
-        mScheduledDuration = in.readLong();
+        mScheduledDuration = Duration.valueOf(in.readString());
         mPlannedStartDate = (Date) in.readSerializable();
         mStatus = TaskStatus.valueOf(in.readString());
         mRepeatPeriod = RepeatPeriod.valueOf(in.readString());
@@ -66,7 +67,7 @@ public class Task implements Parcelable {
         dest.writeString(mTitle);
         dest.writeString(mDescription);
         dest.writeString(mImage);
-        dest.writeLong(mScheduledDuration);
+        dest.writeString(mScheduledDuration.name());
         dest.writeSerializable(mPlannedStartDate);
         dest.writeString(mStatus.name());
         dest.writeString(mRepeatPeriod.name());
@@ -109,11 +110,11 @@ public class Task implements Parcelable {
         return mRepeatPeriod != RepeatPeriod.NO_REPEAT;
     }
 
-    public long getScheduledDuration() {
+    public Duration getScheduledDuration() {
         return mScheduledDuration;
     }
 
-    public void setScheduledDuration(long scheduledDuration) {
+    public void setScheduledDuration(Duration scheduledDuration) {
         mScheduledDuration = scheduledDuration;
     }
 

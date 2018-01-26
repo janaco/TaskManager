@@ -90,7 +90,7 @@ public class TaskModel {
 
             task.setStatus(TaskStatus.ACTIVE);
             mRecordsModel.update(task);
-            mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration());
+            mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration().getDuration());
 
             e.onSuccess(task);
         })
@@ -123,7 +123,7 @@ public class TaskModel {
         task.setMetadata(metadata);
 
         mRecordsModel.update(task, new TaskEvent(task.getId(), System.currentTimeMillis(), Action.START));
-        mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration());
+        mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration().getDuration());
 
         return task;
     }
@@ -214,7 +214,7 @@ public class TaskModel {
 
             mRecordsModel.update(task, new TaskEvent(task.getId(), System.currentTimeMillis(), Action.RESUME));
 
-            long timeToComplete = task.getScheduledDuration() - timeSpent;
+            long timeToComplete = task.getScheduledDuration().getDuration() - timeSpent;
             mTaskReminderModel.scheduleEndReminder(task.getId(), timeToComplete);
             e.onSuccess(task);
         })

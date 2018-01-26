@@ -1,5 +1,9 @@
 package com.nandy.taskmanager.mvp.model;
 
+import android.content.Context;
+
+import com.nandy.taskmanager.AppPreferencesStorage;
+import com.nandy.taskmanager.enums.Duration;
 import com.nandy.taskmanager.enums.RepeatPeriod;
 import com.nandy.taskmanager.model.Location;
 import com.nandy.taskmanager.model.Metadata;
@@ -19,13 +23,15 @@ public class CreateTaskModel {
 
     private final Task mTask;
 
-    public CreateTaskModel(Task task, int mode) {
+    public CreateTaskModel(Context context, Task task, int mode) {
         mMode = mode;
 
         if (task == null) {
             mTask = new Task(System.currentTimeMillis());
             mTask.setStatus(TaskStatus.NEW);
             mTask.setRepeatPeriod(RepeatPeriod.NO_REPEAT);
+            mTask.setScheduledDuration(
+                    AppPreferencesStorage.getDefaultDuration(context));
         } else {
             mTask = task;
         }
@@ -78,7 +84,7 @@ public class CreateTaskModel {
         mTask.setPlannedStartDate(date);
     }
 
-    public void setDuration(long duration) {
+    public void setDuration(Duration duration) {
         mTask.setScheduledDuration(duration);
     }
 

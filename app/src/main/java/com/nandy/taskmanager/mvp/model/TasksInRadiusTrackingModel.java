@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+import com.nandy.taskmanager.AppPreferencesStorage;
 import com.nandy.taskmanager.OnServiceConnectedListener;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.service.LocationService;
@@ -54,15 +55,18 @@ public class TasksInRadiusTrackingModel {
 
     public void startTracking() {
 
-        if (isLocationServiceRunning()) {
-            mContext.bindService(mServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
-        } else {
-            mContext.startService(mServiceIntent);
-            mContext.bindService(mServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        if (AppPreferencesStorage.isLocationTrackingEnabled(mContext)) {
+            if (isLocationServiceRunning()) {
+                mContext.bindService(mServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+            } else {
+                mContext.startService(mServiceIntent);
+                mContext.bindService(mServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+            }
         }
+
     }
 
-    public void stopTracking(){
+    public void stopTracking() {
         unbind();
         mContext.stopService(mServiceIntent);
     }
@@ -119,7 +123,7 @@ public class TasksInRadiusTrackingModel {
         mLocationService = null;
     }
 
-    public void destroy(){
+    public void destroy() {
         mContext = null;
     }
 }
