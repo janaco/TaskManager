@@ -8,6 +8,7 @@ import com.nandy.taskmanager.OnServiceConnectedListener;
 import com.nandy.taskmanager.SubscriptionUtils;
 import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.activity.SettingsActivity;
+import com.nandy.taskmanager.eventbus.LocationTrackingEnabledStateChangedEvent;
 import com.nandy.taskmanager.eventbus.TaskChangedEvent;
 import com.nandy.taskmanager.eventbus.TaskListChangedEvent;
 import com.nandy.taskmanager.eventbus.TaskRemovedEvent;
@@ -75,7 +76,7 @@ public class MainPresenter implements Presenter<MainActivityContract.View>,
         updateTaskWithLocationList();
     }
 
-    private void updateTaskWithLocationList(){
+    private void updateTaskWithLocationList() {
         Single.create((SingleOnSubscribe<List<Task>>) e -> e.onSuccess(mRecordsModel.selectAllWithLocation()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -83,23 +84,32 @@ public class MainPresenter implements Presenter<MainActivityContract.View>,
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onTaskListChanged(TasksCleanedEvent event){
+    public void onTaskListChanged(TasksCleanedEvent event) {
         updateTaskWithLocationList();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onTasksCleanedEvent(){
+    public void onTasksCleanedEvent() {
         mTaskTrakingModel.onTasksCleaned();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onTaskChangedEvent(TaskChangedEvent event){
+    public void onTaskChangedEvent(TaskChangedEvent event) {
         mTaskTrakingModel.onTaskChanged(event.task);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onTaskRemovedEvent(TaskRemovedEvent event){
+    public void onTaskRemovedEvent(TaskRemovedEvent event) {
         mTaskTrakingModel.onTaskRemoved(event.task);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLocationTrackingEnabledStateChnaged(LocationTrackingEnabledStateChangedEvent event) {
+        if (!event.isEnabled()) {
+            mTaskTrakingModel.stopTracking();
+        } else if (!mTaskTrakingModel.isLocationServiceRunning()) {
+            mTaskTrakingModel.startTracking();
+        }
     }
 
     @Override
@@ -151,7 +161,7 @@ public class MainPresenter implements Presenter<MainActivityContract.View>,
         mRecordsModel = recordsModel;
     }
 
-    public void setTaskInRadiusTrakingModel(TasksInRadiusTrackingModel taskInRadiusTrakingModel){
+    public void setTaskInRadiusTrakingModel(TasksInRadiusTrackingModel taskInRadiusTrakingModel) {
         mTaskTrakingModel = taskInRadiusTrakingModel;
     }
 

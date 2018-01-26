@@ -3,6 +3,7 @@ package com.nandy.taskmanager.ui.fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v4.content.ContextCompat;
@@ -29,6 +30,8 @@ public class MainPreferencesFragment extends PreferenceFragment
     private static final String KEY_CREATE_BACKUP = "KEY_CREATE_BACKUP";
     private static final String KEY_RESTORE_BACKUP = "KEY_RESTORE_BACKUP";
 
+    private static final String KEY_LOCATION_TRACKING = "pref_location_tracking";
+
     private MainPreferencesPresenter mPresenter;
     private ProgressDialog mProgressDialog;
 
@@ -39,6 +42,17 @@ public class MainPreferencesFragment extends PreferenceFragment
 
         findPreference(KEY_CREATE_BACKUP).setOnPreferenceClickListener(this);
         findPreference(KEY_RESTORE_BACKUP).setOnPreferenceClickListener(this);
+
+        CheckBoxPreference prefLocationTracking = (CheckBoxPreference) getPreferenceManager().findPreference(KEY_LOCATION_TRACKING);
+        if (prefLocationTracking != null) {
+            prefLocationTracking.setOnPreferenceChangeListener((preference, newValue) -> {
+                if (newValue instanceof Boolean) {
+                    mPresenter.onLocationTrackingPreferenceChanged((Boolean) newValue);
+                }
+                return true;
+            });
+
+        }
 
         mPresenter = new MainPreferencesPresenter(this);
         mPresenter.setCreateBackupModel(new CreateBackupModel(getActivity().getApplicationContext()));

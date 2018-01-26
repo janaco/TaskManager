@@ -62,6 +62,11 @@ public class TasksInRadiusTrackingModel {
         }
     }
 
+    public void stopTracking(){
+        unbind();
+        mContext.stopService(mServiceIntent);
+    }
+
     public void setTasks(List<Task> tasks) {
         if (mLocationService != null) {
             mLocationService.setTasks(tasks);
@@ -96,7 +101,7 @@ public class TasksInRadiusTrackingModel {
 
     }
 
-    private boolean isLocationServiceRunning() {
+    public boolean isLocationServiceRunning() {
         ActivityManager activityManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
         if (activityManager != null) {
             for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {

@@ -107,5 +107,29 @@
     <string name="you_have_no_tasks">You have no tasks</string>
     <string name="delete_item_alert">Are you really want to delete this task?</string>
     <string name="failed_to_sign_in">Failed to sign in</string>
+    <string name="enable_location_tracking">Enable location tracking</string>
+    <string name="location_tracking_summary">Set option enabled to start and complete tasks with location automatically. Please, enable locations on your device to make this option work</string>
+    <string name="duration_summary">Set default duration for all tasks</string>
 
+    <string-array name="array_duration">
+        <item>15 mins</item>
+        <item>Half of hour</item>
+        <item>1 hour</item>
+        <item>2 hour</item>
+        <item>3 hour</item>
+        <item>4 hour</item>
+        <item>5 hour</item>
+        <item>6 hour</item>
+    </string-array>
+
+    <string-array name="array_duration_values">
+        <item>0.25</item>
+        <item>0.5</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
 </resources>

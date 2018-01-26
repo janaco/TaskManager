@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/backups" >
+    <PreferenceCategory android:title="@string/backups">
 
         <Preference
             android:key="KEY_CREATE_BACKUP"
@@ -13,6 +13,26 @@
             android:persistent="false"
 
             android:title="@string/restore_from_backup" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/location">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_location_tracking"
+            android:summary="@string/location_tracking_summary"
+            android:title="@string/enable_location_tracking" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/task">
+
+        <ListPreference
+            android:entries="@array/array_duration"
+            android:entryValues="@array/array_duration_values"
+            android:key="pref_max_duration"
+            android:summary="@string/duration_summary"
+            android:defaultValue="@string/fifteen_minutes"
+            android:title="@string/duration"/>
 
     </PreferenceCategory>
 

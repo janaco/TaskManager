@@ -8,11 +8,14 @@ import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.events.OpenFileCallback;
 import com.nandy.taskmanager.R;
+import com.nandy.taskmanager.eventbus.LocationTrackingEnabledStateChangedEvent;
 import com.nandy.taskmanager.mvp.model.CreateBackupModel;
 import com.nandy.taskmanager.mvp.model.DataImportModel;
 import com.nandy.taskmanager.mvp.model.GoogleDriveConnectionModel;
 import com.nandy.taskmanager.mvp.model.RestoreFromBackupModel;
 import com.nandy.taskmanager.mvp.view.MainPreferencesView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
@@ -148,6 +151,10 @@ public class MainPreferencesPresenter  {
                 MainPreferencesPresenter.this.onError(e);
             }
         });
+    }
+
+    public void onLocationTrackingPreferenceChanged(boolean enabled){
+        EventBus.getDefault().post(new LocationTrackingEnabledStateChangedEvent(enabled));
     }
 
     public void setCreateBackupModel(CreateBackupModel createBackupModel) {
