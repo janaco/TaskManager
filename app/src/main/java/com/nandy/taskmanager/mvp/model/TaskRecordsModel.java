@@ -33,6 +33,11 @@ public class TaskRecordsModel {
         return mTasksDao.getAll();
     }
 
+
+    public List<Task> selectAllWithLocation() {
+        return mTasksDao.selectAllWithLocation();
+    }
+
     public void insert(Task task) {
         mTasksDao.insert(task);
     }

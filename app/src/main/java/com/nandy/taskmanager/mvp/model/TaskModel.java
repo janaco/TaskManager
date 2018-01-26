@@ -8,11 +8,15 @@ import com.nandy.taskmanager.db.dao.EventsDao;
 import com.nandy.taskmanager.db.dao.StatisticsDao;
 import com.nandy.taskmanager.db.dao.TasksDao;
 import com.nandy.taskmanager.enums.Action;
+import com.nandy.taskmanager.eventbus.TaskChangedEvent;
+import com.nandy.taskmanager.eventbus.TaskRemovedEvent;
 import com.nandy.taskmanager.model.Metadata;
 import com.nandy.taskmanager.model.Statistics;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.model.TaskEvent;
 import com.nandy.taskmanager.enums.TaskStatus;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.Date;
 import java.util.List;
@@ -70,6 +74,7 @@ public class TaskModel {
 
             e.onSuccess(task);
         })
+                .doOnSuccess(updatedTask -> EventBus.getDefault().post(new TaskChangedEvent(updatedTask)))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
 
@@ -89,6 +94,7 @@ public class TaskModel {
 
             e.onSuccess(task);
         })
+                .doOnSuccess(updatedTask -> EventBus.getDefault().post(new TaskChangedEvent(updatedTask)))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -101,74 +107,65 @@ public class TaskModel {
         return resetEnd(mTask);
     }
 
-    public Single<Task> start() {
+    public Task start() {
         return start(mTask);
     }
 
 
-    public Single<Task> start(Task task) {
+    public Task start(Task task) {
 
-        return Single.create((SingleOnSubscribe<Task>) e -> {
+        task.setStatus(TaskStatus.ACTIVE);
+        Metadata metadata = task.getMetadata();
+        if (metadata == null) {
+            metadata = new Metadata();
+        }
+        metadata.setActualStartDate(new Date());
+        task.setMetadata(metadata);
 
-            task.setStatus(TaskStatus.ACTIVE);
-            Metadata metadata = task.getMetadata();
-            if (metadata == null) {
-                metadata = new Metadata();
-            }
-            metadata.setActualStartDate(new Date());
-            task.setMetadata(metadata);
+        mRecordsModel.update(task, new TaskEvent(task.getId(), System.currentTimeMillis(), Action.START));
+        mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration());
 
-            mRecordsModel.update(task, new TaskEvent(task.getId(), System.currentTimeMillis(), Action.START));
-            mTaskReminderModel.scheduleEndReminder(task.getId(), task.getScheduledDuration());
-
-            e.onSuccess(task);
-        })  .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+        return task;
     }
 
-    public Single<Task> complete() {
+    public Task complete() {
         return complete(mTask);
     }
 
-    public Single<Task> complete(Task task) {
+    public Task complete(Task task) {
 
-        return Single.create((SingleOnSubscribe<Task>)e -> {
+        Metadata metadata = task.getMetadata();
+        Date actualStartDate = metadata.getActualStartDate();
+        long duration = System.currentTimeMillis() - actualStartDate.getTime();
+        long downtime = 0;
 
-            Metadata metadata = task.getMetadata();
-            Date actualStartDate = metadata.getActualStartDate();
-            long duration = System.currentTimeMillis() - actualStartDate.getTime();
-            long downtime = 0;
+        switch (task.getStatus()) {
 
-            switch (task.getStatus()) {
+            case ACTIVE:
+                downtime = metadata.getDownTime();
+                break;
 
-                case ACTIVE:
-                    downtime = metadata.getDownTime();
-                    break;
+            case PAUSED:
+                downtime = duration - metadata.getTimeSpent();
+                break;
+        }
 
-                case PAUSED:
-                    downtime = duration - metadata.getTimeSpent();
-                    break;
-            }
+        long timeSpent = duration - downtime;
 
-            long timeSpent = duration - downtime;
+        metadata.setTimeSpent(timeSpent);
+        metadata.setDownTime(downtime);
+        task.setMetadata(metadata);
 
-            metadata.setTimeSpent(timeSpent);
-            metadata.setDownTime(downtime);
-            task.setMetadata(metadata);
+        task.setStatus(TaskStatus.COMPLETED);
+        mRecordsModel.update(task, new TaskEvent(task.getId(), System.currentTimeMillis(), Action.END));
+        mRecordsModel.addStatistics(new Statistics(task.getId(), actualStartDate, timeSpent));
 
-            task.setStatus(TaskStatus.COMPLETED);
-            mRecordsModel.update(task, new TaskEvent(task.getId(), System.currentTimeMillis(), Action.END));
-            mRecordsModel.addStatistics(new Statistics(task.getId(), actualStartDate, timeSpent));
-
-            e.onSuccess(task);
-        })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+        return task;
     }
 
     public Single<Task> pause(Task task) {
 
-        return Single.create((SingleOnSubscribe<Task>)e -> {
+        return Single.create((SingleOnSubscribe<Task>) e -> {
 
             task.setStatus(TaskStatus.PAUSED);
 
@@ -187,6 +184,7 @@ public class TaskModel {
 
             e.onSuccess(task);
         })
+                .doOnSuccess(updatedTask -> EventBus.getDefault().post(new TaskChangedEvent(updatedTask)))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -201,7 +199,7 @@ public class TaskModel {
 
     public Single<Task> resume(Task task) {
 
-        return Single.create((SingleOnSubscribe<Task>)e -> {
+        return Single.create((SingleOnSubscribe<Task>) e -> {
 
             task.setStatus(TaskStatus.ACTIVE);
 
@@ -220,6 +218,7 @@ public class TaskModel {
             mTaskReminderModel.scheduleEndReminder(task.getId(), timeToComplete);
             e.onSuccess(task);
         })
+                .doOnSuccess(updatedTask -> EventBus.getDefault().post(new TaskChangedEvent(updatedTask)))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -232,11 +231,12 @@ public class TaskModel {
 
         return Completable.create(e -> {
 
-            mTaskReminderModel.cancelReminders(task.getId());
-            mRecordsModel.delete(task);
+                    mTaskReminderModel.cancelReminders(task.getId());
+                    mRecordsModel.delete(task);
 
-            e.onComplete();
-        })
+                    e.onComplete();
+                }
+        ).doOnComplete(() -> EventBus.getDefault().post(new TaskRemovedEvent(task)))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -246,7 +246,7 @@ public class TaskModel {
         mTask = task;
     }
 
-    public Task getTask(){
+    public Task getTask() {
         return mTask;
     }
 

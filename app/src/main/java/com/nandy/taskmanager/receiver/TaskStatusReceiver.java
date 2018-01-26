@@ -50,38 +50,53 @@ public class TaskStatusReceiver extends BroadcastReceiver {
 
             if (task == null || intent.getAction() == null) {
                 e.onError(new Throwable("Task or action not found"));
+
             } else {
-                e.onSuccess(task);
+
+                task = toggleTaskStatus(taskModel, task, intent.getAction());
+
+                if (task != null) {
+                    e.onSuccess(task);
+                } else {
+                    e.onError(new Throwable("Task status not changed"));
+                }
             }
+
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        task -> toggleTaskStatus(context, taskModel, task, intent.getAction()),
+                        task -> {
+                            if (task.getStatus() == TaskStatus.ACTIVE) {
+                                showTaskStartedNotification(context, task.getTitle());
+                            } else if (task.getStatus() == TaskStatus.COMPLETED) {
+                                showTaskCompletedNotification(context, task.getTitle());
+                            }
+                        },
                         Throwable::printStackTrace);
     }
 
-    private void toggleTaskStatus(Context context, TaskModel taskModel, Task task, String action) {
+    private Task toggleTaskStatus(TaskModel taskModel, Task task, String action) {
         switch (action) {
 
             case ACTION_START:
                 if (task.getStatus() == TaskStatus.NEW
                         || (task.isPeriodical() && task.getStatus() == TaskStatus.COMPLETED)) {
                     Log.d("TASK_", "start:" + task.getTitle());
-                    taskModel.start(task).subscribe(
-                            updatedTask -> showTaskStartedNotification(context, updatedTask.getTitle())
-                    );
+
+
+                    return taskModel.start(task);
                 }
                 break;
 
             case ACTION_COMPLETE:
                 if (task.getStatus() == TaskStatus.ACTIVE) {
                     Log.d("TASK_", "complete:" + task.getTitle());
-                    taskModel.complete(task).subscribe(
-                            updatedTask -> showTaskCompletedNotification(context, updatedTask.getTitle())
-                    );
+                    return taskModel.complete(task);
                 }
                 break;
         }
+
+        return null;
     }
 
     private void showTaskCompletedNotification(Context context, String title) {

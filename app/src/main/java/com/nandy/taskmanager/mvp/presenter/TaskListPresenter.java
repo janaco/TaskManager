@@ -10,6 +10,7 @@ import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
 import com.nandy.taskmanager.adapter.TasksAdapter;
 import com.nandy.taskmanager.enums.TaskStatus;
+import com.nandy.taskmanager.eventbus.TaskChangedEvent;
 import com.nandy.taskmanager.eventbus.TaskListChangedEvent;
 import com.nandy.taskmanager.eventbus.TasksCleanedEvent;
 import com.nandy.taskmanager.model.Task;
@@ -200,13 +201,22 @@ public class TaskListPresenter implements TaskListContract.Presenter, TasksAdapt
         switch (task.getStatus()) {
 
             case NEW:
-                mTaskStatusSubscription = mTaskModel.start(task)
-                        .subscribe(result -> updateListItem(result, position), Throwable::printStackTrace);
+                mTaskStatusSubscription =
+                        Single.create((SingleOnSubscribe<Task>) e -> e.onSuccess(mTaskModel.start(task)))
+                                .doOnSuccess(updatedTask -> EventBus.getDefault().post(new TaskChangedEvent(updatedTask)))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(result -> updateListItem(result, position), Throwable::printStackTrace);
+
                 break;
 
             case ACTIVE:
-                mTaskStatusSubscription = mTaskModel.complete(task)
+                mTaskStatusSubscription =Single.create((SingleOnSubscribe<Task>) e -> e.onSuccess(mTaskModel.complete(task)))
+                        .doOnSuccess(updatedTask -> EventBus.getDefault().post(new TaskChangedEvent(updatedTask)))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(result -> updateListItem(result, position), Throwable::printStackTrace);
+
                 break;
         }
 

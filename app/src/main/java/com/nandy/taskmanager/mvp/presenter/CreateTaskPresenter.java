@@ -12,6 +12,7 @@ import com.nandy.taskmanager.Constants;
 import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.SubscriptionUtils;
 import com.nandy.taskmanager.enums.RepeatPeriod;
+import com.nandy.taskmanager.eventbus.TaskChangedEvent;
 import com.nandy.taskmanager.model.Location;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.mvp.contract.CreateTaskContract;
@@ -23,6 +24,8 @@ import com.nandy.taskmanager.mvp.model.TaskRecordsModel;
 import com.nandy.taskmanager.mvp.model.TaskRemindersModel;
 import com.nandy.taskmanager.mvp.model.ValidationModel;
 import com.theartofdev.edmodo.cropper.CropImage;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
@@ -189,6 +192,11 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
                 .doOnSubscribe(disposable -> mView.setProgressViewVisible(true))
                 .doFinally(() -> mView.setProgressViewVisible(false))
                 .subscribe(() -> {
+
+                    if (task.hasLocation()) {
+                        EventBus.getDefault().post(new TaskChangedEvent(task));
+                    }
+
                     Intent intent = new Intent();
                     Bundle args = new Bundle();
                     args.putParcelable(Constants.PARAM_TASK, task);
@@ -275,9 +283,9 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
                         }
                     }
 
-                    if (fileUri != null){
+                    if (fileUri != null) {
                         mView.startCropActivity(CropImage.activity(fileUri));
-                    }else {
+                    } else {
                         mView.showMessage(R.string.image_loading_error);
                     }
 

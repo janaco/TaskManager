@@ -9,13 +9,18 @@ import com.nandy.taskmanager.R;
 import com.nandy.taskmanager.SubscriptionUtils;
 import com.nandy.taskmanager.activity.CreateTaskActivity;
 import com.nandy.taskmanager.activity.TaskDetailsActivity;
+import com.nandy.taskmanager.eventbus.TaskChangedEvent;
 import com.nandy.taskmanager.model.Task;
 import com.nandy.taskmanager.enums.TaskStatus;
 import com.nandy.taskmanager.mvp.contract.TaskDetailsContract;
 import com.nandy.taskmanager.mvp.model.DateFormatModel;
 import com.nandy.taskmanager.mvp.model.TaskModel;
 
+import org.greenrobot.eventbus.EventBus;
+
 import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
@@ -160,14 +165,23 @@ public class TaskItemPresenter implements TaskDetailsContract.Presenter {
         switch (mTaskModel.getTask().getStatus()) {
 
             case NEW:
-                mTaskStatusSubscriprion = mTaskModel.start().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
+                mTaskStatusSubscriprion =
+                        Single.create((SingleOnSubscribe<Task>) e -> e.onSuccess(mTaskModel.start()))
+                                .doOnSuccess(updatedTask -> EventBus.getDefault().post(new TaskChangedEvent(updatedTask)))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
                 break;
 
             case ACTIVE:
-                mTaskStatusSubscriprion = mTaskModel.complete().subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
+                mTaskStatusSubscriprion =
+                        Single.create((SingleOnSubscribe<Task>) e -> e.onSuccess(mTaskModel.complete()))
+                                .doOnSuccess(updatedTask -> EventBus.getDefault().post(new TaskChangedEvent(updatedTask)))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(this::onTaskStatusChanged, Throwable::printStackTrace);
                 break;
         }
-
     }
 
     public void delete() {
