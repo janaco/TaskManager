@@ -34,20 +34,34 @@ import io.reactivex.schedulers.Schedulers;
 
 public class DataImportModel {
 
-    private AppDatabase mAppDatabase;
+    private Context mContext;
 
     public DataImportModel(Context context) {
-        mAppDatabase = AppDatabase.getInstance(context);
+        mContext = context;
     }
 
     public Completable importData(File backupDbFile) throws IOException {
 
-       return Completable.create(e -> {
-            SQLiteDatabase backupDb = SQLiteDatabase.openDatabase(backupDbFile.getPath(), null, 0);
+        return Completable.create(e -> {
+            AppDatabase.getInstance(mContext);
 
-            importTasks(backupDb);
-            importEvents(backupDb);
-            importStatistics(backupDb);
+            SQLiteDatabase database = SQLiteDatabase.openDatabase(
+                    mContext.getDatabasePath(AppDatabase.DB_NAME).getPath(), null, 0);
+
+            try {
+                database.execSQL("ATTACH DATABASE ? AS backup ", new String[]{backupDbFile.getPath()});
+                database.beginTransaction();
+
+                importTasks(database);
+                importEvents(database);
+                importStatistics(database);
+
+                database.setTransactionSuccessful();
+            } finally {
+                database.endTransaction();
+                database.execSQL("DETACH backup");
+            }
+
 
             e.onComplete();
         }).subscribeOn(Schedulers.io())
@@ -55,93 +69,30 @@ public class DataImportModel {
 
     }
 
-    private void importEvents(SQLiteDatabase backupDb) {
-        EventsDao eventsDao = mAppDatabase.taskEventsDao();
-        Cursor cursor = backupDb.rawQuery("SELECT * FROM events", null);
+    private void importEvents(SQLiteDatabase database) {
 
-        if (cursor.moveToFirst()) {
+        database.execSQL("INSERT OR IGNORE INTO events( id_task, timestamp, action) " +
+                "SELECT  backup.events.id_task, backup.events.timestamp, backup.events.action FROM backup.events");
 
-            do {
-                long taskId = cursor.getLong(cursor.getColumnIndex("id_task"));
-                long timestamp = cursor.getLong(cursor.getColumnIndex("timestamp"));
-                String action = cursor.getString(cursor.getColumnIndex("action"));
-
-                eventsDao.insert(new TaskEvent(taskId, timestamp, ActionConverter.toAction(action)));
-
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
     }
 
-    private void importStatistics(SQLiteDatabase backupDb) {
-        StatisticsDao statisticsDao = mAppDatabase.statisticsDao();
-        Cursor cursor = backupDb.rawQuery("SELECT * FROM statistics", null);
-
-        if (cursor.moveToFirst()) {
-
-            do {
-                long taskId = cursor.getLong(cursor.getColumnIndex("id_task"));
-                long timeSpent = cursor.getLong(cursor.getColumnIndex("spent_time"));
-                long startDate = cursor.getLong(cursor.getColumnIndex("start_date"));
-
-                statisticsDao.insert(new Statistics(taskId,
-                        DateTypeConverter.fromTimestamp(startDate), timeSpent));
-
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
+    private void importStatistics(SQLiteDatabase database) {
+        database.execSQL("INSERT OR IGNORE INTO statistics( id_task, spent_time, start_date) " +
+                "SELECT  backup.statistics.id_task, backup.statistics.spent_time, backup.statistics.start_date " +
+                "FROM backup.statistics");
     }
 
-    private void importTasks(SQLiteDatabase backupDb) {
-        TasksDao tasksDao = mAppDatabase.tasksDao();
+    private void importTasks(SQLiteDatabase database) {
 
-        Cursor cursor = backupDb.rawQuery("SELECT * FROM tasks", null);
+        database.execSQL("INSERT OR IGNORE INTO tasks( id, title, description, image, geo_position, " +
+                "address, planned_start_date, status, scheduled_duration, repeat_period, " +
+                "actual_start_date, time_spent, downtime) " +
+                "SELECT  backup.tasks.id, backup.tasks.title, backup.tasks.description, backup.tasks.image, " +
+                "backup.tasks.geo_position, backup.tasks.address, backup.tasks.planned_start_date, " +
+                "backup.tasks.status, backup.tasks.scheduled_duration, backup.tasks.repeat_period, " +
+                "backup.tasks.actual_start_date, backup.tasks.time_spent, backup.tasks.downtime " +
+                "FROM backup.tasks");
 
-        if (cursor.moveToFirst()) {
-
-            do {
-                long id = cursor.getLong(cursor.getColumnIndex("id"));
-                String title = cursor.getString(cursor.getColumnIndex("title"));
-                String description = cursor.getString(cursor.getColumnIndex("description"));
-                String image = cursor.getString(cursor.getColumnIndex("image"));
-                String location = cursor.getString(cursor.getColumnIndex("geo_position"));
-                String address = cursor.getString(cursor.getColumnIndex("address"));
-                long plannedStartDate = cursor.getLong(cursor.getColumnIndex("planned_start_date"));
-                String status = cursor.getString(cursor.getColumnIndex("status"));
-                long scheduledDuration = cursor.getLong(cursor.getColumnIndex("scheduled_duration"));
-                String repeatPeriod = cursor.getString(cursor.getColumnIndex("repeat_period"));
-                long actualStartDate = cursor.getLong(cursor.getColumnIndex("actual_start_date"));
-                long timeSpent = cursor.getLong(cursor.getColumnIndex("time_spent"));
-                long downtime = cursor.getLong(cursor.getColumnIndex("downtime"));
-
-                Task task = new Task(id);
-                task.setTitle(title);
-                task.setDescription(description);
-                task.setImage(image);
-                task.setStatus(TaskStatusConverter.toTaskStatus(status));
-                task.setPlannedStartDate(DateTypeConverter.fromTimestamp(plannedStartDate));
-                task.setScheduledDuration(scheduledDuration);
-                task.setRepeatPeriod(RepeatPeriodConverter.toRepeatPeriod(repeatPeriod));
-
-                Metadata metadata = new Metadata();
-                metadata.setActualStartDate(DateTypeConverter.fromTimestamp(actualStartDate));
-                metadata.setTimeSpent(timeSpent);
-                metadata.setDownTime(downtime);
-                if (location != null && !location.isEmpty()) {
-                    metadata.setLocation(new Location(
-                            LocationTypeConverter.toLatLng(location), address));
-                }
-
-                task.setMetadata(metadata);
-
-                tasksDao.insert(task);
-
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
     }
 
 }
