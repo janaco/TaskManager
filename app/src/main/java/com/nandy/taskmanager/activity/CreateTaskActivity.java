@@ -8,12 +8,14 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -46,6 +48,9 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import org.kaerdan.presenterretainer.PresenterActivity;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -169,7 +174,7 @@ public class CreateTaskActivity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == Constants.REQUEST_CODE_PERMISSIONS && isPermissionsGranted()) {
-            showPickImagePopup();
+            getPresenter().chooseTaskCover();
         }
     }
 
@@ -249,7 +254,7 @@ public class CreateTaskActivity
             return;
         }
 
-        showPickImagePopup();
+        getPresenter().chooseTaskCover();
     }
 
     @Override
@@ -300,7 +305,6 @@ public class CreateTaskActivity
     @Override
     public void setTitle(String title) {
         mInputTitle.setText(title);
-        Log.d("CREATE_TASK_", "set title: " + title);
 
         if (!TextUtils.isEmpty(title)) {
             mInputTitle.setSelection(title.length());
@@ -358,22 +362,14 @@ public class CreateTaskActivity
         mProgressView.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
+    @Override
+    public void launchActivityForResult(Intent intent, int requestCode) {
+        startActivityForResult(intent, requestCode);
+    }
+
     private boolean isPermissionsGranted() {
         return Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 || ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 
-    }
-
-    private void showPickImagePopup() {
-        Intent pickIntent = new Intent();
-        pickIntent.setType("image/*");
-        pickIntent.setAction(Intent.ACTION_GET_CONTENT);
-        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        Uri outputUri = Uri.fromFile(new File(getFilesDir(), "temp_cover.jpg"));
-        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
-
-        Intent chooserIntent = Intent.createChooser(pickIntent, getString(R.string.take_or_select_photo));
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
-        startActivityForResult(chooserIntent, Constants.REQUEST_CODE_CHOOSE_IMAGE);
     }
 
 

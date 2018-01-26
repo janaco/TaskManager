@@ -3,7 +3,9 @@ package com.nandy.taskmanager.mvp.presenter;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.speech.RecognizerIntent;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nandy.taskmanager.Constants;
@@ -24,6 +26,7 @@ import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -75,6 +78,12 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
         mView = null;
         SubscriptionUtils.dispose(mAddressSubscription);
         SubscriptionUtils.dispose(mCreateTaskSubscription);
+    }
+
+    @Override
+    public void chooseTaskCover() {
+        mView.launchActivityForResult(
+                mCoverModel.createAndGetChooseCoverIntent(), Constants.REQUEST_CODE_CHOOSE_IMAGE);
     }
 
     private void displayData() {
@@ -231,7 +240,7 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
 
             case Constants.REQUEST_CODE_LOCATION:
                 if (resultCode == RESULT_OK) {
-                    LatLng latLng = data.getParcelableExtra("location");
+                    LatLng latLng = data.getParcelableExtra(Constants.PARAM_LOCATION);
                     onLocationSpecified(latLng);
 
                 }
@@ -264,10 +273,13 @@ public class CreateTaskPresenter implements CreateTaskContract.Presenter {
                             mView.showMessage(R.string.image_loading_error);
                             return;
                         }
-
                     }
 
-                    mView.startCropActivity(CropImage.activity(fileUri));
+                    if (fileUri != null){
+                        mView.startCropActivity(CropImage.activity(fileUri));
+                    }else {
+                        mView.showMessage(R.string.image_loading_error);
+                    }
 
                 }
                 break;

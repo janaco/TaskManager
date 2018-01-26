@@ -5,8 +5,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 
+import com.nandy.taskmanager.R;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -26,10 +30,11 @@ public class TaskCoverModel {
 
     private static final String COVER_PREFIX = "tcover_";
     private static final String COVER_EXTENSION = ".png";
-    private static final String DEFAULT_CAMERA_OUTPUT_NAME = "temp_cover.jpg";
+    private static final String CAMERA_OUTPUT_EXTENSION = ".jpg";
     private static final String DEFAULT_TEMP_COVER_NAME = "ctemp";
 
     private final Context mContext;
+    private File mCameraOutputFile;
 
     public TaskCoverModel(Context context) {
         mContext = context;
@@ -45,17 +50,25 @@ public class TaskCoverModel {
     }
 
 
+    @Nullable
     public Uri getOutputFromCamera() {
 
-        return Uri.fromFile(new File(mContext.getFilesDir(), DEFAULT_CAMERA_OUTPUT_NAME));
+        if (mCameraOutputFile != null){
+            return Uri.fromFile(mCameraOutputFile);
+        }
+
+        return null;
     }
 
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public File getCroppedImage(Intent data, int resultCode) throws Exception {
 
         CropImage.ActivityResult result = CropImage.getActivityResult(data);
         if (resultCode == RESULT_OK) {
-            removeCameraOutputFile();
+            if (mCameraOutputFile != null){
+                mCameraOutputFile.delete();
+            }
 
             return new File(result.getUri().getPath());
 
@@ -67,13 +80,17 @@ public class TaskCoverModel {
     }
 
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void removeCameraOutputFile() {
-        File file = new File(mContext.getFilesDir(), DEFAULT_CAMERA_OUTPUT_NAME);
-        if (file.exists()) {
-            file.delete();
+    private File createCameraOutputFile() {
+        String imageFileName = "JPEG_" + System.currentTimeMillis();
+        File storageDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File cameraOutputFile = null;
+        try {
+            cameraOutputFile = File.createTempFile(imageFileName, CAMERA_OUTPUT_EXTENSION, storageDir);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
+        return cameraOutputFile;
     }
 
     @Nullable
@@ -97,6 +114,28 @@ public class TaskCoverModel {
 
         return outputFile.getPath();
     }
+
+
+    public Intent createAndGetChooseCoverIntent() {
+        Intent pickIntent = new Intent();
+        pickIntent.setType("image/*");
+        pickIntent.setAction(Intent.ACTION_GET_CONTENT);
+        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePhotoIntent.resolveActivity(mContext.getPackageManager()) != null) {
+            mCameraOutputFile = createCameraOutputFile();
+            if (mCameraOutputFile != null) {
+                Uri photoURI = FileProvider
+                        .getUriForFile(mContext, "com.nandy.taskmanager.fileprovider", mCameraOutputFile);
+                takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+            }
+        }
+
+        Intent chooserIntent = Intent.createChooser(pickIntent, mContext.getString(R.string.take_or_select_photo));
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
+
+        return chooserIntent;
+    }
+
 
     private String generateFileName(long taskId) {
 

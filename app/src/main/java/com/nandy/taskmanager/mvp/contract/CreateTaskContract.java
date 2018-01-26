@@ -8,6 +8,8 @@ import android.support.annotation.StringRes;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.io.File;
+
 /**
  * Created by yana on 24.01.18.
  */
@@ -30,10 +32,11 @@ public interface CreateTaskContract {
 
         boolean onRepeatPeriodSelected(int optionId);
 
-
         void onTitleChanged(String title);
 
         void onDescriptionChanged(String description);
+
+        void chooseTaskCover();
     }
 
     interface View extends org.kaerdan.presenterretainer.Presenter.View {
@@ -75,5 +78,7 @@ public interface CreateTaskContract {
         void finishWithResult(int resultCode, Intent data);
 
         void setProgressViewVisible(boolean visible);
+
+        void launchActivityForResult(Intent intent, int requestCode);
     }
 }

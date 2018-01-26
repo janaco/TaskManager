@@ -48,13 +48,13 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".receiver.TaskStatusReceiver"
-            android:enabled="true"/>
+        <receiver
+            android:name=".receiver.TaskStatusReceiver"
+            android:enabled="true" />
 
         <service
             android:name=".service.LocationService"
             android:enabled="true"
-            android:exported="true"
             android:process=":remote" />
 
         <activity
@@ -62,6 +62,17 @@
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme" />
         <activity android:name=".activity.SettingsActivity" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.nandy.taskmanager.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
 
 </manifest>
